@@ -9,6 +9,3 @@ MULLS is an efficient, low-drift, and versatile LiDAR-only SLAM system with both
 
 --------
 
-<img src="assets/overview.jpg" alt="alt text" style="zoom:20%;"/>
-
-### 
