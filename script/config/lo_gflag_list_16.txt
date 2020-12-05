@@ -1,0 +1,117 @@
+-parameter list (standard for 16-line LiDAR)
+---------------------------------------------------------------------------------------------------------------
+--vis_intensity_scale=256
+--vis_map_history_down_rate=5
+--vis_map_history_keep_frame_num=200
+-color_map: intensity2=4, intensity=3, elevation=2, frame-wise=1, semantic=0
+--vis_initial_color_type=3
+--laser_vis_size=0.15
+---------------------------------------------------------------------------------------------------------------
+--apply_dist_filter=true
+--min_dist_used=0.5
+--max_dist_used=30.0
+--map_downrate_output=4
+--approx_scanner_height=1.8
+--underground_height_thre=-15.0
+--vertical_ang_correction_deg=0.0
+--cloud_down_res=0.0
+--unit_dist=5.0
+--cloud_pca_neigh_r=1.0
+--cloud_pca_neigh_k=20
+--cloud_pca_neigh_k_min=7
+--gf_grid_size=1.5
+--gf_in_grid_h_thre=0.2
+--gf_neigh_grid_h_thre=0.8
+--gf_max_h=0.2
+--gf_ground_down_rate=1
+--gf_nonground_down_rate=1
+--gf_grid_min_pt_num=5
+--gf_reliable_neighbor_grid_thre=0
+--gf_down_down_rate=2
+--unground_down_fixed_num=10000
+--ground_down_fixed_num=500
+--pillar_down_fixed_num=400
+--facade_down_fixed_num=1000
+--beam_down_fixed_num=200
+--roof_down_fixed_num=200
+--linearity_thre=0.62
+--planarity_thre=0.62
+--beam_direction_ang=10
+--pillar_direction_ang=70
+--facade_normal_ang=20
+--roof_normal_ang=80
+--beam_max_height=0.5
+--curvature_thre=0.1
+--corr_dis_thre_init=1.0
+--corr_dis_thre_min=0.4
+--dis_thre_update_rate=1.1
+--z_xy_balance_ratio=1.0
+--pt2pt_res_window=0.05
+--pt2pl_res_window=0.05
+--pt2li_res_window=0.05
+--converge_tran=0.0005
+--converge_rot_d=0.002
+--reg_max_iter_num_s2s=20
+--reg_max_iter_num_s2m=20
+--local_map_radius=40
+--append_frame_radius=40
+--local_map_max_pt_num=10000
+--local_map_recalculation_frequency=5
+--dynamic_removal_radius=0.0
+--dynamic_dist_thre_min=0.3
+--s2m_frequency=1
+---------------------------------------------------------------------------------------------------------------
+--scan_to_scan_module_on=false
+--adaptive_parameters_on=false
+--vertical_ang_calib_on=true
+--apply_scanner_filter=false
+--reg_intersection_filter_on=false
+--fixed_num_downsampling_on=true
+--sharpen_with_nms_on=false
+--apply_map_based_dynamic_removal=false
+-motion_compensation_method: (0: disabled, 1: uniform motion model (from point-wise timestamp), 2: from azimuth, 3: imu-assisted)
+--motion_compensation_method=1
+-dist_inverse_sampling_method: (0: disabled, 1: linear weight, 2: quadratic weight)
+--dist_inverse_sampling_method=1
+-ground_normal_method: (0: directly use (0,0,1), 1: estimate normal in fixed radius neighborhood, 2: estimate normal in k nearest neighborhood , 3: use ransac to estimate plane coeffs in a grid)
+--ground_normal_method=3
+-vertex_extraction_method: "extraction method of vertex points (0: disabled, 1: maximum local curvature within stable points, 2: intersection points of pillar and beams)
+--vertex_extraction_method=2
+-weighting strategy for correspondences (1: on, 0: off, order: x,y,z balanced weight, residual weight, distance weight, intensity weight)
+--corr_weight_strategy=1101
+-used_feature_type: (1: on, 0: off, order: ground, pillar,facade, beam, roof, vetrex)
+--used_feature_type=111110
+-initial_guess_mode: (0: no initial guess, 1: uniform motion(translation only), 2: uniform motion(translation+rotation), 3:imu based)
+--initial_guess_mode=2
+---------------------------------------------------------------------------------------------------------------
+--loop_closure_detection_on=true
+--transfer_correct_reg_tran_on=true
+--adjacent_edge_weight_ratio=1.0
+--map2map_reliable_sigma_thre=0.01
+--cooling_submap_num=2
+--min_submap_id_diff=8
+--submap_accu_tran=8.0
+--submap_accu_rot=60.0
+--submap_accu_frame=100
+--min_iou_thre=0.65
+--min_iou_thre_global_reg=0.75
+--neighbor_search_dist=15.0
+--map_to_map_min_cor_ratio=0.4
+--teaser_based_global_registration_on=true
+--best_n_feature_match_on=true
+--feature_corr_num=4000
+--teaser_min_inlier_count=12
+--free_node_on=false
+--inter_submap_t_limit=1.0
+--inter_submap_r_limit=0.02
+--inner_submap_t_limit=0.1
+--inner_submap_r_limit=0.002
+--wrong_edge_tran_thre=2.5
+--wrong_edge_rot_thre_deg=12.0
+--robust_kernel_on=false
+--equal_weight_on=false
+--diagonal_information_matrix_on=false
+--framewise_pgo_on=false
+-pose_graph_optimization_method: select from g2o, ceres and gtsam
+--pose_graph_optimization_method=ceres
+---------------------------------------------------------------------------------------------------------------

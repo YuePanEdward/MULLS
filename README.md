@@ -1,4 +1,5 @@
-# MULLS
+MULLS
+
 ### MULLS: Versatile LiDAR SLAM via Multi-metric Linear Least Square 
 
 MULLS is an efficient, low-drift, and versatile LiDAR-only SLAM system with both the front-end and back-end.  It's an overall updated version of [LLS-LOAM](https://github.com/YuePanEdward/LLS-LOAM). 
@@ -12,9 +13,9 @@ ________________________________________________________________________________
 ![Built](https://img.shields.io/appveyor/ci/gruntjs/grunt.svg)
 ____________________________________________________________________________________
 
-## How to use 
+## Instruction
 
-### 1.Install dependent 3rd libraries 
+### 1. Install dependent 3rd libraries 
 
 For a compiler that supports OpenMP
 
@@ -35,7 +36,7 @@ Optional:
 - For pose graph optimization: [g2o(<=2016version)](https://github.com/RainerKuemmerle/g2o/releases/tag/20160424_git)
 - or [ceres](http://ceres-solver.org/)
 - or [gtsam](https://bitbucket.org/gtborg/gtsam/src/develop/)
-- For global registration using truncted least square: [TEASER++](https://github.com/MIT-SPARK/TEASER-plusplus)
+- For global registration using truncated least square: [TEASER++](https://github.com/MIT-SPARK/TEASER-plusplus)
 
 You may run the following shell file to install all the dependent libs (tested on Ubuntu 16.04):
 ```
@@ -44,7 +45,7 @@ sh script/tools/install_dep_lib.sh
 
 Note: ceres, g2o and gtsam are all used for pose graph optimization. You only need to install one of them (ceres is recommended).
 
-### 2.Compile
+### 2. Compile
 
 ```
 mkdir build
@@ -84,7 +85,7 @@ _____...
    
 ```
 
-Scripts for converting the data format are availaible in ```./script/tool/``` folder.
+Scripts for converting the data format are available in ```./script/tool/``` folder.
 
 You can use ```script/tools/run_kittibin2pcd.sh ``` to convert ```*.bin``` to ```*.pcd``` to get the ```pcd``` folder.
 Similarly, you can use ```script/tools/run_semantic_kitti_labelbin2pcd.sh ``` to convert ```*.label``` to ```*.pcd``` to get the ```label_pcd``` folder.
@@ -105,7 +106,7 @@ Base Folder
       |___dummy_ground_truth_trajectory.txt (optional)   
       |___dummy_calibration_file.txt (optional)  
 ```
-Links to more open datasets are availiable in ```./script/tools/online_data_source.md```.
+Links to more open datasets are available in ```./script/tools/online_data_source.md```.
 
 ### 4. Run
 
@@ -117,6 +118,8 @@ If you'd like to test the LiDAR SLAM module (MULLS-SLAM), please edit the ```scr
 sh script/run_mulls_slam.sh
 ```
 
+If the visualization is enabled, then you can configure the visualization GUI by following the instructions below the main window.
+
 For better performance on a specific dataset, you are suggested to play with the parameters in ```script/config/lo_gflag_list_[xxx].txt``` (tips on parameter tuning will be released in project Wiki), and then you need to change the config file path in ```script/run_mulls_slam.sh``` as following:
 
 ```
@@ -125,15 +128,55 @@ config_file=./script/config/lo_gflag_list_[xxx].txt
 
 To disable or enable the back-end (loop closure detection and pose graph optimization), you can edit the ```--loop_closure_detection_on=true/false``` in the config file.
 
-After the transaction, you are expected to find the results (plots, poses, evaluation details, generated 3d and 2d map ...) in the ```result``` folder under the data path.
+After the transaction, you are expected to find the results (plots, poses, evaluation results, generated 3D and 2D map ...) in the ```result``` folder under the data path.
 
 #### MULLS-Registration
 
-You can use ```script/run_mulls_reg.sh``` to test the pairwise point cloud registration using MULLS-ICP with TEASER simply by configuring the data path in it.
+You can use ```script/run_mulls_reg.sh``` to test the pairwise point cloud registration using MULLS-ICP with TEASER++ simply by configuring the data path in it.
 
 ```
 sh script/run_mulls_reg.sh
 ```
 
 ----------
+
+### Demo
+
+#### On KITTI dataset
+
+<img src="assets/kitti_00_show.jpg" alt="alt text" style="zoom:80%;">
+
+<img src="assets/kitti_01_show.jpg" alt="alt text" style="zoom:80%;">
+
+----------------------------
+
+### Contact
+
+If you have any questions, please let me know:
+
+**Yue Pan** {yuepan@ethz.ch}
+
+---------
+
+### TODO List
+
+- [ ] Code reproducing
+
+- [ ] Add preprint paper
+
+- [ ] Add Wiki
+
+- [ ] Add ROS support
+
+- [ ] Add cross-platform support 
+
+- [ ] Add sensor fusion module
+
+- [ ] Test on more dataset
+
+  
+
+  
+
+
 
