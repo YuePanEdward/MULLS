@@ -1,6 +1,4 @@
-MULLS
-
-### MULLS: Versatile LiDAR SLAM via Multi-metric Linear Least Square 
+## MULLS: Versatile LiDAR SLAM via Multi-metric Linear Least Square 
 
 MULLS is an efficient, low-drift, and versatile LiDAR-only SLAM system with both the front-end and back-end.  It's an overall updated version of [LLS-LOAM](https://github.com/YuePanEdward/LLS-LOAM). 
 
