@@ -78,7 +78,7 @@ ls ${pc_folder} >> ${pc_folder}_filelist.txt
 #run (you can comment this part to directly evaluate the already calculated lidar odometry's result)
 #--v : log_vebose_level, increase it to remove the logs
 #gdb --args \
-./bin/mmlls_lo \
+./bin/mulls_slam \
 --colorlogtostderr=true \
 -stderrthreshold 0 \
 -log_dir ./log/test \

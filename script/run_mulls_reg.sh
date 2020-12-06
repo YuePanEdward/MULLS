@@ -10,7 +10,7 @@ opc_path=xxxx/dummy_transformed_source_point_cloud.xxx
 
 #run
 #gdb --args \
-./bin/mmlls_reg \
+./bin/mulls_reg \
 --colorlogtostderr=true \
 -stderrthreshold 0 \
 -log_dir ./log/test \
