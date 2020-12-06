@@ -108,13 +108,14 @@ ls ${pc_folder} >> ${pc_folder}_filelist.txt
 
 #please set the parameters in the config file 
 
-#simple evaluation
+#simple evaluation using evo (https://github.com/MichaelGrupp/evo)
 evaluation_file=${project_folder}/result/Rt_lo_${exp_id}_evaluation.txt
 #evo_imgs=${project_folder}/result/${exp_id}_evaluation_evo.zip
 
 # evo_traj kitti ${lo_body_pose_file} --ref=${gt_body_pose_file} -p --plot_mode=xz
 # evo_ape kitti ${gt_body_pose_file} ${lo_body_pose_file} -va --plot --plot_mode xz --save_results ${evo_imgs}
 
+#simple evaluation using kitti_eval
 python ./python/kitti_eval.py ${lo_body_pose_file} ${gt_body_pose_file} ${lo_adjacent_tran_file} ${calib_file} ${timing_report_file} ${evaluation_file}
 
 # cat ${config_file} >> ${evaluation_file}

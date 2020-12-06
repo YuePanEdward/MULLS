@@ -5,7 +5,7 @@ MULLS is an efficient, low-drift, and versatile LiDAR-only SLAM system with both
 [[Video](https://www.youtube.com/watch?v=85bGD55e3-0&feature=youtu.be)], [[KITTI Leaderboard](http://www.cvlibs.net/datasets/kitti/eval_odometry.php)], [Preprint]
 
 #### Version 1.0 (passed on Ubuntu 16.04 / 18.04) 
-codes are under reproducing for better readability and performance
+Codes are currently under reproducing for better readability and performance.
 
 ____________________________________________________________________________________
 ![Built](https://img.shields.io/appveyor/ci/gruntjs/grunt.svg)
@@ -104,13 +104,13 @@ Base Folder
       |___dummy_ground_truth_trajectory.txt (optional)   
       |___dummy_calibration_file.txt (optional)  
 ```
-Links to more open datasets are available in ```./script/tools/online_data_source.md```.
+Links to more open datasets are available [here](./script/tools/online_data_source.md). 
 
 ### 4. Run
 
 #### MULLS-SLAM
 
-If you'd like to test the LiDAR SLAM module (MULLS-SLAM), please edit the ```script/run_mulls_slam.sh``` file, specify the data path and then run
+If you'd like to test the LiDAR SLAM module (MULLS-SLAM), please edit the ```script/run_mulls_slam.sh``` file, specify the data path and then run:
 
 ```
 sh script/run_mulls_slam.sh
@@ -130,7 +130,7 @@ After the transaction, you are expected to find the results (plots, poses, evalu
 
 #### MULLS-Registration
 
-You can use ```script/run_mulls_reg.sh``` to test the pairwise point cloud registration using MULLS-ICP with TEASER++ simply by configuring the data path in it.
+You can use ```script/run_mulls_reg.sh``` to test the pairwise point cloud registration using MULLS-ICP with TEASER++ simply by configuring the data path in it. Then you can run it by:
 
 ```
 sh script/run_mulls_reg.sh

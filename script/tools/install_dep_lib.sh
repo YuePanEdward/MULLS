@@ -39,18 +39,18 @@ echo "install [libpcap] done"
 
 cd dependent_libs
 
-echo "install [g2o] 20160424 version"
-# the original version may encounter segfault on linux, use the following commit
-#git clone -b 20170730_git https://github.com/RainerKuemmerle/g2o.git 
-git clone -b 20160424_git https://github.com/RainerKuemmerle/g2o.git 
-cd g2o
-mkdir build
-cd build
-cmake ..
-make -j4
-sudo make install
-cd ../..
-echo "install [g2o] done"
+# echo "install [g2o] 20160424 version"
+# # the original version may encounter segfault on linux, use the following commit
+# #git clone -b 20170730_git https://github.com/RainerKuemmerle/g2o.git 
+# git clone -b 20160424_git https://github.com/RainerKuemmerle/g2o.git 
+# cd g2o
+# mkdir build
+# cd build
+# cmake ..
+# make -j4
+# sudo make install
+# cd ../..
+# echo "install [g2o] done"
 
 echo "install [ceres] 1.14"
 echo "install ceres dependent libs: glog, gflags, suitesparse"
@@ -69,19 +69,19 @@ sudo make install
 cd ../..
 echo "install [ceres] done"
 
-echo "install [gtsam] 4.0"
-# tbb
-sudo apt-get install libtbb-dev
-#clone gtsam to local
-git clone https://bitbucket.org/gtborg/gtsam.git
-cd gtsam
-mkdir build
-cd build
-cmake ..
-make -j4
-sudo make install
-cd ../..
-echo "install [gtsam] done"
+# echo "install [gtsam] 4.0"
+# # tbb
+# sudo apt-get install libtbb-dev
+# #clone gtsam to local
+# git clone https://bitbucket.org/gtborg/gtsam.git
+# cd gtsam
+# mkdir build
+# cd build
+# cmake ..
+# make -j4
+# sudo make install
+# cd ../..
+# echo "install [gtsam] done"
 
 echo "install [sophus]"
 git clone -b v1.0.0 https://github.com/strasdat/Sophus.git

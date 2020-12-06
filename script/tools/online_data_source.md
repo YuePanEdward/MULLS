@@ -1,10 +1,12 @@
-## Avalibale free datasets online for lidar odometry and point cloud registration test
+## Available open datasets for LiDAR SLAM and point cloud registration test
 
 ### 64-line mechanical LiDAR
 
 [KITTI Odometery Dataset](http://www.cvlibs.net/datasets/kitti/eval_odometry.php)
 
 [KITTI Raw Data](http://www.cvlibs.net/datasets/kitti/raw_data.php)
+
+[KITTI 360](http://www.cvlibs.net/datasets/kitti-360/user_login.php)
 
 [Semantic KITTI](http://semantic-kitti.org/)
 
@@ -40,7 +42,9 @@
 
 [Livox HKU & HKUST Dataset](https://github.com/hku-mars/loam_livox)
 
-### Terristial Laser Scanning (TLS)
+[Livox Dataset](https://www.livoxtech.com/cn/dataset)
+
+### Terristial laser scanning (TLS) registration
 
 [ETH PRS Registration Dataset](https://prs.igp.ethz.ch/research/completed_projects/automatic_registration_of_point_clouds.html)
 
