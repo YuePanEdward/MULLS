@@ -1284,7 +1284,7 @@ class CRegistration : public CloudUtility<PointT>
 				   Eigen::Matrix4d initial_guess = Eigen::Matrix4d::Identity(), //used_feature_type (1: on, 0: off, order: ground, pillar, beam, facade, roof, vetrex)
 				   bool apply_intersection_filter = true, bool apply_motion_undistortion_while_registration = false,
 				   bool normal_shooting_on = false, float normal_bearing = 35.0, bool use_more_points = false,
-				   bool keep_less_source_points = false, float min_neccessary_corr_ratio = 0.1, float max_bearable_rotation_d = 45.0)
+				   bool keep_less_source_points = false, float sigma_thre = 0.25, float min_neccessary_corr_ratio = 0.1, float max_bearable_rotation_d = 45.0) //sigma_thre means the maximum threshold of the posterior standar deviation of the registration LLS (unit:m)
 
 	{	
 		//LOG(INFO) << "Begin registration";
@@ -1537,7 +1537,7 @@ class CRegistration : public CloudUtility<PointT>
 												   pc_facade_sc, pc_facade_tc, corrs_facade,
 												   pc_roof_sc, pc_roof_tc, corrs_roof,
 												   pc_vertex_sc, pc_vertex_tc, corrs_vertex,
-												   transform_x, sigma_square_post))
+												   transform_x, sigma_square_post, sigma_thre))
 					process_code = 1;
 				else
 				{

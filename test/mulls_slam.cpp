@@ -1,7 +1,7 @@
 //
 // This file is for the general implements of Multi-Metrics Linear Least Square Lidar SLAM (MULLS)
 // Compulsory Dependent 3rd Libs: PCL (>1.7), glog, gflags
-// By Yue Pan 
+// By Yue Pan
 
 #include "dataio.hpp"
 #include "cfilter.hpp"
@@ -140,6 +140,7 @@ DEFINE_int32(reg_max_iter_num_s2m, 15, "max iteration number for icp-based regis
 DEFINE_int32(reg_max_iter_num_m2m, 20, "max iteration number for icp-based registration (map to map)");
 DEFINE_double(converge_tran, 0.001, "convergence threshold for translation (in m)");
 DEFINE_double(converge_rot_d, 0.01, "convergence threshold for rotation (in degree)");
+DEFINE_double(post_sigma_thre, 0.25, "the maximum threshold for the posterior standard deviation of the least square adjustment during the registration.(unit:m)");
 DEFINE_double(local_map_radius, 100.0, "the radius of the local map (regarded as a sphere aera)");
 DEFINE_int32(local_map_max_pt_num, 20000, "max point number allowed for the local map");
 DEFINE_int32(local_map_max_vertex_pt_num, 1000, "max vertex point number allowed for the local map");
@@ -199,7 +200,7 @@ DEFINE_string(baseline_reg_method, "", "name of the baseline lidar odometery met
 DEFINE_double(reg_voxel_size, 1.0, "the grid size of ndt or vgicp");
 DEFINE_bool(ndt_searching_method, true, "using direct searching or kdtree (0: kdtree, 1: direct7)");
 DEFINE_bool(voxel_gicp_on, true, "using voxel based gicp (faster)");
-//Note: Set these parameters in the config file , or the default values are used. 
+//Note: Set these parameters in the config file , or the default values are used.
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------
 int main(int argc, char **argv)
 {
@@ -421,7 +422,7 @@ int main(int argc, char **argv)
             cfilter.dist_filter(cblock_source->pc_raw, FLAGS_min_dist_used, FLAGS_max_dist_used);
         if (FLAGS_vertical_ang_calib_on) //intrinsic angle correction
             cfilter.vertical_intrinsic_calibration(cblock_source->pc_raw, FLAGS_vertical_ang_correction_deg);
-        // motion compensation [first step: using the last frame's transformation] 
+        // motion compensation [first step: using the last frame's transformation]
         if (FLAGS_motion_compensation_method == 1) //calculate from time-stamp
             cfilter.get_pts_timestamp_ratio_in_frame(cblock_source->pc_raw, true);
         else if (FLAGS_motion_compensation_method == 2)                                   //calculate from azimuth
@@ -445,7 +446,7 @@ int main(int argc, char **argv)
         // FLAGS_apply_roi_filter, FLAGS_roi_min_y, FLAGS_roi_max_y);
         std::chrono::steady_clock::time_point toc_feature_extraction = std::chrono::steady_clock::now();
 
-        //update local map 
+        //update local map
         if (i % FLAGS_local_map_recalculation_frequency == 0)
             local_map_recalculate_feature_on = true;
         else
@@ -499,7 +500,7 @@ int main(int argc, char **argv)
                                                                   FLAGS_used_feature_type, "1101", z_xy_balance_ratio,
                                                                   2 * pt2pt_residual_window, 2 * pt2pl_residual_window, 2 * pt2li_residual_window,
                                                                   pgo_edges[current_edge_index].Trans1_2, FLAGS_reg_intersection_filter_on, false,
-                                                                  FLAGS_normal_shooting_on, 1.5 * FLAGS_normal_bearing, true, true); //use its information matrix for pgo
+                                                                  FLAGS_normal_shooting_on, 1.5 * FLAGS_normal_bearing, true, true, FLAGS_post_sigma_thre); //use its information matrix for pgo
 
                 if (registration_status_map2map <= 0) //candidate wrong registration
                     mviewer.keep_visualize(reg_viewer);
@@ -578,7 +579,8 @@ int main(int argc, char **argv)
                                                                           FLAGS_used_feature_type, "1101", z_xy_balance_ratio,
                                                                           2 * pt2pt_residual_window, 2 * pt2pl_residual_window, 2 * pt2li_residual_window,
                                                                           init_mat, FLAGS_reg_intersection_filter_on, false,
-                                                                          FLAGS_normal_shooting_on, 1.5 * FLAGS_normal_bearing, true, true, FLAGS_map_to_map_min_cor_ratio);
+                                                                          FLAGS_normal_shooting_on, 1.5 * FLAGS_normal_bearing,
+                                                                          true, true, FLAGS_post_sigma_thre, FLAGS_map_to_map_min_cor_ratio);
                         if (registration_status_map2map > 0)
                         {
                             pgo_edges.push_back(current_registration_edges[j]);
@@ -659,7 +661,8 @@ int main(int argc, char **argv)
                                                                     FLAGS_used_feature_type, FLAGS_corr_weight_strategy, z_xy_balance_ratio,
                                                                     pt2pt_residual_window, pt2pl_residual_window, pt2li_residual_window,
                                                                     initial_guess_tran, FLAGS_reg_intersection_filter_on,
-                                                                    apply_motion_compensation_while_registration, FLAGS_normal_shooting_on, FLAGS_normal_bearing);
+                                                                    apply_motion_compensation_while_registration, FLAGS_normal_shooting_on, FLAGS_normal_bearing,
+                                                                    false, false, FLAGS_post_sigma_thre);
 
                 if (registration_status_scan2scan < 0) //candidate wrong registration
                 {
@@ -695,7 +698,8 @@ int main(int argc, char **argv)
                                                                    FLAGS_used_feature_type, FLAGS_corr_weight_strategy, z_xy_balance_ratio,
                                                                    pt2pt_residual_window, pt2pl_residual_window, pt2li_residual_window,
                                                                    initial_guess_tran, FLAGS_reg_intersection_filter_on,
-                                                                   apply_motion_compensation_while_registration, FLAGS_normal_shooting_on, FLAGS_normal_bearing);
+                                                                   apply_motion_compensation_while_registration, FLAGS_normal_shooting_on, FLAGS_normal_bearing,
+                                                                   false, false, FLAGS_post_sigma_thre);
                 if (registration_status_scan2map < 0) //candidate wrong registration
                 {
                     add_length = 1.0;
