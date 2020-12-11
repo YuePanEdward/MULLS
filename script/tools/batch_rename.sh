@@ -1,6 +1,6 @@
 #!/bin/sh
 
-target_folder=/media/edward/BackupPlus/Data/vlp16/vlp16_dataset
+target_folder=xxxx/xxxx
 file_format=.pcd
 file_head= ;
 file_extension= ;
