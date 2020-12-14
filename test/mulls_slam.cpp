@@ -17,12 +17,6 @@
 #include <glog/logging.h>
 #include <gflags/gflags.h>
 
-//For visualizer's size (fit pc monitor)
-//#define screen_width 2560
-//#define screen_height 1440
-#define screen_width 1920
-#define screen_height 1080
-//using namespace std;
 using namespace lo;
 //static void CheckCudaErrorAux(const char *, unsigned, const char *, cudaError_t);
 //#define CUDA_CHECK(value) CheckCudaErrorAux(__FILE__, __LINE__, #value, value)
@@ -61,6 +55,8 @@ DEFINE_double(min_dist_mapping, 2.0, "only the points whose distance to the scan
 DEFINE_double(max_dist_mapping, 50.0, "only the points whose distance to the scanner is smaller than this value would be used for map merging (m)");
 //viusalization related
 DEFINE_bool(real_time_viewer_on, false, "launch real time viewer or not");
+DEFINE_int32(screen_width, 1920, "monitor horizontal resolution (pixel)");
+DEFINE_int32(screen_height, 1080, "monitor vertical resolution (pixel)");
 DEFINE_double(vis_intensity_scale, 256.0, "max intensity value of your data");
 DEFINE_int32(vis_map_history_down_rate, 300, "downsampling rate of the map point cloud kept in the memory");
 DEFINE_int32(vis_map_history_keep_frame_num, 150, "frame number of the dense map that would be kept in the memory");
@@ -287,10 +283,10 @@ int main(int argc, char **argv)
         reg_viewer = boost::shared_ptr<pcl::visualization::PCLVisualizer>(new pcl::visualization::PCLVisualizer("Registration Viewer"));
         scan_viewer = boost::shared_ptr<pcl::visualization::PCLVisualizer>(new pcl::visualization::PCLVisualizer("Scan Viewer"));
         map_viewer = boost::shared_ptr<pcl::visualization::PCLVisualizer>(new pcl::visualization::PCLVisualizer("Map Viewer"));
-        mviewer.set_interactive_events(feature_viewer, screen_width / 2, screen_height / 2);
-        mviewer.set_interactive_events(reg_viewer, screen_width / 2, screen_height / 2);
-        mviewer.set_interactive_events(scan_viewer, screen_width / 2, screen_height / 2);
-        mviewer.set_interactive_events(map_viewer, screen_width / 2, screen_height);
+        mviewer.set_interactive_events(feature_viewer, FLAGS_screen_width / 2, FLAGS_screen_height / 2);
+        mviewer.set_interactive_events(reg_viewer, FLAGS_screen_width / 2, FLAGS_screen_height / 2);
+        mviewer.set_interactive_events(scan_viewer, FLAGS_screen_width / 2, FLAGS_screen_height / 2);
+        mviewer.set_interactive_events(map_viewer, FLAGS_screen_width / 2, FLAGS_screen_height);
     }
     double time_count = 0.0;
     std::vector<std::string> filenames;
@@ -1027,7 +1023,7 @@ int main(int argc, char **argv)
         if (FLAGS_write_out_map_on)
         {
             cv::Mat map_2d;
-            map_2d = cfilter.generate_2d_map(pc_map_merged, 1, screen_width, screen_height, 20, 1000, -FLT_MAX, FLT_MAX, true);
+            map_2d = cfilter.generate_2d_map(pc_map_merged, 1, FLAGS_screen_width, FLAGS_screen_height, 20, 1000, -FLT_MAX, FLT_MAX, true);
             if (FLAGS_show_bev_image)
                 mviewer.display_image(map_2d, "2D Map");
             std::string output_merged_map_image = output_pc_folder + "/" + "merged_map_2d.png";

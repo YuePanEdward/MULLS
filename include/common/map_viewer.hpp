@@ -470,6 +470,29 @@ void MapViewer<PointT>::display_scan_realtime(const typename pcl::PointCloud<Poi
         std::string frame_name = "current_scan";
         switch (color_rendering_type_)
         {
+        case SINGLE:
+        {
+            pcl::PointCloud<pcl::PointXYZRGB>::Ptr pc_frame_visual_rgb(new pcl::PointCloud<pcl::PointXYZRGB>);
+            float intensity_color;
+            int r_c,g_c,b_c;
+            for (int i = 0; i < pc->points.size(); ++i)
+            {
+                pcl::PointXYZRGB pt;
+                pt.x = pc->points[i].x;
+                pt.y = pc->points[i].y;
+                pt.z = pc->points[i].z;
+                apply_label_color_mapping((int)(pc->points[i].curvature), r_c, g_c, b_c); //the curvature here indicates the point semantic label (mask)
+                float intensity_color = 1.0 / intensity_scale_ * pc->points[i].intensity;
+                intensity_color = 0.2 + min_(0.8, intensity_color);
+                pt.r = r_c * intensity_color;
+                pt.g = g_c * intensity_color;
+                pt.b = b_c * intensity_color;
+                pc_frame_visual_rgb->points.push_back(pt);
+            }
+            viewer->addPointCloud(pc_frame_visual_rgb, frame_name);
+            break;
+
+        }
         case HEIGHT: //Height ramp color scalar
         {
             typename pcl::visualization::PointCloudColorHandlerGenericField<PointT>::PointCloudColorHandlerGenericField rgb_z(pc_clone, "z");
@@ -1879,7 +1902,7 @@ void MapViewer<PointT>::display_lo_realtime(cloudblock_Ptr &current_frame,
         }
         switch (color_rendering_type_)
         {
-        case SINGLE: // Golden
+        case SINGLE: // Golden or semantic mask
         {
             float intensity_color;
             int r_c, g_c, b_c;
@@ -2098,23 +2121,33 @@ void MapViewer<PointT>::display_dense_map_realtime(cloudblock_Ptr &current_frame
                 pt.z = current_frame->pc_raw_w->points[i].z;
                 apply_label_color_mapping((int)(current_frame->pc_raw_w->points[i].curvature), r, g, b);
                 intensity_color = 0.2 + min_(0.8, 1.0 / intensity_scale_ * current_frame->pc_raw_w->points[i].intensity);
-                pt.r = 255.0 * intensity_color;
-                pt.g = 0.0 * intensity_color;
-                pt.b = 0.0 * intensity_color;
+                pt.r = r * intensity_color;
+                pt.g = g * intensity_color;
+                pt.b = b * intensity_color;
                 pc_frame_dense_rgb->points.push_back(pt);
             }
             viewer->addPointCloud(pc_frame_dense_rgb, dense_frame_name);
             break;
         }
-            // case FRAME: //TODO: check (use other color scale)
-            // {
-            //     for (size_t i = 0; i < current_frame->pc_raw_w->points.size(); ++i)
-            //         current_frame->pc_raw_w->points[i].intensity = 255.0 - current_frame->pc_raw_w->points[i].intensity;
-
-            //     typename pcl::visualization::PointCloudColorHandlerGenericField<PointT>::PointCloudColorHandlerGenericField rgb_i_c(current_frame->pc_raw_w, "intensity");
-            //     viewer->addPointCloud<PointT>(current_frame->pc_raw_w, rgb_i_c, dense_frame_name);
-            //     break;
-            // }
+        case FRAME: 
+        {
+            pcl::PointCloud<pcl::PointXYZRGB>::Ptr pc_frame_dense_rgb(new pcl::PointCloud<pcl::PointXYZRGB>);
+            float color_r, color_g, color_b;
+            get_random_color(color_r, color_g, color_b, 255);
+            for (size_t i = 0; i < current_frame->pc_raw_w->points.size(); ++i)
+            {
+                pcl::PointXYZRGB pt;
+                pt.x = current_frame->pc_raw_w->points[i].x;
+                pt.y = current_frame->pc_raw_w->points[i].y;
+                pt.z = current_frame->pc_raw_w->points[i].z;
+                pt.r = color_r;
+                pt.g = color_g;
+                pt.b = color_b;
+                pc_frame_dense_rgb->points.push_back(pt);
+            }
+            viewer->addPointCloud(pc_frame_dense_rgb, dense_frame_name);
+            break;
+        }
         case INTENSITY_2: //TODO: check (use other color scale)
         {
             //!!! the JET LUT in pcl is from red (small) to blue (large), however, we'd like to use the LUT from blue (small) to red (large)

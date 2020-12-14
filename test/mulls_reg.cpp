@@ -14,16 +14,6 @@
 #include <glog/logging.h>
 #include <gflags/gflags.h>
 
-//#include <cuda_runtime_api.h>
-//#include <cuda.h>
-
-//For visualizer's size (fit pc monitor)
-//#define screen_width 2560
-//#define screen_height 1440
-#define screen_width 1920
-#define screen_height 1080
-
-using namespace std;
 using namespace lo;
 
 //static void CheckCudaErrorAux(const char *, unsigned, const char *, cudaError_t);
@@ -36,16 +26,16 @@ DEFINE_string(point_cloud_2_path, "", "Pointcloud 2 file path");
 DEFINE_string(output_point_cloud_path, "", "Registered source pointcloud file path");
 DEFINE_string(appro_coordinate_file, "", "File used to store the approximate station coordinate");
 //key parameters
-DEFINE_double(cloud_1_down_res, 0.05, "voxel size(m) of downsample for target point cloud");
-DEFINE_double(cloud_2_down_res, 0.05, "voxel size(m) of downsample for source point cloud");
+DEFINE_double(cloud_1_down_res, 0.0, "voxel size(m) of downsample for target point cloud");
+DEFINE_double(cloud_2_down_res, 0.0, "voxel size(m) of downsample for source point cloud");
 DEFINE_double(gf_grid_size, 2.0, "grid size(m) of ground segmentation");
 DEFINE_double(gf_in_grid_h_thre, 0.3, "height threshold(m) above the lowest point in a grid for ground segmentation");
 DEFINE_double(gf_neigh_grid_h_thre, 2.2, "height threshold(m) among neighbor grids for ground segmentation");
 DEFINE_double(gf_max_h, DBL_MAX, "max height(m) allowed for ground point");
-DEFINE_int32(gf_ground_down_rate, 15, "downsampling decimation rate for target ground point cloud");
+DEFINE_int32(gf_ground_down_rate, 10, "downsampling decimation rate for target ground point cloud");
 DEFINE_int32(gf_nonground_down_rate, 3, "downsampling decimation rate for nonground point cloud");
 DEFINE_double(pca_neighbor_radius, 1.0, "pca neighborhood searching radius(m) for target point cloud");
-DEFINE_int32(pca_neighbor_count, 20, "use only the k nearest neighbor in the r-neighborhood to do PCA");
+DEFINE_int32(pca_neighbor_count, 30, "use only the k nearest neighbor in the r-neighborhood to do PCA");
 DEFINE_double(linearity_thre, 0.6, "pca linearity threshold");
 DEFINE_double(planarity_thre, 0.6, "pca planarity threshold");
 DEFINE_double(curvature_thre, 0.1, "pca local stability threshold");
@@ -59,7 +49,11 @@ DEFINE_double(converge_rot_d, 0.01, "convergence threshold for rotation (in degr
 DEFINE_double(heading_change_step_degree, 15, "The step for the rotation of heading");
 DEFINE_bool(is_global_reg, false, "Allow the global registration without good enough initial guess or not");
 DEFINE_bool(teaser_on, false, "Using TEASER++ to do the global coarse registration or not");
+//visualizer parameters
 DEFINE_bool(realtime_viewer_on, false, "Launch the real-time registration(correspondence) viewer or not");
+DEFINE_int32(screen_width, 1920, "monitor horizontal resolution (pixel)");
+DEFINE_int32(screen_height, 1080, "monitor vertical resolution (pixel)");
+DEFINE_double(vis_intensity_scale, 256.0, "max intensity value of your data");
 
 int main(int argc, char **argv)
 {
@@ -107,7 +101,7 @@ int main(int argc, char **argv)
     float nms_radius = 0.2 * pca_neigh_r;
 
     DataIo<Point_T> dataio;
-    MapViewer<Point_T> viewer(255.0, 0, 1, 1);
+    MapViewer<Point_T> viewer(FLAGS_vis_intensity_scale, 0, 1, 1);
     CFilter<Point_T> cfilter;
     CRegistration<Point_T> creg;
 
@@ -118,8 +112,8 @@ int main(int argc, char **argv)
     {
         feature_viewer = boost::shared_ptr<pcl::visualization::PCLVisualizer>(new pcl::visualization::PCLVisualizer("Feature Viewer"));
         reg_viewer = boost::shared_ptr<pcl::visualization::PCLVisualizer>(new pcl::visualization::PCLVisualizer("Registration Viewer"));
-        viewer.set_interactive_events(feature_viewer, screen_width, screen_height);
-        viewer.set_interactive_events(reg_viewer, screen_width, screen_height);
+        viewer.set_interactive_events(feature_viewer, FLAGS_screen_width, FLAGS_screen_width);
+        viewer.set_interactive_events(reg_viewer, FLAGS_screen_width, FLAGS_screen_width);
     }
 
     cloudblock_Ptr cblock_1(new cloudblock_t()), cblock_2(new cloudblock_t());

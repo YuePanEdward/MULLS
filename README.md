@@ -104,6 +104,8 @@ Base Folder
       |___dummy_ground_truth_trajectory.txt (optional)   
       |___dummy_calibration_file.txt (optional)  
 ```
+To feed your data into MULLS in order, your point clouds' filename should also in the same order. You can use ```script/tools/batch_rename.sh ``` to rename filenames from something like ```1.pcd``` to ```00001.pcd``` in batch.
+
 Links to more open datasets are available [here](./script/tools/online_data_source.md). 
 
 ### 4. Run
@@ -118,7 +120,7 @@ sh script/run_mulls_slam.sh
 
 If the visualization is enabled, then you can configure the visualization GUI by following the instructions below the main window.
 
-For better performance on a specific dataset, you are suggested to play with the parameters in ```script/config/lo_gflag_list_[xxx].txt``` (tips on parameter tuning will be released in project Wiki), and then you need to change the config file path in ```script/run_mulls_slam.sh``` as following:
+For better performance on a specific dataset, you are suggested to play with the parameters in ```script/config/lo_gflag_list_[xxx].txt``` (tips on parameter tuning will be released in project Wiki), and then you need to change the config file path in ```script/run_mulls_slam.sh``` as follows:
 
 ```
 config_file=./script/config/lo_gflag_list_[xxx].txt
@@ -166,7 +168,7 @@ If you have any questions, please let me know:
 
 - [ ] Add ROS support
 
-- [ ] Add cross-platform support 
+- [ ] Add cross-platform support (run on windows)
 
 - [ ] Add sensor fusion module
 

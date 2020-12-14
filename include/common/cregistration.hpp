@@ -1284,7 +1284,7 @@ class CRegistration : public CloudUtility<PointT>
 				   Eigen::Matrix4d initial_guess = Eigen::Matrix4d::Identity(), //used_feature_type (1: on, 0: off, order: ground, pillar, beam, facade, roof, vetrex)
 				   bool apply_intersection_filter = true, bool apply_motion_undistortion_while_registration = false,
 				   bool normal_shooting_on = false, float normal_bearing = 35.0, bool use_more_points = false,
-				   bool keep_less_source_points = false, float sigma_thre = 0.25, float min_neccessary_corr_ratio = 0.1, float max_bearable_rotation_d = 45.0) //sigma_thre means the maximum threshold of the posterior standar deviation of the registration LLS (unit:m)
+				   bool keep_less_source_points = false, float sigma_thre = 0.25, float min_neccessary_corr_ratio = 0.08, float max_bearable_rotation_d = 45.0) //sigma_thre means the maximum threshold of the posterior standar deviation of the registration LLS (unit:m)
 
 	{	
 		//LOG(INFO) << "Begin registration";
@@ -1301,7 +1301,7 @@ class CRegistration : public CloudUtility<PointT>
 		
 		//at least ${min_neccessary_corr_ratio} source points should have a match
 		int min_total_corr_num = 100;
-		int min_neccessary_corr_num = 30;
+		int min_neccessary_corr_num = 25;
 		
 		float neccessary_corr_ratio = 1.0; //posterior unground points overlapping ratio
 
