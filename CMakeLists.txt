@@ -30,7 +30,7 @@ OPTION(BUILD_WITH_GTSAM "Build with GTSAM for Non-linear Optimization" OFF)
 OPTION(BUILD_WITH_SOPHUS "Build with SOPHUS for Lie-Group related Operations" OFF)
 OPTION(BUILD_WITH_TEASER "Build with TEASER++ for Global Registration" ON)
 
-OPTION(BUILD_TOOLS "Build the point cloud format transformation tools" OFF)
+OPTION(BUILD_TOOLS "Build the point cloud format transformation tools" ON)
 OPTION(BUILD_PAIRWISE_REG "Build the pairwise registration test" ON)
 OPTION(BUILD_REPLAY "Build the Lidar SLAM replaying tool" ON)
 OPTION(DEBUG_ON "Turn on DEBUG Mode" OFF)

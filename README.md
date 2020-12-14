@@ -118,9 +118,9 @@ If you'd like to test the LiDAR SLAM module (MULLS-SLAM), please edit the ```scr
 sh script/run_mulls_slam.sh
 ```
 
-If the visualization is enabled, then you can configure the visualization GUI by following the instructions below the main window.
+If the visualization is enabled, then you can configure the visualization GUI by following the instructions [here](https://github.com/YuePanEdward/MULLS/wiki/GUI-instruction).
 
-For better performance on a specific dataset, you are suggested to play with the parameters in ```script/config/lo_gflag_list_[xxx].txt``` (tips on parameter tuning will be released in project Wiki), and then you need to change the config file path in ```script/run_mulls_slam.sh``` as follows:
+For better performance on a specific dataset, you are suggested to play with the parameters in ```script/config/lo_gflag_list_[xxx].txt``` (tips on parameter tuning are available [here](https://github.com/YuePanEdward/MULLS/wiki/MULLS-SLAM-Parameter-List)), and then you need to change the config file path in ```script/run_mulls_slam.sh``` as follows:
 
 ```
 config_file=./script/config/lo_gflag_list_[xxx].txt
