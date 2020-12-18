@@ -46,6 +46,7 @@ Note: ceres, g2o and gtsam are all used for pose graph optimization. You only ne
 ### 2. Compile
 
 ```
+# cd to the base folder of MULLS
 mkdir build
 cd build
 cmake ..
@@ -53,9 +54,11 @@ make
 cd ..
 ```
 
-If you'd like to configure the optional dependent libs needed by your task, you can directly switch the options in ```CMakeLists.txt``` and then rebuild (delete the ```build``` folder and do ```2.Compile``` again) or use ```ccmake ..``` in ```build``` folder instead. 
+If you'd like to configure the optional dependent libs needed by your task, you can directly switch the options in ```CMakeLists.txt``` and then rebuild or use ```ccmake ..``` in ```build``` folder instead. (If it does not work, you nned to delete the ```build``` folder and do ```2.Compile``` again). 
 
 ### 3. Prepare data
+
+The input of MULLS should be a sequence of point cloud. Each point cloud is corresponding to a frame of the transaction.
 
 ##### Test on KITTI
 
@@ -69,11 +72,12 @@ The complete data folder structure should be as following:
 Base Folder
 _____00
      |___velodyne [raw data *.bin]
-     |___pcd [*.pcd]
+     |___pcd [*.pcd] (can be generated from *.bin by run_kittibin2pcd.sh)
      |___labels [raw semantic label *.label] (optional for semantic aided lidar odometry) 
-     |___label_pcd [*.pcd] (optional for semantic aided lidar odometry) 
+     |___label_pcd [*.pcd] (optional for semantic aided lidar odometry, can be generated from *.label and *.bin by run_semantic_kitti_labelbin2pcd.sh) 
      |___00.txt [ground truth (gnssins) pose] (optional for evaluation)
      |___calib.txt [extrinsic transformation matrix (from body to lidar coordinate system)] (optional for evaluation)
+     |___result [output of MULLS: generated map, pose and evaluation] (would be generated automatically after the transaction) 
 _____01
      |___velodyne
      |___pcd
@@ -106,7 +110,7 @@ Base Folder
 ```
 To feed your data into MULLS in order, your point clouds' filename should also in the same order. You can use ```script/tools/batch_rename.sh ``` to rename filenames from something like ```1.pcd``` to ```00001.pcd``` in batch.
 
-Links to more open datasets are available [here](./script/tools/online_data_source.md). 
+Links to more open datasets are available [here](https://github.com/YuePanEdward/MULLS/wiki/Open-datasets). 
 
 ### 4. Run
 
@@ -128,7 +132,7 @@ config_file=./script/config/lo_gflag_list_[xxx].txt
 
 To disable or enable the back-end (loop closure detection and pose graph optimization), you can edit the ```--loop_closure_detection_on=true/false``` in the config file.
 
-After the transaction, you are expected to find the results (plots, poses, evaluation results, generated 3D and 2D map ...) in the ```result``` folder under the data path.
+After the transaction, you are expected to find the results (plots, poses, evaluation results, generated 3D and 2D map ...) in the ```result``` folder under the data path. You can configure the output preference according to [here](https://github.com/YuePanEdward/MULLS/wiki/MULLS-Visualization-Parameter-List).
 
 #### MULLS-Registration
 
