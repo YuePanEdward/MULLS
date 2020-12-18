@@ -677,7 +677,7 @@ class CRegistration : public CloudUtility<PointT>
 			std::vector<int> count_target_kpt(target_kpts_num, 0);
 			std::vector<int> count_source_kpt(source_kpts_num, 0);
 
-			int max_corr_num = 6;
+			int max_corr_num = 7;
 
 			for (int k = 0; k < corr_num; k++)
 			{

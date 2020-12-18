@@ -34,14 +34,16 @@ DEFINE_double(gf_neigh_grid_h_thre, 2.2, "height threshold(m) among neighbor gri
 DEFINE_double(gf_max_h, DBL_MAX, "max height(m) allowed for ground point");
 DEFINE_int32(gf_ground_down_rate, 10, "downsampling decimation rate for target ground point cloud");
 DEFINE_int32(gf_nonground_down_rate, 3, "downsampling decimation rate for nonground point cloud");
+DEFINE_bool(pca_distance_adpative_on, false, "enable the distance adpative pca or not. It is preferred to be on if the point cloud is collected by a spining scanner located at origin point");
 DEFINE_double(pca_neighbor_radius, 1.0, "pca neighborhood searching radius(m) for target point cloud");
 DEFINE_int32(pca_neighbor_count, 30, "use only the k nearest neighbor in the r-neighborhood to do PCA");
 DEFINE_double(linearity_thre, 0.6, "pca linearity threshold");
 DEFINE_double(planarity_thre, 0.6, "pca planarity threshold");
 DEFINE_double(curvature_thre, 0.1, "pca local stability threshold");
+
 DEFINE_int32(corr_num, 1000, "number of the correspondence for global coarse registration");
-DEFINE_bool(reciprocal_corr_on, true, "Using reciprocal correspondence");
-DEFINE_bool(fixed_num_corr_on, false, "Using fixed number correspondece (best k matches)");
+DEFINE_bool(reciprocal_corr_on, false, "Using reciprocal correspondence");
+DEFINE_bool(fixed_num_corr_on, true, "Using fixed number correspondece (best k matches)");
 DEFINE_double(corr_dis_thre, 2.0, "distance threshold between correspondence points");
 DEFINE_int32(reg_max_iter_num, 25, "Max iteration number for icp-based registration");
 DEFINE_double(converge_tran, 0.001, "convergence threshold for translation (in m)");
@@ -82,6 +84,7 @@ int main(int argc, char **argv)
     float gf_max_height = FLAGS_gf_max_h;
     int ground_down_rate = FLAGS_gf_ground_down_rate;
     int nonground_down_rate = FLAGS_gf_nonground_down_rate;
+    bool pca_distance_adpative_on = FLAGS_pca_distance_adpative_on;
     float pca_neigh_r = FLAGS_pca_neighbor_radius;
     int pca_neigh_k = FLAGS_pca_neighbor_count;
     float pca_linearity_thre = FLAGS_linearity_thre;
@@ -128,11 +131,11 @@ int main(int argc, char **argv)
     cfilter.extract_semantic_pts(cblock_1, vf_downsample_resolution_target, gf_grid_resolution, gf_max_grid_height_diff,
                                  gf_neighbor_height_diff, gf_max_height, ground_down_rate, nonground_down_rate,
                                  pca_neigh_r, pca_neigh_k, pca_linearity_thre, pca_planarity_thre, pca_curvature_thre,
-                                 pca_linearity_thre_down, pca_planarity_thre_down);
+                                 pca_linearity_thre_down, pca_planarity_thre_down, pca_distance_adpative_on);
     cfilter.extract_semantic_pts(cblock_2, vf_downsample_resolution_source, gf_grid_resolution, gf_max_grid_height_diff,
                                  gf_neighbor_height_diff, gf_max_height, ground_down_rate, nonground_down_rate,
                                  pca_neigh_r, pca_neigh_k, pca_linearity_thre, pca_planarity_thre, pca_curvature_thre,
-                                 pca_linearity_thre_down, pca_planarity_thre_down);
+                                 pca_linearity_thre_down, pca_planarity_thre_down, pca_distance_adpative_on);
 
     if (teaser_global_regsitration_on) //refine keypoints
     {

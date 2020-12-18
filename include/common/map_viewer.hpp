@@ -1070,7 +1070,7 @@ void MapViewer<PointT>::display_2_pc_compare_realtime(const typename pcl::PointC
                 pt.z = Cloud1_left->points[i].z;
                 intensity_color = 0.2 + min_(0.8, 1.0 / intensity_scale_ * Cloud1_left->points[i].intensity);
                 if (!intensity_availiable)
-                    intensity_color = 1;
+                    intensity_color = 1.0;
                 pt.r = 255 * intensity_color;
                 pt.g = 215 * intensity_color;
                 pt.b = 0 * intensity_color;
@@ -1090,7 +1090,7 @@ void MapViewer<PointT>::display_2_pc_compare_realtime(const typename pcl::PointC
                 pt.z = Cloud2_left->points[i].z;
                 intensity_color = 0.2 + min_(0.8, 1.0 / intensity_scale_ * Cloud2_left->points[i].intensity);
                 if (!intensity_availiable)
-                    intensity_color = 1;
+                    intensity_color = 1.0;
                 pt.r = 233 * intensity_color;
                 pt.g = 233 * intensity_color;
                 pt.b = 216 * intensity_color;
@@ -1113,7 +1113,7 @@ void MapViewer<PointT>::display_2_pc_compare_realtime(const typename pcl::PointC
                 pt.z = Cloud1_right->points[i].z;
                 intensity_color = 0.2 + min_(0.8, 1.0 / intensity_scale_ * Cloud1_right->points[i].intensity);
                 if (!intensity_availiable)
-                    intensity_color = 1;
+                    intensity_color = 1.0;
                 pt.r = 255 * intensity_color;
                 pt.g = 215 * intensity_color;
                 pt.b = 0 * intensity_color;

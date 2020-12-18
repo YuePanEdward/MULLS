@@ -1389,7 +1389,7 @@ class CFilter : public CloudUtility<PointT>
 			//LOG(INFO) << i << "-ring-" << (int)(cloud->points[i].curvature);
 		}
 	}
-    
+
 	//detect curb point clouds (Deprecated)
 	bool detect_curbs(const typename pcl::PointCloud<PointT>::Ptr &cloud_in, typename pcl::PointCloud<PointT>::Ptr &cloud_curb)
 	{
@@ -1422,7 +1422,7 @@ class CFilter : public CloudUtility<PointT>
 	{
 		return pt_a.curvature < pt_b.curvature; // now curvature is used to store the horizontal angle
 	}
-    
+
 	//detect curb points on each scanline (Deprecated)
 	bool detect_curbs_on_scanline(typename pcl::PointCloud<PointT>::Ptr &ring, typename pcl::PointCloud<PointT>::Ptr &cloud_curb,
 								  float delta_z_thre = 0.03, float delta_z_thre_max = 0.08, float scan_begin_ang_anticlock_x_positive_deg = 180.0)
@@ -1648,7 +1648,7 @@ class CFilter : public CloudUtility<PointT>
 
 		return 1;
 	}
-    
+
 	// -------------------------------------------------------------------------------------------------------------------//
 	// Two threshold Fast Ground filter
 	// 1.Construct 2D grid
@@ -1668,7 +1668,7 @@ class CFilter : public CloudUtility<PointT>
 							typename pcl::PointCloud<PointT>::Ptr &cloud_curb,
 							int min_grid_pt_num, float grid_resolution, float max_height_difference,
 							float neighbor_height_diff, float max_ground_height,
-							int ground_random_down_rate, int ground_random_down_down_rate, int nonground_random_downsample_rate, int reliable_neighbor_grid_num_thre,
+							int ground_random_down_rate, int ground_random_down_down_rate, int nonground_random_down_rate, int reliable_neighbor_grid_num_thre,
 							int estimate_ground_normal_method, float normal_estimation_radius, //estimate_ground_normal_method, 0: directly use (0,0,1), 1: estimate normal in fix radius neighborhood , 2: estimate normal in k nearest neighborhood, 3: use ransac to estimate plane coeffs in a grid
 							int distance_weight_downsampling_method, float standard_distance,  //standard distance: the distance where the distance_weight is 1
 							bool fixed_num_downsampling = false, int down_ground_fixed_num = 1000,
@@ -1691,7 +1691,7 @@ class CFilter : public CloudUtility<PointT>
 		float non_ground_height_thre;
 		float distance_weight;
 		// int ground_random_down_rate_temp = ground_random_down_rate;
-		// int nonground_random_down_rate_temp = nonground_random_downsample_rate;
+		// int nonground_random_down_rate_temp = nonground_random_down_rate;
 
 		//For some points,  calculating the approximate mean height
 		for (int j = 0; j < cloud_in->points.size(); j++)
@@ -1746,11 +1746,11 @@ class CFilter : public CloudUtility<PointT>
 				if (cloud_in->points[j].z > non_ground_height_thre)
 				{
 					distance_weight = 1.0 * standard_distance / (grid[temp_id].dist2station + 0.0001); //avoiding Floating point exception
-					int nonground_random_down_rate_temp = nonground_random_downsample_rate;
+					int nonground_random_down_rate_temp = nonground_random_down_rate;
 					if (distance_weight_downsampling_method == 1) //linear weight
-						nonground_random_down_rate_temp = (int)(distance_weight * nonground_random_downsample_rate + 1);
+						nonground_random_down_rate_temp = (int)(distance_weight * nonground_random_down_rate + 1);
 					else if (distance_weight_downsampling_method == 2) //quadratic weight
-						nonground_random_down_rate_temp = (int)(distance_weight * distance_weight * nonground_random_downsample_rate + 1);
+						nonground_random_down_rate_temp = (int)(distance_weight * distance_weight * nonground_random_down_rate + 1);
 
 					if (j % nonground_random_down_rate_temp == 0 || cloud_in->points[j].intensity > intensity_thre)
 					{
@@ -1841,17 +1841,17 @@ class CFilter : public CloudUtility<PointT>
 			if (grid[i].pts_count >= min_grid_pt_num && grid[i].reliable_neighbor_grid_num >= reliable_neighbor_grid_num_thre)
 			{
 				int ground_random_down_rate_temp = ground_random_down_rate;
-				int nonground_random_down_rate_temp = nonground_random_down_rate_temp;
+				int nonground_random_down_rate_temp = nonground_random_down_rate;
 				distance_weight = 1.0 * standard_distance / (grid[i].dist2station + 0.0001);
 				if (distance_weight_downsampling_method == 1) //linear weight
 				{
 					ground_random_down_rate_temp = (int)(distance_weight * ground_random_down_rate + 1);
-					nonground_random_down_rate_temp = (int)(distance_weight * nonground_random_downsample_rate + 1);
+					nonground_random_down_rate_temp = (int)(distance_weight * nonground_random_down_rate + 1);
 				}
 				else if (distance_weight_downsampling_method == 2) //quadratic weight
 				{
 					ground_random_down_rate_temp = (int)(distance_weight * distance_weight * ground_random_down_rate + 1);
-					nonground_random_down_rate_temp = (int)(distance_weight * distance_weight * nonground_random_downsample_rate + 1);
+					nonground_random_down_rate_temp = (int)(distance_weight * distance_weight * nonground_random_down_rate + 1);
 				}
 				//LOG(WARNING) << ground_random_down_rate_temp << "," << nonground_random_down_rate_temp;
 				if (grid[i].min_z - grid[i].neighbor_min_z < neighbor_height_diff)
@@ -2000,8 +2000,8 @@ class CFilter : public CloudUtility<PointT>
 			LOG(INFO) << "Ground segmentation done in [" << ground_seg_time.count() * 1000.0 << "] ms.";
 			LOG(INFO) << "Ground Normal Estimation done in [" << ground_normal_time.count() * 1000.0 << "] ms."
 					  << " preparation in [" << ground_seg_prepare_time.count() * 1000.0 << "] ms.";
-		} 
-#if 0  //curb detection (deprecated)
+		}
+#if 0 //curb detection (deprecated)
 			if (detect_curb_or_not)
 			{
 				//detect curb points
@@ -2079,7 +2079,8 @@ class CFilter : public CloudUtility<PointT>
 							  bool fixed_num_downsampling = false, int pillar_down_fixed_num = 200, int facade_down_fixed_num = 800, int beam_down_fixed_num = 200,
 							  int roof_down_fixed_num = 100, int unground_down_fixed_num = 20000,
 							  float beam_height_max = FLT_MAX, float roof_height_min = -FLT_MAX,
-							  float feature_pts_ratio_guess = 0.3, bool sharpen_with_nms = true)
+							  float feature_pts_ratio_guess = 0.3, bool sharpen_with_nms = true,
+							  bool use_distance_adaptive_pca = false)
 
 	{
 
@@ -2096,7 +2097,7 @@ class CFilter : public CloudUtility<PointT>
 		tree->setInputCloud(cloud_in);
 
 		float unit_distance = 30.0;
-		pca_estimator.get_pc_pca_feature(cloud_in, cloud_features, tree, neighbor_searching_radius, neighbor_k, 1, pca_down_rate, true, unit_distance);
+		pca_estimator.get_pc_pca_feature(cloud_in, cloud_features, tree, neighbor_searching_radius, neighbor_k, 1, pca_down_rate, use_distance_adaptive_pca, unit_distance);
 		//LOG(WARNING)<< "PCA done";
 
 		std::chrono::steady_clock::time_point toc_pca = std::chrono::steady_clock::now();
@@ -2304,11 +2305,11 @@ class CFilter : public CloudUtility<PointT>
 							  int &gf_down_rate_ground, int &gf_downsample_rate_nonground,
 							  float pca_neighbor_radius, int pca_neighbor_k,
 							  float edge_thre, float planar_thre, float curvature_thre,
-							  float edge_thre_down, float planar_thre_down,
+							  float edge_thre_down, float planar_thre_down, bool use_distance_adaptive_pca = false,
 							  bool use_adpative_parameters = false, bool apply_scanner_filter = false,
-							  int estimate_ground_normal_method = 2,	//estimate_ground_normal_method, 0: directly use (0,0,1), 1: estimate normal in neighborhood, 2: use ransac to estimate plane coeffs in a grid
+							  int estimate_ground_normal_method = 3,	//estimate_ground_normal_method, 0: directly use (0,0,1), 1: estimate normal in fix radius neighborhood , 2: estimate normal in k nearest neighborhood, 3: use ransac to estimate plane coeffs in a grid
 							  float normal_estimation_radius = 2.0,		//only when enabled when estimate_ground_normal_method = 1
-							  int distance_inverse_sampling_method = 2, //distance_inverse_downsample, 0: disabled, 1: linear weight, 2: quadratic weight
+							  int distance_inverse_sampling_method = 0, //distance_inverse_downsample, 0: disabled, 1: linear weight, 2: quadratic weight
 							  float standard_distance = 15.0,			//the distance where the weight is 1, only useful when distance_inverse_downsample is on
 							  bool extract_curb_or_not = false,
 							  int extract_vertex_points_method = 2, //use the maximum curvature based keypoints
@@ -2323,22 +2324,22 @@ class CFilter : public CloudUtility<PointT>
 							  float approx_scanner_height = 2.0, float underground_thre = -7.0, float feature_pts_ratio_guess = 0.3,
 							  bool semantic_assisted = false, bool apply_roi_filtering = false, float roi_min_y = 0.0, float roi_max_y = 0.0)
 	{
-		if (use_adpative_parameters) 
+		if (use_adpative_parameters)
 			LOG(INFO) << "update parameters"
 					  << "\ngf_down_rate_ground: " << gf_down_rate_ground
 					  << "\ngf_downsample_rate_nonground: " << gf_downsample_rate_nonground
 					  << "\npca_neighbor_k: " << pca_neighbor_k
 					  << "\nedge_thre (down): " << edge_thre << " ( " << edge_thre_down << " )"
 					  << "\nplanar_thre (down): " << planar_thre << " ( " << planar_thre_down << " )";
-         
-        //pre-processing
+
+		//pre-processing
 
 		//with semantic mask
 		//remove dynamic objects and outliers (underground ghost points) using the semantic mask predicted by neural network
-		if (semantic_assisted) 
+		if (semantic_assisted)
 			filter_with_dynamic_object_mask_pre(in_block->pc_raw);
-        
-		else if (apply_scanner_filter) 
+
+		else if (apply_scanner_filter)
 		{
 			float self_ring_radius = 1.75;
 			float ghost_radius = 20.0;
@@ -2350,16 +2351,16 @@ class CFilter : public CloudUtility<PointT>
 		}
 
 		//get_pc_ring_ids(in_block->pc_raw);
-        
+
 		voxel_downsample(in_block->pc_raw, in_block->pc_down, vf_downsample_resolution);
 
 		random_downsample(in_block->pc_down, in_block->pc_sketch, in_block->pc_down->points.size() / 1024 + 1);
-        
+
 		//Used for UAV borne Lidar SLAM
 		//rotate to world coordiante system (because we want to use some geometric constraints that would only apply on world coordinate system)
 		//typename pcl::PointCloud<PointT>::Ptr rotated_pc_down(new pcl::PointCloud<PointT>);
 		//pcl::transformPointCloud(*in_block->pc_down, *rotated_pc_down, in_block->pose_lo); //now the pose_lo stored only the rotation matrix of last frame
-        
+
 		//filtered point cloud --> ground & non-ground point cloud
 		fast_ground_filter(in_block->pc_down, in_block->pc_ground, in_block->pc_ground_down, in_block->pc_unground, in_block->pc_vertex,
 						   gf_grid_pt_num_thre, gf_grid_resolution, gf_max_grid_height_diff, gf_neighbor_height_diff,
@@ -2369,7 +2370,7 @@ class CFilter : public CloudUtility<PointT>
 						   intensity_thre, apply_scanner_filter);
 
 		float vertex_curvature_non_max_r = 1.5 * pca_neighbor_radius;
-        
+
 		// if (apply_roi_filtering) //Deprecated
 		// {
 		// 	bounds_t roi;
@@ -2379,7 +2380,7 @@ class CFilter : public CloudUtility<PointT>
 		// 	roi.max_y = roi_max_y;
 		// 	bbx_filter(in_block->pc_unground, roi, true);
 		// }
-        
+
 		//non-ground points --> planar (facade, roof) & linear (pillar, beam) & spherical (vertex) points
 		classify_nground_pts(in_block->pc_unground, in_block->pc_pillar, in_block->pc_beam,
 							 in_block->pc_facade, in_block->pc_roof,
@@ -2392,12 +2393,13 @@ class CFilter : public CloudUtility<PointT>
 							 planar_vertical_sin_high_thre, planar_vertical_sin_low_thre,
 							 fixed_num_downsampling, pillar_down_fixed_num, facade_down_fixed_num,
 							 beam_down_fixed_num, roof_down_fixed_num, unground_down_fixed_num,
-							 beam_height_max, roof_height_min, feature_pts_ratio_guess, sharpen_with_nms_on);
+							 beam_height_max, roof_height_min, feature_pts_ratio_guess,
+							 sharpen_with_nms_on, use_distance_adaptive_pca);
 
 		//with semantic mask
 		//using semantic mask predicted by neural network to refine the detected geometric feature points
 		if (semantic_assisted)
-		 	filter_with_semantic_mask(in_block, "111100");
+			filter_with_semantic_mask(in_block); //currently disabled '000000'
 
 		//transform the feature points back to the scanner's coordinate system
 		//in_block->transform_feature(in_block->pose_lo.inverse(), true);
@@ -2445,12 +2447,12 @@ class CFilter : public CloudUtility<PointT>
 			//pca_neighbor_k = max_(20, pca_neighbor_k + 1);
 		}
 	}
-    
+
 	//Only works on Semantic KITTI dataset (Deprecated)
-    //http://semantic-kitti.org/dataset.html
+	//http://semantic-kitti.org/dataset.html
 	bool extract_semantic_pts_from_mask(cloudblock_Ptr in_block, float vf_downsample_resolution,
 										int ground_down_down_rate, int facade_down_down_rate,
-										int pillar_down_down_rate, int beam_down_down_rate) 
+										int pillar_down_down_rate, int beam_down_down_rate)
 	{
 		voxel_downsample(in_block->pc_raw, in_block->pc_down, vf_downsample_resolution);
 
@@ -2483,9 +2485,9 @@ class CFilter : public CloudUtility<PointT>
 		//random_downsample(in_block->pc_beam, in_block->pc_beam_down, beam_down_down_rate);
 		return 1;
 	}
-    
+
 	//Only works on Semantic KITTI dataset (Deprecated)
-    //http://semantic-kitti.org/dataset.html
+	//http://semantic-kitti.org/dataset.html
 	//actually, points that are farther than 50 m from the scanner would not be labeled. This would cause a lot of problem
 	bool filter_with_dynamic_object_mask_pre(const typename pcl::PointCloud<PointT>::Ptr &cloud_in_out)
 	{
@@ -2505,9 +2507,9 @@ class CFilter : public CloudUtility<PointT>
 
 		return true;
 	}
-    
+
 	//Only works on Semantic KITTI dataset (Deprecated)
-    //http://semantic-kitti.org/dataset.html
+	//http://semantic-kitti.org/dataset.html
 	bool filter_with_semantic_mask(cloudblock_Ptr in_block, const std::string mask_feature_type = "000000")
 	{
 		float labeled_radius = 45.0;
@@ -2542,7 +2544,7 @@ class CFilter : public CloudUtility<PointT>
 			{
 				int label = (int)(in_block->pc_facade->points[i].curvature);
 				float dist2 = in_block->pc_facade->points[i].x * in_block->pc_facade->points[i].x + in_block->pc_facade->points[i].y * in_block->pc_facade->points[i].y;
-				if (label == 50 || label == 13 || dist2 > labeled_radius * labeled_radius)
+				if (label == 50 || label == 13 || label == 51 || dist2 > labeled_radius * labeled_radius)
 					cloud_temp3->points.push_back(in_block->pc_facade->points[i]);
 			}
 			cloud_temp3->points.swap(in_block->pc_facade->points);
@@ -2552,7 +2554,7 @@ class CFilter : public CloudUtility<PointT>
 			{
 				int label = (int)(in_block->pc_facade_down->points[i].curvature);
 				float dist2 = in_block->pc_facade_down->points[i].x * in_block->pc_facade_down->points[i].x + in_block->pc_facade_down->points[i].y * in_block->pc_facade_down->points[i].y;
-				if (label == 50 || label == 13 || dist2 > labeled_radius * labeled_radius)
+				if (label == 50 || label == 13 || label == 51 || dist2 > labeled_radius * labeled_radius)
 					cloud_temp4->points.push_back(in_block->pc_facade_down->points[i]);
 			}
 			cloud_temp4->points.swap(in_block->pc_facade_down->points);
