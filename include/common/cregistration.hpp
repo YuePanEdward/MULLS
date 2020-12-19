@@ -3,7 +3,7 @@
 // The following registration methods are involoved:
 // ICP (PCL), GICP, VGICP, NDT (Kenji Koide), FPFH-SAC(PCL), BSC-SAC (Zhen Dong et al.), TEASER (Heng Yang et al.), MMLLS-ICP (Yue Pan et al.)
 // Dependent 3rd Libs: PCL (>1.7), TEASER++ (optional), Sophus (optional)
-// By Yue Pan 
+// By Yue Pan
 //
 
 #ifndef _INCLUDE_COMMON_REG_HPP
@@ -78,8 +78,6 @@ template <typename PointT>
 class CRegistration : public CloudUtility<PointT>
 {
   public:
-
-
 	//General implement of icp registration algorithm in pcl (baseline method)
 	//(with different distance metrics, correspondence estimation, transformation estimation methods and parameters)
 	//radius NN neighborhood search
@@ -520,6 +518,8 @@ class CRegistration : public CloudUtility<PointT>
 	bool find_feature_correspondence_ncc(const typename pcl::PointCloud<PointT>::Ptr &target_kpts, const typename pcl::PointCloud<PointT>::Ptr &source_kpts,
 										 typename pcl::PointCloud<PointT>::Ptr &target_corrs, typename pcl::PointCloud<PointT>::Ptr &source_corrs,
 										 bool fixed_num_corr = false, int corr_num = 2000, bool reciprocal_on = true)
+										 // to enable reciprocal correspondence, you need to disable fixed_num_corr. 
+										 // once fixed_num_cor is enabled, reciprocal correspondence would be automatically disabled
 	{
 		int target_kpts_num = target_kpts->points.size();
 		int source_kpts_num = source_kpts->points.size();
@@ -534,10 +534,21 @@ class CRegistration : public CloudUtility<PointT>
 		}
 
 		std::chrono::steady_clock::time_point tic = std::chrono::steady_clock::now();
-		
+
 		//first get descriptor
 		//std::vector<std::vector<int>> target_kpts_descriptors;
 		std::vector<Eigen::VectorXf, Eigen::aligned_allocator<Eigen::VectorXf>> target_kpts_descriptors;
+
+		float intensity_min = FLT_MAX;
+		float intensity_max = 0;
+
+		for (int i = 0; i < target_kpts_num; i++)
+		{
+			float cur_i = target_kpts->points[i].intensity;
+
+			intensity_min = min_(intensity_min, cur_i);
+			intensity_max = max_(intensity_max, cur_i);
+		}
 
 		for (int i = 0; i < target_kpts_num; i++)
 		{
@@ -560,9 +571,10 @@ class CRegistration : public CloudUtility<PointT>
 			// temp_descriptor[7] = (temp_descriptor_long % 10000) / 100;
 			// temp_descriptor[8] = temp_descriptor_long % 100;
 			// other properties
-			temp_descriptor(8) = target_kpts->points[i].intensity ;		 //[0 - 255] //intensity //TODO: add the intensity scale input paremeter
-			temp_descriptor(9) = target_kpts->points[i].normal[3] * 200; //[0 - 100] //curvature
-			temp_descriptor(10) = target_kpts->points[i].data[3] * 20;   //[0 - 100] //height above ground
+			float cur_i = target_kpts->points[i].intensity;
+			temp_descriptor(8) = (cur_i - intensity_min) / (intensity_max - intensity_min) * 255.0; //[0 - 255] //intensity //TODO: add the intensity scale input paremeter
+			temp_descriptor(9) = target_kpts->points[i].normal[3] * 200;							//[0 - 100] //curvature
+			temp_descriptor(10) = target_kpts->points[i].data[3] * 20;								//[0 - 100] //height above ground
 
 			//LOG(INFO) << temp_descriptor[1] << "," << temp_descriptor[2] << "," << temp_descriptor[3] << "," << temp_descriptor[4] << "," << temp_descriptor[5] << "," << temp_descriptor[6] << "," << temp_descriptor[7] << "," << temp_descriptor[8] << "," << temp_descriptor[9] << "," << temp_descriptor[10] << "," << temp_descriptor[11];
 			target_kpts_descriptors.push_back(temp_descriptor);
@@ -590,9 +602,12 @@ class CRegistration : public CloudUtility<PointT>
 			// temp_descriptor[7] = (temp_descriptor_long % 10000) / 100;
 			// temp_descriptor[8] = temp_descriptor_long % 100;
 			// other properties
-			temp_descriptor(8) = source_kpts->points[i].intensity;		 //[0 - 255] //intensity //TODO: add the intensity scale input paremeter
+			float cur_i = source_kpts->points[i].intensity;
+			temp_descriptor(8) = (cur_i - intensity_min) / (intensity_max - intensity_min) * 255.0;
 			temp_descriptor(9) = source_kpts->points[i].normal[3] * 200; //[0 - 100] //curvature
 			temp_descriptor(10) = source_kpts->points[i].data[3] * 20;   //[0 - 100] //height above ground
+
+			//LOG(INFO)<< "i:" << temp_descriptor(8);
 
 			//LOG(INFO) << temp_descriptor[1] << "," << temp_descriptor[2] << "," << temp_descriptor[3] << "," << temp_descriptor[4] << "," << temp_descriptor[5] << "," << temp_descriptor[6] << "," << temp_descriptor[7] << "," << temp_descriptor[8] << "," << temp_descriptor[9] << "," << temp_descriptor[10] << "," << temp_descriptor[11];
 			source_kpts_descriptors.push_back(temp_descriptor);
@@ -616,8 +631,8 @@ class CRegistration : public CloudUtility<PointT>
 
 				//Method 2. use cosine similarity instead
 				//dist_table[i][j] =
-					//target_kpts_descriptors[i].norm() * source_kpts_descriptors[j].norm() / target_kpts_descriptors[i].dot(source_kpts_descriptors[j]);
-				
+				//target_kpts_descriptors[i].norm() * source_kpts_descriptors[j].norm() / target_kpts_descriptors[i].dot(source_kpts_descriptors[j]);
+
 				//Method 3. use K-L divergence instead (use only the histogram (distribution)
 				//for (int k = 0; k < 8; k++)
 				//	dist_table[i][j] += 1.0 * target_kpts_descriptors[i](k) * std::log((1.0 * target_kpts_descriptors[i](k) + 0.001) / (1.0 * source_kpts_descriptors[j](k) + 0.001));
@@ -677,7 +692,7 @@ class CRegistration : public CloudUtility<PointT>
 			std::vector<int> count_target_kpt(target_kpts_num, 0);
 			std::vector<int> count_source_kpt(source_kpts_num, 0);
 
-			int max_corr_num = 7;
+			int max_corr_num = 5;
 
 			for (int k = 0; k < corr_num; k++)
 			{
@@ -824,11 +839,11 @@ class CRegistration : public CloudUtility<PointT>
 		return true;
 	}
 #endif
-    
-	//coarse global registration using TEASER ++ 
+
+	//coarse global registration using TEASER ++
 	int coarse_reg_teaser(const typename pcl::PointCloud<PointT>::Ptr &target_pts,
 						  const typename pcl::PointCloud<PointT>::Ptr &source_pts,
-						  Eigen::Matrix4d &tran_mat, float noise_bound = 0.05, int min_inlier_num = 8)
+						  Eigen::Matrix4d &tran_mat, float noise_bound = 0.1, int min_inlier_num = 8)
 	{
 		//reference: https://github.com/MIT-SPARK/TEASER-plusplus
 		//TEASER: Fast and Certifiable Point Cloud Registration, Heng Yang et al.
@@ -903,7 +918,7 @@ class CRegistration : public CloudUtility<PointT>
 			LOG(INFO) << "Estimated transformation by TEASER is :\n"
 					  << tran_mat;
 
-			// certificate the result here 
+			// certificate the result here
 			// teaser::DRSCertifier::Params cer_params;
 			// teaser::DRSCertifier certifier(cer_params);
 			// auto certification_result = certifier.certify(tran_mat,src,dst, theta);
@@ -922,7 +937,7 @@ class CRegistration : public CloudUtility<PointT>
 #endif
 		return (-1);
 	}
-    
+
 	// registration basic interface
 	double base_align(typename pcl::Registration<PointT, PointT>::Ptr registration,
 					  const typename pcl::PointCloud<PointT>::Ptr &target_cloud,
@@ -1279,30 +1294,30 @@ class CRegistration : public CloudUtility<PointT>
 				   int max_iter_num = 20, float dis_thre_unit = 1.5,
 				   float converge_translation = 0.002, float converge_rotation_d = 0.01,
 				   float dis_thre_min = 0.4, float dis_thre_update_rate = 1.1, std::string used_feature_type = "111110",
-				   std::string weight_strategy = "1111", float z_xy_balanced_ratio = 1.0,
+				   std::string weight_strategy = "1101", float z_xy_balanced_ratio = 1.0,
 				   float pt2pt_residual_window = 0.1, float pt2pl_residual_window = 0.1, float pt2li_residual_window = 0.1,
 				   Eigen::Matrix4d initial_guess = Eigen::Matrix4d::Identity(), //used_feature_type (1: on, 0: off, order: ground, pillar, beam, facade, roof, vetrex)
 				   bool apply_intersection_filter = true, bool apply_motion_undistortion_while_registration = false,
-				   bool normal_shooting_on = false, float normal_bearing = 35.0, bool use_more_points = false,
-				   bool keep_less_source_points = false, float sigma_thre = 0.25, float min_neccessary_corr_ratio = 0.08, float max_bearable_rotation_d = 45.0) //sigma_thre means the maximum threshold of the posterior standar deviation of the registration LLS (unit:m)
+				   bool normal_shooting_on = false, float normal_bearing = 45.0, bool use_more_points = false,
+				   bool keep_less_source_points = false, float sigma_thre = 0.5, float min_neccessary_corr_ratio = 0.03, float max_bearable_rotation_d = 45.0) //sigma_thre means the maximum threshold of the posterior standar deviation of the registration LLS (unit:m)
 
-	{	
+	{
 		//LOG(INFO) << "Begin registration";
 		std::chrono::steady_clock::time_point tic = std::chrono::steady_clock::now();
 
 		CFilter<PointT> cfilter;
-        
+
 		//code that indicate the status of the registration
 		//successful registration                ---   process_code= 1
 		//too large tran or rot for one iter.    ---   process_code=-1
 		//too few correspondences (ratio)        ---   process_code=-2
 		//final standard deviation is too large  ---   process_code=-3
 		int process_code = 0;
-		
+
 		//at least ${min_neccessary_corr_ratio} source points should have a match
 		int min_total_corr_num = 100;
 		int min_neccessary_corr_num = 25;
-		
+
 		float neccessary_corr_ratio = 1.0; //posterior unground points overlapping ratio
 
 		Eigen::Matrix4d transformationS2T = Eigen::Matrix4d::Identity();
@@ -1499,8 +1514,8 @@ class CRegistration : public CloudUtility<PointT>
 			//0010: distance weight (adaptive)
 			//0001: intensity weight
 			//....
-			//1111: all in 
-            
+			//1111: all in
+
 			//roll, pitch, yaw, tx, ty, tz --> Transformation matrix [4x4]
 			construct_trans_a(transform_x(0), transform_x(1), transform_x(2), transform_x(3), transform_x(4), transform_x(5), TempTran);
 
@@ -1555,8 +1570,8 @@ class CRegistration : public CloudUtility<PointT>
 				//sigma_post^2 = (vTPv)/(n-t) = VTPV/(n-t)
 				//v is the residual vector, n is the number of the observation equations and t is the number of the neccessary observation
 				//information_matrix = (Dxx) ^(-1) =  (Qxx * (sigma_post)^2)^(-1) = ATPA / (sigma_post)^2  = (n-t)/(VTPV)*(ATPA)
-                //because cofactor_matrix =  (ATPA)^(-1), so we get
-				information_matrix = (1.0 / sigma_square_post) * cofactor_matrix.inverse(); 
+				//because cofactor_matrix =  (ATPA)^(-1), so we get
+				information_matrix = (1.0 / sigma_square_post) * cofactor_matrix.inverse();
 
 				// LOG(INFO) << "sqrt information_matrix:\n"
 				// 		  << information_matrix;
@@ -1571,10 +1586,10 @@ class CRegistration : public CloudUtility<PointT>
 				break; //OUT
 			}
 
-			//Update the source pointcloud 
+			//Update the source pointcloud
 			//batch_transform_feature_points(pc_ground_sc, pc_pillar_sc, pc_beam_sc, pc_facade_sc, pc_roof_sc, pc_vertex_sc, TempTran);
 
-			//Update the transformation matrix till-now 
+			//Update the transformation matrix till-now
 			initial_guess = TempTran * initial_guess;
 		}
 
@@ -1594,8 +1609,8 @@ class CRegistration : public CloudUtility<PointT>
 
 		//Multiple evalualtion metrics
 		registration_cons.information_matrix = information_matrix; //Final information matrix
-		registration_cons.sigma = std::sqrt(sigma_square_post);	   //Final unit weight standard deviation 
-		registration_cons.confidence = neccessary_corr_ratio;      //posterior unground points overlapping ratio
+		registration_cons.sigma = std::sqrt(sigma_square_post);	//Final unit weight standard deviation
+		registration_cons.confidence = neccessary_corr_ratio;	  //posterior unground points overlapping ratio
 
 		LOG(INFO) << "The posterior overlapping ratio is [" << registration_cons.confidence << "]";
 
@@ -1606,9 +1621,17 @@ class CRegistration : public CloudUtility<PointT>
 		LOG(INFO) << "Final tran. matrix:\n"
 				  << registration_cons.Trans1_2;
 
+		//free mannually
+		corrs_ground.reset(new pcl::Correspondences);
+		corrs_pillar.reset(new pcl::Correspondences);
+		corrs_beam.reset(new pcl::Correspondences);
+		corrs_facade.reset(new pcl::Correspondences);
+		corrs_roof.reset(new pcl::Correspondences);
+		corrs_vertex.reset(new pcl::Correspondences);
+
 		return process_code;
 	}
-    
+
 	// This is for the comparison between LeGO-LOAM , which used the two step LM. We'd like to try the two step LLS for the same task
 	bool lls_icp_3dof_ground(constraint_t &registration_cons, int max_iter_num = 20, float dis_thre_unit = 1.5, float converge_translation = 0.002,
 							 float converge_rotation_d = 0.01, float dis_thre_min = 0.4, float dis_thre_update_rate = 1.1, std::string weight_strategy = "1111",
@@ -1765,7 +1788,7 @@ class CRegistration : public CloudUtility<PointT>
 
 		return process_code;
 	}
-    
+
 	bool mm_lls_icp_4dof_global(constraint_t &registration_con, float heading_step_d,
 								int max_iter_num = 20, float dis_thre_unit = 1.5, float converge_translation = 0.005, float converge_rotation_d = 0.05,
 								float dis_thre_min = 0.5, float dis_thre_update_rate = 1.05, float max_bearable_rotation_d = 15.0)
@@ -1774,6 +1797,7 @@ class CRegistration : public CloudUtility<PointT>
 		cloudblock_t rot_block2; //rotated block2
 		constraint_t rot_con;
 		float current_best_sigma = FLT_MAX;
+		float current_best_score = 0; //score =  confidence / sigma, (the larger, the better)
 		float current_best_heading_d;
 
 		float heading_d = 0.0;
@@ -1784,6 +1808,7 @@ class CRegistration : public CloudUtility<PointT>
 		bool successful_reg = false;
 
 		rot_con.block1 = registration_con.block1; //bbx is also included
+		rot_con.block2 = registration_con.block2; //bbx is also included
 
 		std::chrono::steady_clock::time_point tic = std::chrono::steady_clock::now();
 
@@ -1820,30 +1845,19 @@ class CRegistration : public CloudUtility<PointT>
 			LOG(INFO) << "Heading rotation matrix" << std::endl
 					  << temp_rot_z_mat;
 
-			//In this case, all the points are already in station centric coordinate system
-			pcl::transformPointCloudWithNormals(*registration_con.block2->pc_ground_down, *rot_block2.pc_ground_down, temp_rot_z_mat);
-			pcl::transformPointCloudWithNormals(*registration_con.block2->pc_pillar_down, *rot_block2.pc_pillar_down, temp_rot_z_mat);
-			pcl::transformPointCloudWithNormals(*registration_con.block2->pc_beam_down, *rot_block2.pc_beam_down, temp_rot_z_mat);
-			pcl::transformPointCloudWithNormals(*registration_con.block2->pc_facade_down, *rot_block2.pc_facade_down, temp_rot_z_mat);
-			pcl::transformPointCloudWithNormals(*registration_con.block2->pc_roof_down, *rot_block2.pc_roof_down, temp_rot_z_mat);
-			pcl::transformPointCloudWithNormals(*registration_con.block2->pc_vertex, *rot_block2.pc_vertex, temp_rot_z_mat);
-			pcl::transformPointCloudWithNormals(*registration_con.block2->pc_sketch, *rot_block2.pc_sketch, temp_rot_z_mat);
-
-			this->get_cloud_bbx(rot_block2.pc_sketch, rot_block2.local_bound);
-
-			rot_con.block2 = boost::make_shared<cloudblock_t>(rot_block2);
-
 			if (mm_lls_icp(rot_con, max_iter_num, dis_thre_unit, converge_translation,
 						   converge_translation, dis_thre_min,
-						   dis_thre_update_rate) > 0)
+						   dis_thre_update_rate, "111110", "1001", 1.0, 0.1, 0.1, 0.1, temp_rot_z_mat) > 0)
 			{
-
-				if (rot_con.sigma < current_best_sigma)
+				float cur_score = rot_con.confidence / rot_con.sigma;
+				if (cur_score > current_best_score)
 				{
-					registration_con.Trans1_2 = rot_con.Trans1_2 * temp_rot_z_mat;
+					registration_con.Trans1_2 = rot_con.Trans1_2;
 					registration_con.sigma = rot_con.sigma;
 					registration_con.information_matrix = rot_con.information_matrix;
-					current_best_sigma = rot_con.sigma;
+					registration_con.confidence = rot_con.confidence;
+
+					current_best_score = cur_score;
 					current_best_heading_d = heading_d;
 				}
 				successful_reg = true;
@@ -1866,6 +1880,8 @@ class CRegistration : public CloudUtility<PointT>
 
 		LOG(INFO) << "Aprroximate heading angle (degree): " << current_best_heading_d;
 		LOG(INFO) << "square of the posterior standard deviation (m^2): " << registration_con.sigma;
+		LOG(INFO) << "posterior overlapping ratio: " << registration_con.confidence;
+		LOG(INFO) << "registration score: " << current_best_score;
 		LOG(INFO) << "Final transformation matrix from Block_2 to Block_1:" << std::endl
 				  << registration_con.Trans1_2;
 
@@ -2577,7 +2593,7 @@ class CRegistration : public CloudUtility<PointT>
 
 		return 1;
 	}
-    
+
 	//brief: entrance to mulls transformation estimation
 	bool multi_metrics_lls_tran_estimation(const typename pcl::PointCloud<PointT>::Ptr &Source_Ground, const typename pcl::PointCloud<PointT>::Ptr &Target_Ground, boost::shared_ptr<pcl::Correspondences> &Corr_Ground,
 										   const typename pcl::PointCloud<PointT>::Ptr &Source_Pillar, const typename pcl::PointCloud<PointT>::Ptr &Target_Pillar, boost::shared_ptr<pcl::Correspondences> &Corr_Pillar,
@@ -2634,15 +2650,15 @@ class CRegistration : public CloudUtility<PointT>
 
 		if (weight_strategy[3] == '1') //weight according to intensity
 			intensity_weight = true;
-        
+
 		//point to plane
 		pt2pl_lls_summation(Source_Ground, Target_Ground, Corr_Ground, ATPA, ATPb, iter_num, w_ground, dist_weight, residual_weight, intensity_weight, pt2pl_residual_window);
 		pt2pl_lls_summation(Source_Facade, Target_Facade, Corr_Facade, ATPA, ATPb, iter_num, w_facade, dist_weight, residual_weight, intensity_weight, pt2pl_residual_window);
 		pt2pl_lls_summation(Source_Roof, Target_Roof, Corr_Roof, ATPA, ATPb, iter_num, w_roof, dist_weight, residual_weight, intensity_weight, pt2pl_residual_window);
-        //point to line
+		//point to line
 		pt2li_lls_pri_direction_summation(Source_Pillar, Target_Pillar, Corr_Pillar, ATPA, ATPb, iter_num, w_pillar, dist_weight, residual_weight, intensity_weight, pt2li_residual_window);
 		pt2li_lls_pri_direction_summation(Source_Beam, Target_Beam, Corr_Beam, ATPA, ATPb, iter_num, w_beam, dist_weight, residual_weight, intensity_weight, pt2li_residual_window);
-        //point to point
+		//point to point
 		pt2pt_lls_summation(Source_Vertex, Target_Vertex, Corr_Vertex, ATPA, ATPb, iter_num, w_vertex, dist_weight, residual_weight, intensity_weight, pt2pt_residual_window);
 
 		//ATPA is a symmetric matrix
@@ -2742,7 +2758,7 @@ class CRegistration : public CloudUtility<PointT>
 	//  = | 1      -gamma    beta |
 	//    | gamma   1       -alpha|
 	//    |-beta    alpha     1   |
-    
+
 	//point-to-point LLS
 	bool pt2pt_lls_summation(const typename pcl::PointCloud<PointT>::Ptr &Source_Cloud, const typename pcl::PointCloud<PointT>::Ptr &Target_Cloud,
 							 boost::shared_ptr<pcl::Correspondences> &Corr, Matrix6d &ATPA, Vector6d &ATPb, int iter_num,
@@ -2830,7 +2846,7 @@ class CRegistration : public CloudUtility<PointT>
 
 		return 1;
 	}
-    
+
 	//point-to-plane LLS
 	bool pt2pl_lls_summation(const typename pcl::PointCloud<PointT>::Ptr &Source_Cloud, const typename pcl::PointCloud<PointT>::Ptr &Target_Cloud,
 							 boost::shared_ptr<pcl::Correspondences> &Corr, Matrix6d &ATPA, Vector6d &ATPb, int iter_num,
@@ -3246,7 +3262,7 @@ class CRegistration : public CloudUtility<PointT>
 
 		return 1;
 	}
-    
+
 	//calculate residual v
 	bool get_multi_metrics_lls_residual(const typename pcl::PointCloud<PointT>::Ptr &Source_Ground, const typename pcl::PointCloud<PointT>::Ptr &Target_Ground, boost::shared_ptr<pcl::Correspondences> &Corr_Ground,
 										const typename pcl::PointCloud<PointT>::Ptr &Source_Pillar, const typename pcl::PointCloud<PointT>::Ptr &Target_Pillar, boost::shared_ptr<pcl::Correspondences> &Corr_Pillar,
@@ -3454,7 +3470,7 @@ class CRegistration : public CloudUtility<PointT>
 		return intensity_weight;
 		//return (base_value + (1 - base_value) * min_(intensity_1 / intensity_2, intensity_2 / intensity_1));
 	}
-    
+
 	//By huber loss function
 	inline float get_weight_by_residual(float res, float huber_thre = 0.05, int delta = 1) //test different kind of robust kernel function here
 	{

@@ -72,7 +72,7 @@ class MapViewer
         reset_camera_ = false;
         show_distance_circles_ = false;
         show_correspondences_ = true;
-        show_vertex_keypoints_ = true;
+        show_vertex_keypoints_ = false;
 
         show_feature_ = feature_window_on;
         show_reg_ = reg_window_on;

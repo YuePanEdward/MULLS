@@ -75,7 +75,7 @@ DEFINE_bool(zupt_on_or_not, false, "enable zupt (zero velocity updating) or not"
 DEFINE_bool(apply_scanner_filter, false, "enable scanner based distance filtering or not");
 DEFINE_bool(semantic_assist_on, false, "apply semantic mask to assist the geometric feature points extraction");
 DEFINE_double(cloud_down_res, 0.04, "voxel size(m) of downsample for target point cloud");
-DEFINE_int32(dist_inverse_sampling_method, 2, "use distance inverse sampling or not (0: disabled, 1: linear weight, 2: quadratic weight)");
+DEFINE_int32(dist_inverse_sampling_method, 0, "use distance inverse sampling or not (0: disabled, 1: linear weight, 2: quadratic weight)");
 DEFINE_double(unit_dist, 15, "distance that correspoinding to unit weight in inverse distance downsampling");
 DEFINE_bool(adaptive_parameters_on, false, "use self-adaptive parameters for different surroundings and road situation");
 DEFINE_double(cloud_pca_neigh_r, 0.5, "pca neighborhood searching radius(m) for target point cloud");
@@ -377,10 +377,10 @@ int main(int argc, char **argv)
                                  gf_neighbor_height_diff, FLAGS_gf_max_h, ground_down_rate,
                                  nonground_down_rate, pca_neigh_r, pca_neigh_k,
                                  pca_linearity_thre, pca_planarity_thre, pca_curvature_thre,
-                                 FLAGS_linearity_thre_down, FLAGS_planarity_thre_down, true, 
-                                 FLAGS_adaptive_parameters_on, FLAGS_apply_scanner_filter,
+                                 FLAGS_linearity_thre_down, FLAGS_planarity_thre_down, true,
+                                 FLAGS_dist_inverse_sampling_method, FLAGS_unit_dist,
                                  FLAGS_ground_normal_method, FLAGS_gf_normal_estimation_radius,
-                                 FLAGS_dist_inverse_sampling_method, FLAGS_unit_dist, FLAGS_detect_curb_or_not,
+                                 FLAGS_adaptive_parameters_on, FLAGS_apply_scanner_filter, FLAGS_detect_curb_or_not,
                                  FLAGS_vertex_extraction_method, gf_grid_min_pt_num, gf_reliable_neighbor_grid_thre,
                                  FLAGS_gf_down_down_rate, FLAGS_cloud_pca_neigh_k_min, FLAGS_pca_down_rate, FLAGS_intensity_thre_nonground,
                                  pillar_direction_sin, beam_direction_sin, roof_normal_sin, facade_normal_sin,
@@ -431,8 +431,8 @@ int main(int argc, char **argv)
             cfilter.extract_semantic_pts(cblock_source, FLAGS_cloud_down_res, gf_grid_resolution, gf_max_grid_height_diff,
                                          gf_neighbor_height_diff, FLAGS_gf_max_h, ground_down_rate,
                                          nonground_down_rate, pca_neigh_r, pca_neigh_k, pca_linearity_thre, pca_planarity_thre, pca_curvature_thre,
-                                         FLAGS_linearity_thre_down, FLAGS_planarity_thre_down, true, FLAGS_adaptive_parameters_on, FLAGS_apply_scanner_filter,
-                                         FLAGS_ground_normal_method, FLAGS_gf_normal_estimation_radius, FLAGS_dist_inverse_sampling_method, FLAGS_unit_dist, FLAGS_detect_curb_or_not,
+                                         FLAGS_linearity_thre_down, FLAGS_planarity_thre_down, true, FLAGS_dist_inverse_sampling_method, FLAGS_unit_dist,
+                                         FLAGS_ground_normal_method, FLAGS_gf_normal_estimation_radius, FLAGS_adaptive_parameters_on, FLAGS_apply_scanner_filter, FLAGS_detect_curb_or_not,
                                          FLAGS_vertex_extraction_method, gf_grid_min_pt_num, gf_reliable_neighbor_grid_thre,
                                          FLAGS_gf_down_down_rate, FLAGS_cloud_pca_neigh_k_min, FLAGS_pca_down_rate, FLAGS_intensity_thre_nonground,
                                          pillar_direction_sin, beam_direction_sin, roof_normal_sin, facade_normal_sin, FLAGS_sharpen_with_nms_on, FLAGS_fixed_num_downsampling_on, FLAGS_ground_down_fixed_num,

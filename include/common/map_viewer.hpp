@@ -1071,6 +1071,8 @@ void MapViewer<PointT>::display_2_pc_compare_realtime(const typename pcl::PointC
                 intensity_color = 0.2 + min_(0.8, 1.0 / intensity_scale_ * Cloud1_left->points[i].intensity);
                 if (!intensity_availiable)
                     intensity_color = 1.0;
+                
+                //LOG(INFO)<< intensity_color;
                 pt.r = 255 * intensity_color;
                 pt.g = 215 * intensity_color;
                 pt.b = 0 * intensity_color;
@@ -2383,7 +2385,7 @@ void MapViewer<PointT>::display_correspondences(boost::shared_ptr<pcl::visualiza
             pt.z = pc_0->points[i].z;
             intensity_color = 0.2 + min_(0.8, 1.0 / intensity_scale_ * pc_0->points[i].intensity);
             if (!intensity_availiable)
-                intensity_color = 1;
+                intensity_color = 1.0;
             pt.r = 255 * intensity_color;
             pt.g = 215 * intensity_color;
             pt.b = 0 * intensity_color;
@@ -2401,7 +2403,7 @@ void MapViewer<PointT>::display_correspondences(boost::shared_ptr<pcl::visualiza
             pt.z = pc_1->points[i].z;
             intensity_color = 0.2 + min_(0.8, 1.0 / intensity_scale_ * pc_1->points[i].intensity);
             if (!intensity_availiable)
-                intensity_color = 1;
+                intensity_color = 1.0;
             pt.r = 233 * intensity_color;
             pt.g = 233 * intensity_color;
             pt.b = 216 * intensity_color;
@@ -2507,7 +2509,7 @@ void MapViewer<PointT>::display_correspondences_compare(boost::shared_ptr<pcl::v
         typename pcl::PointCloud<PointT>::Ptr kpc_target_correct(new pcl::PointCloud<PointT>());
 
         *keypoints_source_copy = *kpc_source;
-        //*keypoints_source_tran_copy = *kpc_source_tran;
+        // *keypoints_source_tran_copy = *kpc_source_tran;
 
         //judge if point cloud intensity is availiable
         for (int i = 0; i < pc_source->points.size(); i += 50)
@@ -2528,7 +2530,8 @@ void MapViewer<PointT>::display_correspondences_compare(boost::shared_ptr<pcl::v
             pt.z = pc_source->points[i].z;
             intensity_color = 0.2 + min_(0.8, 1.0 / intensity_scale_ * pc_source->points[i].intensity);
             if (!intensity_availiable)
-                intensity_color = 1;
+                intensity_color = 1.0;
+            //LOG(INFO)<< intensity_color;
             pt.r = 255 * intensity_color;
             pt.g = 215 * intensity_color;
             pt.b = 0 * intensity_color;
@@ -2546,7 +2549,7 @@ void MapViewer<PointT>::display_correspondences_compare(boost::shared_ptr<pcl::v
             pt.z = pc_target->points[i].z;
             intensity_color = 0.2 + min_(0.8, 1.0 / intensity_scale_ * pc_target->points[i].intensity);
             if (!intensity_availiable)
-                intensity_color = 1;
+                intensity_color = 1.0;
             pt.r = 233 * intensity_color;
             pt.g = 233 * intensity_color;
             pt.b = 216 * intensity_color;
@@ -2563,7 +2566,7 @@ void MapViewer<PointT>::display_correspondences_compare(boost::shared_ptr<pcl::v
             pt.z = pc_source_tran->points[i].z;
             intensity_color = 0.2 + min_(0.8, 1.0 / intensity_scale_ * pc_source_tran->points[i].intensity);
             if (!intensity_availiable)
-                intensity_color = 1;
+                intensity_color = 1.0;
             pt.r = 255 * intensity_color;
             pt.g = 215 * intensity_color;
             pt.b = 0 * intensity_color;

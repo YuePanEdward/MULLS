@@ -1,7 +1,7 @@
 //
 // This file is for the test of pairwise point cloud registration using MULLS-ICP and TEASER
 // Dependent 3rd Libs: PCL (>1.7), glog, gflags, TEASER (optional)
-// By Yue Pan 
+// By Yue Pan
 //
 
 #include "dataio.hpp"
@@ -34,16 +34,17 @@ DEFINE_double(gf_neigh_grid_h_thre, 2.2, "height threshold(m) among neighbor gri
 DEFINE_double(gf_max_h, DBL_MAX, "max height(m) allowed for ground point");
 DEFINE_int32(gf_ground_down_rate, 10, "downsampling decimation rate for target ground point cloud");
 DEFINE_int32(gf_nonground_down_rate, 3, "downsampling decimation rate for nonground point cloud");
+DEFINE_int32(dist_inverse_sampling_method, 0 , "use distance inverse sampling or not (0: disabled, 1: linear weight, 2: quadratic weight)");
+DEFINE_double(unit_dist, 15.0, "distance that correspoinding to unit weight in inverse distance downsampling");
 DEFINE_bool(pca_distance_adpative_on, false, "enable the distance adpative pca or not. It is preferred to be on if the point cloud is collected by a spining scanner located at origin point");
 DEFINE_double(pca_neighbor_radius, 1.0, "pca neighborhood searching radius(m) for target point cloud");
 DEFINE_int32(pca_neighbor_count, 30, "use only the k nearest neighbor in the r-neighborhood to do PCA");
 DEFINE_double(linearity_thre, 0.6, "pca linearity threshold");
 DEFINE_double(planarity_thre, 0.6, "pca planarity threshold");
 DEFINE_double(curvature_thre, 0.1, "pca local stability threshold");
-
-DEFINE_int32(corr_num, 1000, "number of the correspondence for global coarse registration");
+DEFINE_int32(corr_num, 3000, "fixed number of the correspondence for global coarse registration (only when fixed_num_corr_on is on).");
 DEFINE_bool(reciprocal_corr_on, false, "Using reciprocal correspondence");
-DEFINE_bool(fixed_num_corr_on, true, "Using fixed number correspondece (best k matches)");
+DEFINE_bool(fixed_num_corr_on, false, "Using fixed number correspondece (best k matches)");
 DEFINE_double(corr_dis_thre, 2.0, "distance threshold between correspondence points");
 DEFINE_int32(reg_max_iter_num, 25, "Max iteration number for icp-based registration");
 DEFINE_double(converge_tran, 0.001, "convergence threshold for translation (in m)");
@@ -84,6 +85,8 @@ int main(int argc, char **argv)
     float gf_max_height = FLAGS_gf_max_h;
     int ground_down_rate = FLAGS_gf_ground_down_rate;
     int nonground_down_rate = FLAGS_gf_nonground_down_rate;
+    int dist_inv_sampling_method = FLAGS_dist_inverse_sampling_method;
+    float dist_inv_sampling_dist = FLAGS_unit_dist;
     bool pca_distance_adpative_on = FLAGS_pca_distance_adpative_on;
     float pca_neigh_r = FLAGS_pca_neighbor_radius;
     int pca_neigh_k = FLAGS_pca_neighbor_count;
@@ -101,7 +104,7 @@ int main(int argc, char **argv)
     bool teaser_global_regsitration_on = FLAGS_teaser_on;
     float pca_linearity_thre_down = pca_linearity_thre + 0.1;
     float pca_planarity_thre_down = pca_planarity_thre + 0.1;
-    float nms_radius = 0.2 * pca_neigh_r;
+    float keypoint_nms_radius = 0.1 * pca_neigh_r;
 
     DataIo<Point_T> dataio;
     MapViewer<Point_T> viewer(FLAGS_vis_intensity_scale, 0, 1, 1);
@@ -131,16 +134,18 @@ int main(int argc, char **argv)
     cfilter.extract_semantic_pts(cblock_1, vf_downsample_resolution_target, gf_grid_resolution, gf_max_grid_height_diff,
                                  gf_neighbor_height_diff, gf_max_height, ground_down_rate, nonground_down_rate,
                                  pca_neigh_r, pca_neigh_k, pca_linearity_thre, pca_planarity_thre, pca_curvature_thre,
-                                 pca_linearity_thre_down, pca_planarity_thre_down, pca_distance_adpative_on);
+                                 pca_linearity_thre_down, pca_planarity_thre_down, pca_distance_adpative_on,
+                                 dist_inv_sampling_method, dist_inv_sampling_dist);
     cfilter.extract_semantic_pts(cblock_2, vf_downsample_resolution_source, gf_grid_resolution, gf_max_grid_height_diff,
                                  gf_neighbor_height_diff, gf_max_height, ground_down_rate, nonground_down_rate,
                                  pca_neigh_r, pca_neigh_k, pca_linearity_thre, pca_planarity_thre, pca_curvature_thre,
-                                 pca_linearity_thre_down, pca_planarity_thre_down, pca_distance_adpative_on);
+                                 pca_linearity_thre_down, pca_planarity_thre_down, pca_distance_adpative_on,
+                                 dist_inv_sampling_method, dist_inv_sampling_dist);
 
     if (teaser_global_regsitration_on) //refine keypoints
     {
-        cfilter.non_max_suppress(cblock_1->pc_vertex, nms_radius);
-        cfilter.non_max_suppress(cblock_2->pc_vertex, nms_radius);
+        cfilter.non_max_suppress(cblock_1->pc_vertex, keypoint_nms_radius);
+        cfilter.non_max_suppress(cblock_2->pc_vertex, keypoint_nms_radius);
     }
 
     //Registration
@@ -169,7 +174,7 @@ int main(int argc, char **argv)
         pcTPtr target_cor(new pcT()), source_cor(new pcT()), pc_s_init(new pcT()), source_cor_tran(new pcT());
         creg.find_feature_correspondence_ncc(reg_con.block1->pc_vertex, reg_con.block2->pc_vertex, target_cor, source_cor,
                                              FLAGS_fixed_num_corr_on, feature_correspondence_num, FLAGS_reciprocal_corr_on);
-        creg.coarse_reg_teaser(target_cor, source_cor, init_mat, 2.0 * nms_radius);
+        creg.coarse_reg_teaser(target_cor, source_cor, init_mat, 3.0 * keypoint_nms_radius);
         if (launch_realtime_viewer)
         {
             pcl::transformPointCloud(*reg_con.block2->pc_down, *pc_s_init, init_mat);
@@ -182,7 +187,7 @@ int main(int argc, char **argv)
         }
     }
 
-    float reg_corr_dis_thre_min_thre = 2.0 * nonground_down_rate * min_(0.05, max_(vf_downsample_resolution_target, vf_downsample_resolution_source));
+    float reg_corr_dis_thre_min_thre = 0.25 * reg_corr_dis_thre;
     if (!is_global_registration)
         creg.mm_lls_icp(reg_con, max_iteration_num, reg_corr_dis_thre, converge_tran, converge_rot_d, reg_corr_dis_thre_min_thre,
                         1.1, "111110", "1101", 1.0, 0.1, 0.1, 0.1, init_mat);

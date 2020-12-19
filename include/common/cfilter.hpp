@@ -2239,7 +2239,7 @@ class CFilter : public CloudUtility<PointT>
 
 		if (sharpen_with_nms)
 		{
-			float nms_radius = 0.25 * neighbor_searching_radius;
+			float nms_radius = 0.2 * neighbor_searching_radius;
 #pragma omp parallel sections
 			{
 #pragma omp section
@@ -2306,12 +2306,11 @@ class CFilter : public CloudUtility<PointT>
 							  float pca_neighbor_radius, int pca_neighbor_k,
 							  float edge_thre, float planar_thre, float curvature_thre,
 							  float edge_thre_down, float planar_thre_down, bool use_distance_adaptive_pca = false,
-							  bool use_adpative_parameters = false, bool apply_scanner_filter = false,
-							  int estimate_ground_normal_method = 3,	//estimate_ground_normal_method, 0: directly use (0,0,1), 1: estimate normal in fix radius neighborhood , 2: estimate normal in k nearest neighborhood, 3: use ransac to estimate plane coeffs in a grid
-							  float normal_estimation_radius = 2.0,		//only when enabled when estimate_ground_normal_method = 1
 							  int distance_inverse_sampling_method = 0, //distance_inverse_downsample, 0: disabled, 1: linear weight, 2: quadratic weight
 							  float standard_distance = 15.0,			//the distance where the weight is 1, only useful when distance_inverse_downsample is on
-							  bool extract_curb_or_not = false,
+							  int estimate_ground_normal_method = 3,	//estimate_ground_normal_method, 0: directly use (0,0,1), 1: estimate normal in fix radius neighborhood , 2: estimate normal in k nearest neighborhood, 3: use ransac to estimate plane coeffs in a grid
+							  float normal_estimation_radius = 2.0,		//only when enabled when estimate_ground_normal_method = 1
+							  bool use_adpative_parameters = false, bool apply_scanner_filter = false, bool extract_curb_or_not = false,
 							  int extract_vertex_points_method = 2, //use the maximum curvature based keypoints
 							  int gf_grid_pt_num_thre = 8, int gf_reliable_neighbor_grid_thre = 0,
 							  int gf_down_down_rate_ground = 2, int pca_neighbor_k_min = 8, int pca_down_rate = 2,

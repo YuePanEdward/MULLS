@@ -426,7 +426,7 @@ class DataIo : public CloudUtility<PointT>
             // bool intensity_available = pcl::traits::has_field<PointT, pcl::fields::intensity>::value;
             // if (intensity_available)
             // {
-            //     pt.intensity = p.GetIntensity();
+                pt.intensity = p.GetIntensity();
             // }
 
             //pt.intensity = p.GetIntensity();
@@ -480,7 +480,7 @@ class DataIo : public CloudUtility<PointT>
                 // bool intensity_available = pcl::traits::has_field<PointT, pcl::fields::intensity>::value;
                 // if (intensity_available)
                 // {
-                //     pt.SetIntensity(pointCloud->points[i].intensity);
+                     pt.SetIntensity(pointCloud->points[i].intensity);
                 // }
 
                 //If the Point template PointT is without RGB, you should comment the line.
@@ -579,7 +579,7 @@ class DataIo : public CloudUtility<PointT>
             // bool intensity_available = pcl::traits::has_field<PointT, pcl::fields::intensity>::value;
             // if (intensity_available)
             // {
-            //     pt.intensity = p.GetIntensity();
+                pt.intensity = p.GetIntensity();
             // }
 
             //pt.intensity = p.GetTime();
@@ -665,7 +665,7 @@ class DataIo : public CloudUtility<PointT>
                 // figure out why this cannot be used properly.
                 // if (intensity_available)
                 // {
-                //     pt.SetIntensity(pointCloud->points[i].intensity);
+                    pt.SetIntensity(pointCloud->points[i].intensity);
                 // }
 
                 //If the Point template PointT is without RGB, you should comment the line.
@@ -715,7 +715,7 @@ class DataIo : public CloudUtility<PointT>
             // bool intensity_available = pcl::traits::has_field<PointT, pcl::fields::intensity>::value;
             // if (intensity_available)
             // {
-            //     pt.intensity = p.GetIntensity();
+                pt.intensity = p.GetIntensity();
             // }
             //pt.intensity = p.GetTime();
             //pt.intensity = p.GetScanAngleRank();
