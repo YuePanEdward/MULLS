@@ -1,0 +1,7 @@
+-parameter list (demo)
+---------------------------------------------------------------------------------------------------------------
+--vis_map_history_down_rate=1
+-color_map: intensity2=4, intensity=3, elevation=2, frame-wise=1, semantic=0
+--vis_initial_color_type=0
+--map_downrate_output=1
+---------------------------------------------------------------------------------------------------------------

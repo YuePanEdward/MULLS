@@ -56,7 +56,22 @@ cd ..
 
 If you'd like to configure the optional dependent libs needed by your task, you can directly switch the options in ```CMakeLists.txt``` and then rebuild or use ```ccmake ..``` in ```build``` folder instead. (If it does not work, you nned to delete the ```build``` folder and do ```2.Compile``` again). 
 
-### 3. Prepare data
+### 3. Minimum example
+
+By using the example data (10 adjacent scans) in ```./demo_data```, you can have a quick test of MULLS-SLAM and MULLS-Registration.
+
+Without editing anything, directly run 
+```
+sh script/run_mulls_slam.sh
+```
+and 
+```
+sh script/run_mulls_reg.sh
+```
+to check the results (in the real-time viewer and the ```result``` folder in ```demo_data```).
+
+
+### 4. Prepare data
 
 The input of MULLS should be a sequence of point cloud. Each point cloud is corresponding to a frame of the transaction.
 
@@ -112,7 +127,7 @@ To feed your data into MULLS in order, your point clouds' filename should also i
 
 Links to more open datasets are available [here](https://github.com/YuePanEdward/MULLS/wiki/Open-datasets). 
 
-### 4. Run
+### 5. Run
 
 #### MULLS-SLAM
 
@@ -141,6 +156,8 @@ You can use ```script/run_mulls_reg.sh``` to test the pairwise point cloud regis
 ```
 sh script/run_mulls_reg.sh
 ```
+
+An example on TLS point cloud registration can be found [here](https://github.com/YuePanEdward/MULLS/wiki/Case-study:-example-on-TLS-point-cloud-registration).
 
 ----------
 
@@ -178,7 +195,7 @@ If you have any questions, please let me know:
 
 - [ ] Test on more dataset
 
-  
+
 
   
 
