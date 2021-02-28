@@ -4,7 +4,7 @@ MULLS is an efficient, low-drift, and versatile LiDAR-only SLAM system with both
 
 #### [[Demo Video](https://www.youtube.com/watch?v=85bGD55e3-0&feature=youtu.be)] [[KITTI Leaderboard](http://www.cvlibs.net/datasets/kitti/eval_odometry.php)]  [[Preprint Paper](https://arxiv.org/abs/2102.03771)] [[Project Wiki](https://github.com/YuePanEdward/MULLS/wiki)]
 
-**Version 1.0 (tested on Ubuntu 16.04 / 18.04) **
+**Version 1.0 (tested on Ubuntu 16.04 / 18.04)**
 
 Codes are currently under refactoring for better readability and performance.
 
