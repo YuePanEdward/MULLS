@@ -2,14 +2,13 @@
 
 MULLS is an efficient, low-drift, and versatile LiDAR-only SLAM system with both the front-end and back-end.  It's an overall updated version of [LLS-LOAM](https://github.com/YuePanEdward/LLS-LOAM). 
 
-[[Demo Video](https://www.youtube.com/watch?v=85bGD55e3-0&feature=youtu.be)], [[KITTI Leaderboard](http://www.cvlibs.net/datasets/kitti/eval_odometry.php)], [[Preprint Paper](https://arxiv.org/abs/2102.03771)], [[Project Wiki](https://github.com/YuePanEdward/MULLS/wiki)]
+#### [[Demo Video](https://www.youtube.com/watch?v=85bGD55e3-0&feature=youtu.be)] [[KITTI Leaderboard](http://www.cvlibs.net/datasets/kitti/eval_odometry.php)]  [[Preprint Paper](https://arxiv.org/abs/2102.03771)] [[Project Wiki](https://github.com/YuePanEdward/MULLS/wiki)]
 
-#### Version 1.0 (passed on Ubuntu 16.04 / 18.04) 
-Codes are currently under reproducing for better readability and performance.
+**Version 1.0 (tested on Ubuntu 16.04 / 18.04) **
 
-____________________________________________________________________________________
-![Built](https://img.shields.io/appveyor/ci/gruntjs/grunt.svg)
-____________________________________________________________________________________
+Codes are currently under refactoring for better readability and performance.
+
+----------------
 
 ## Instruction
 
@@ -171,21 +170,34 @@ An example on TLS point cloud registration can be found [here](https://github.co
 
 ----------------------------
 
-### Contact
+### Citation
 
-If you have any questions, please let me know:
+[MULLS](https://arxiv.org/pdf/2102.03771.pdf) has been accepted by ICRA'21. If you find this code useful for your work or use it in your project, please consider citing:
 
-**Yue Pan** {yuepan@ethz.ch}
-
+```
+@article{pan2021mulls,
+  title={MULLS: Versatile LiDAR SLAM via Multi-metric Linear Least Square},
+  author={Pan, Yue and Xiao, Pengchuan and He, Yujie and Shao, Zhenlei and Li, Zesong},
+  journal={arXiv preprint arXiv:2102.03771},
+  year={2021}
+}
+```
 ---------
 
-### TODO List
+### Acknowledgments
 
-- [ ] Code reproducing
+We thank the authors of [TEASER](https://github.com/MIT-SPARK/TEASER-plusplus) for making their work public.
+
+
+### TODO List
 
 - [x] Add preprint paper
 
 - [x] Add Wiki
+
+- [ ] Update camera-ready paper
+ 
+- [ ] Code refactoring
 
 - [ ] Add ROS support
 
@@ -193,7 +205,6 @@ If you have any questions, please let me know:
 
 - [ ] Add sensor fusion module
 
-- [ ] Test on more dataset
 
 
 
