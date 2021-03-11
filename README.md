@@ -12,7 +12,6 @@ Codes are currently under refactoring for better readability and performance.
 
 ### MULLS SLAM demo
 
--------
 
 <p align="left">
 <img src="./assets/mulls_slam_demo.gif" width="600" alt="mulls_slam">
@@ -22,7 +21,6 @@ Codes are currently under refactoring for better readability and performance.
 
 ### MULLS Registration demo
 
---------
 
 
 <p align="left">
