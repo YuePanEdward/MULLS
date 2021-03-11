@@ -47,12 +47,12 @@ DEFINE_bool(write_out_map_on, false, "output map point clouds or not");
 DEFINE_bool(write_out_gt_map_on, false, "output map point clouds generated from the gnssins pose or not");
 DEFINE_bool(write_map_each_frame, false, "output each frame's point cloud in map coordinate system");
 DEFINE_int32(map_downrate_output, 5, "downsampling rate for output map point cloud");
-DEFINE_bool(map_filter_on, false, "clean the map point clpud before output");
+DEFINE_bool(map_filter_on, false, "clean the map point cloud before output");
 DEFINE_bool(apply_dist_filter, false, "Use only the points inside a distance range or not");
 DEFINE_double(min_dist_used, 1.0, "only the points whose distance to the scanner is larger than this value would be used for scan matching (m)");
-DEFINE_double(max_dist_used, 150.0, "only the points whose distance to the scanner is smaller than this value would be used for scan matching (m)");
+DEFINE_double(max_dist_used, 120.0, "only the points whose distance to the scanner is smaller than this value would be used for scan matching (m)");
 DEFINE_double(min_dist_mapping, 2.0, "only the points whose distance to the scanner is larger than this value would be used for map merging (m)");
-DEFINE_double(max_dist_mapping, 50.0, "only the points whose distance to the scanner is smaller than this value would be used for map merging (m)");
+DEFINE_double(max_dist_mapping, 60.0, "only the points whose distance to the scanner is smaller than this value would be used for map merging (m)");
 //viusalization related
 DEFINE_bool(real_time_viewer_on, false, "launch real time viewer or not");
 DEFINE_int32(screen_width, 1920, "monitor horizontal resolution (pixel)");
@@ -153,12 +153,13 @@ DEFINE_double(approx_scanner_height, 1.5, "approximate height of the scanner (m)
 DEFINE_double(underground_height_thre, -6.0, "z-axis threshold for rejecting underground ghost points (lines)");
 //loop closure and pose graph optimization related
 DEFINE_bool(loop_closure_detection_on, false, "do loop closure detection and pose graph optimization or not");
-DEFINE_double(submap_accu_tran, 40.0, "accumulated translation (m) for generating a new submap"); //this may not improve the pgo result
-DEFINE_double(submap_accu_rot, 120.0, "accumulated rotation (deg) for generating a new submap");
+DEFINE_double(submap_accu_tran, 15.0, "accumulated translation (m) for generating a new submap"); 
+DEFINE_double(submap_accu_rot, 90.0, "accumulated rotation (deg) for generating a new submap");
 DEFINE_int32(submap_accu_frame, 150, "accumulated frame number for generating a new submap");
 DEFINE_double(map2map_reliable_sigma_thre, 0.04, "if the standard deviation of the map to map registration is smaller than this value, we would use it as odometry result");
 DEFINE_bool(overall_loop_closure_searching_on, false, "searching loop clousre within a larger neighborhood");
-DEFINE_double(min_iou_thre, 0.5, "min boundingbox iou for candidate registration edge");
+DEFINE_double(min_iou_thre, 0.4, "min boundingbox iou for candidate registration edge");
+DEFINE_double(min_iou_thre_global_reg, 0.5, "min boundingbox iou for global registration edge");
 DEFINE_int32(min_submap_id_diff, 8, "min submap id difference between two submaps for a putable registration edge");
 DEFINE_double(neighbor_search_dist, 50.0, "max distance for candidate registration edge");
 DEFINE_double(map_to_map_min_cor_ratio, 0.15, "min feature point overlapping ratio for map to map registration");
@@ -171,7 +172,7 @@ DEFINE_bool(reciprocal_feature_match_on, false, "using reciprocal nn feature mat
 DEFINE_bool(best_n_feature_match_on, true, "select the n correspondence with min feature distance as the putatble matches");
 DEFINE_int32(feature_corr_num, 1000, "number of the correspondence for global coarse registration");
 DEFINE_bool(teaser_based_global_registration_on, true, "Using TEASER++ to do the global coarse registration or not");
-DEFINE_int32(teaser_min_inlier_count, 7, "min inlier correspondence for a successful teaser based registration");
+DEFINE_int32(global_reg_min_inlier_count, 7, "min inlier correspondence for a successful feature based registration (for teaser or ransac)");
 DEFINE_string(pose_graph_optimization_method, "ceres", "use which library to do pgo (select from g2o, ceres and gtsam)");
 DEFINE_double(inter_submap_t_limit, 1.0, "the submap node's limit of translation variation, unit:m");
 DEFINE_double(inter_submap_r_limit, 0.02, "the submap node's limit of rotation variation, unit quaternion");
@@ -181,15 +182,14 @@ DEFINE_int32(max_iter_inter_submap, 100, "max iteration number for inter submap 
 DEFINE_int32(max_iter_inner_submap, 100, "max iteration number for inner submap pgo");
 DEFINE_double(first_time_cov_update_ratio, 1.0, "edge covariance update (at first pgo)");
 DEFINE_double(life_long_cov_update_ratio, 1.0, "edge covariance update (after first pgo)");
-DEFINE_bool(diagonal_information_matrix_on, true, "use diagonal information matrix in pgo or not");
+DEFINE_bool(diagonal_information_matrix_on, false, "use diagonal information matrix in pgo or not");
 DEFINE_double(wrong_edge_tran_thre, 5.0, "translation threshold for judging if a edge is wrong or not");
 DEFINE_double(wrong_edge_rot_thre_deg, 25.0, "rotation threshold for judging if a edge is wrong or not");
 DEFINE_double(frame_estimated_error_tran, 0.5, "estimated max translation error of the lidar odometry per frame");
 DEFINE_double(frame_estimated_error_rot_deg, 1.0, "estimated max rotation error of the lidar odometry per frame");
-DEFINE_bool(robust_kernel_on, true, "turn on the robust kernel function in pgo");
+DEFINE_bool(robust_kernel_on, false, "turn on the robust kernel function in pgo");
 DEFINE_bool(free_node_on, false, "enable the free node module or not");
 DEFINE_bool(transfer_correct_reg_tran_on, true, "enable the registration tranformation transfer (only do global reg. once for each query submap)");
-DEFINE_double(min_iou_thre_global_reg, 0.7, "min boundingbox iou for global registration edge");
 DEFINE_bool(framewise_pgo_on, false, "use frame-wise pgo or not");
 //baseline method options
 DEFINE_string(baseline_reg_method, "", "name of the baseline lidar odometery method (ndt, gicp, pclicp, etc.)");
@@ -542,15 +542,19 @@ int main(int argc, char **argv)
                         Eigen::Matrix4d init_mat = current_registration_edges[j].Trans1_2;
                         if (stable_reg_found)                                                                                                  //infer the init guess according to a already successfully registered loop edge for current submap
                             init_mat = current_registration_edges[j].block1->pose_lo.inverse() * reference_pose_mat * reference_loop_tran_mat; //T23 = T21 * T13 = T2w * Tw1 * T13
-                        // global (coarse) registration by teaser or ransac (using ncc, bsc or fpfh as feature) //TODO: if teaser is not availible, use RANSAC as alternative method (a bit slower)
+                        // global (coarse) registration by teaser or ransac (using ncc, bsc or fpfh as feature) 
                         LOG(INFO) << "Transformation initial guess predicted by lidar odometry:\n"
                                   << init_mat;
                         bool global_reg_on = false;
-                        if (FLAGS_teaser_based_global_registration_on && !stable_reg_found && (current_registration_edges[j].overlapping_ratio > FLAGS_min_iou_thre_global_reg || overall_loop_searching_on)) //with higher overlapping ratio, try to TEASER
+                        if (!stable_reg_found && (current_registration_edges[j].overlapping_ratio > FLAGS_min_iou_thre_global_reg || overall_loop_searching_on)) //with higher overlapping ratio, try to TEASER
                         {
                             creg.find_feature_correspondence_ncc(current_registration_edges[j].block1->pc_vertex, current_registration_edges[j].block2->pc_vertex,
                                                                  target_cor, source_cor, FLAGS_best_n_feature_match_on, FLAGS_feature_corr_num, FLAGS_reciprocal_feature_match_on);
-                            int teaser_status = creg.coarse_reg_teaser(target_cor, source_cor, init_mat, 2.0 * non_max_suppresssion_radius, FLAGS_teaser_min_inlier_count);
+                            int global_reg_status = -1;
+                            if(FLAGS_teaser_based_global_registration_on)
+                               global_reg_status = creg.coarse_reg_teaser(target_cor, source_cor, init_mat, pca_neigh_r, FLAGS_global_reg_min_inlier_count);
+                            else // using ransac, a bit slower than teaser
+                               global_reg_status = creg.coarse_reg_ransac(target_cor, source_cor, init_mat, pca_neigh_r, FLAGS_global_reg_min_inlier_count);
                             if (FLAGS_real_time_viewer_on)
                             {
                                 pcl::transformPointCloud(*source_cor, *kp_guess, init_mat);
@@ -558,14 +562,14 @@ int main(int argc, char **argv)
                                 mviewer.display_correspondences_compare(feature_viewer, source_cor, target_cor, kp_guess, cur_map_origin,
                                                                         hist_map, cur_map_guess, current_registration_edges[j].Trans1_2, 5);
                             }
-                            if (teaser_status == 0) //double check
+                            if (global_reg_status == 0) //double check
                             {
                                 if (overall_loop_searching_on)
                                     global_reg_on = confinder.double_check_tran(init_mat, current_registration_edges[j].Trans1_2, init_mat, 10.0 * FLAGS_wrong_edge_tran_thre, 6.0 * FLAGS_wrong_edge_rot_thre_deg); //the difference tolerance can be a bit larger
                                 else
                                     global_reg_on = confinder.double_check_tran(init_mat, current_registration_edges[j].Trans1_2, init_mat, 3.0 * FLAGS_wrong_edge_tran_thre, 3.0 * FLAGS_wrong_edge_rot_thre_deg); //if the difference of the transformation of teaser and lo initial guess is too large, we will trust lidar odometry
                             }
-                            else if (teaser_status == 1) //reliable
+                            else if (global_reg_status == 1) //reliable
                                 global_reg_on = true;
                         }
                         if (!global_reg_on && !stable_reg_found && accu_frame_count_without_optimization > FLAGS_num_frame_thre_large_drift) //TODO: the tolerance should be determine using pose covariance (reference: overlapnet)

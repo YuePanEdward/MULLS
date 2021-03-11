@@ -1,12 +1,28 @@
 ## MULLS: Versatile LiDAR SLAM via Multi-metric Linear Least Square 
 
-MULLS is an efficient, low-drift, and versatile LiDAR-only SLAM system with both the front-end and back-end.  It's an overall updated version of [LLS-LOAM](https://github.com/YuePanEdward/LLS-LOAM). 
+This repository implements MULLS, an efficient, low-drift, and versatile LiDAR-only SLAM system with both the front-end and back-end.  It's an overall updated version of [LLS-LOAM](https://github.com/YuePanEdward/LLS-LOAM). 
 
-#### [[Demo Video](https://www.youtube.com/watch?v=85bGD55e3-0&feature=youtu.be)] [[KITTI Leaderboard](http://www.cvlibs.net/datasets/kitti/eval_odometry.php)]  [[Preprint Paper](https://arxiv.org/abs/2102.03771)] [[Project Wiki](https://github.com/YuePanEdward/MULLS/wiki)]
+#### [[Demo Video](https://www.youtube.com/watch?v=85bGD55e3-0&feature=youtu.be)] [[Preprint Paper](https://arxiv.org/abs/2102.03771)] [[Project Wiki](https://github.com/YuePanEdward/MULLS/wiki)]
 
-**Version 1.0 (tested on Ubuntu 16.04 / 18.04)**
+**Version 1.1 (tested on Ubuntu 16.04 / 18.04)**
 
 Codes are currently under refactoring for better readability and performance.
+
+------
+
+### MULLS SLAM demo
+
+-------
+
+<img src="assets/mulls_slam_demo.gif" alt="alt text" style="zoom:100%;">
+
+------
+
+### MULLS Registration demo
+
+--------
+
+<img src="assets/mulls_reg_demo.gif" alt="alt text" style="zoom:77%;">
 
 ----------------
 
@@ -33,7 +49,7 @@ Optional:
 - For pose graph optimization: [g2o(<=2016version)](https://github.com/RainerKuemmerle/g2o/releases/tag/20160424_git)
 - or [ceres](http://ceres-solver.org/)
 - or [gtsam](https://bitbucket.org/gtborg/gtsam/src/develop/)
-- For global registration using truncated least square: [TEASER++](https://github.com/MIT-SPARK/TEASER-plusplus)
+- For efficient global registration using truncated least square: [TEASER++](https://github.com/MIT-SPARK/TEASER-plusplus)
 
 You may run the following shell file to install all the dependent libs (tested on Ubuntu 16.04):
 ```
@@ -57,7 +73,7 @@ If you'd like to configure the optional dependent libs needed by your task, you 
 
 ### 3. Minimum example
 
-By using the example data (10 adjacent scans) in ```./demo_data```, you can have a quick test of MULLS-SLAM and MULLS-Registration.
+By using the example data (16 adjacent scans) in ```./demo_data```, you can have a quick test of MULLS-SLAM and MULLS-Registration.
 
 Without editing anything, directly run 
 ```
@@ -160,9 +176,11 @@ An example on TLS point cloud registration can be found [here](https://github.co
 
 ----------
 
-### Demo
+### More demos
 
-#### On KITTI dataset
+------
+
+#### On KITTI dataset (seq. 00 & 01)
 
 <img src="assets/kitti_00_show.jpg" alt="alt text" style="zoom:80%;">
 
@@ -172,43 +190,46 @@ An example on TLS point cloud registration can be found [here](https://github.co
 
 ### Citation
 
-[MULLS](https://arxiv.org/pdf/2102.03771.pdf) has been accepted by ICRA'21. If you find this code useful for your work or use it in your project, please consider citing:
+**[MULLS](https://arxiv.org/pdf/2102.03771.pdf)** has been accepted by **ICRA'21**. If you find this code useful for your work or use it in your project, please consider citing:
 
 ```
 @article{pan2021mulls,
   title={MULLS: Versatile LiDAR SLAM via Multi-metric Linear Least Square},
-  author={Pan, Yue and Xiao, Pengchuan and He, Yujie and Shao, Zhenlei and Li, Zesong},
+  author={Yue Pan, Pengchuan Xiao, Yujie He, Zhenlei Shao, Zesong Li},
   journal={arXiv preprint arXiv:2102.03771},
   year={2021}
 }
 ```
 ---------
 
+### Contact
+
+If you have any questions, please let me know:
+
+- Yue Pan {[yuepan@ethz.ch]()}
+
+--------
+
 ### Acknowledgments
 
-We thank the authors of [TEASER](https://github.com/MIT-SPARK/TEASER-plusplus) for making their work public.
+We thank the authors of [TEASER](https://github.com/MIT-SPARK/TEASER-plusplus) and [NDT_OMP](https://github.com/koide3/ndt_omp) for making their work public.
+
+------
 
 
 ### TODO List
 
 - [x] Add preprint paper
-
 - [x] Add Wiki
-
+- [x] Add demo examples
 - [ ] Update camera-ready paper
- 
 - [ ] Code refactoring
-
 - [ ] Add ROS support
-
 - [ ] Add cross-platform support (run on windows)
-
 - [ ] Add sensor fusion module
 
+-----
 
-
-
-  
 
 
 

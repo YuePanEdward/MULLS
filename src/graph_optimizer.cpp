@@ -543,35 +543,35 @@ bool GlobalOptimize::set_pgo_problem_ceres(cloudblock_Ptrs &all_blocks, constrai
 			edge_tran.SetPose(all_cons[i].Trans1_2); //set edge //test pass (the order is correct)
 
 			//set information_matrix
-			Matrix6d info_mat;
-			info_mat.setIdentity();
+			Matrix6d sqrt_info_mat;
+			sqrt_info_mat.setIdentity();
 			if (param_.use_equal_weight)
 			{
-				info_mat(3, 3) = param_.quat_tran_ratio;
-				info_mat(4, 4) = param_.quat_tran_ratio;
-				info_mat(5, 5) = param_.quat_tran_ratio;
+				sqrt_info_mat(3, 3) = param_.quat_tran_ratio;
+				sqrt_info_mat(4, 4) = param_.quat_tran_ratio;
+				sqrt_info_mat(5, 5) = param_.quat_tran_ratio;
 			}
 			else //directly use information matrix
 			{
 				if (param_.use_diagonal_information_matrix) //only use the diagonal elements of the information matrix
 				{
 					for (int j = 0; j < 6; j++)
-						info_mat(j, j) = std::sqrt(all_cons[i].information_matrix(j, j));
+						sqrt_info_mat(j, j) = std::sqrt(all_cons[i].information_matrix(j, j));
 					// LOG(INFO) << "Sqaure root of information matrix for edge [" << i << "]:\n"
-					// 		  << info_mat;
+					// 		  << sqrt_info_mat;
 				}
 				else
 				{
 					//F1
-					info_mat = all_cons[i].information_matrix.sqrt(); 
+					sqrt_info_mat = all_cons[i].information_matrix.sqrt(); 
 					//F2
-					//info_mat = all_cons[i].information_matrix.llt().matrixL(); //Cholesky (LLT) decomposition: A * A' = B ==> A = LLT(B)
+					//sqrt_info_mat = all_cons[i].information_matrix.llt().matrixL(); //Cholesky (LLT) decomposition: A * A' = B ==> A = LLT(B)
 					//LOG(INFO) << info_mat;
 				}
 			}
 
 			ceres::CostFunction *cost_function =
-				PoseGraph3dErrorTermQUAT::Create(edge_tran, info_mat); //actually, info_mat is the squared root of diagonal information matrix
+				PoseGraph3dErrorTermQUAT::Create(edge_tran, sqrt_info_mat); //actually, info_mat is the squared root of diagonal information matrix
 
 			ceres_problem_->AddResidualBlock(cost_function,
 											 ceres_robust_kernel_function_, // NULL /* squared loss */, /* new CauchyLoss(0.5) */

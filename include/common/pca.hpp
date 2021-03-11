@@ -231,7 +231,7 @@ class PrincipleComponentAnalysis
 
 			std::vector<int> search_indices_used; //points would be stored in sequence (from the closest point to the farthest point within the neighborhood)
 			std::vector<int> search_indices;	  //point index Vector
-			std::vector<float> sqaured_distances; //distance Vector
+			std::vector<float> squared_distances; //distance Vector
 
 			float neighborhood_r = radius;
 			int neighborhood_k = nearest_k;
@@ -245,7 +245,7 @@ class PrincipleComponentAnalysis
 				//neighborhood_k = min_(nearest_k, (int)(unit_dist / dist * nearest_k));
 			}
 			//nearest_k=0 --> the knn is disabled, only the rnn is used
-			tree.radiusSearch(i, neighborhood_r, search_indices, sqaured_distances, neighborhood_k);
+			tree.radiusSearch(i, neighborhood_r, search_indices, squared_distances, neighborhood_k);
 
 			features[i].pt.x = in_cloud->points[i].x;
 			features[i].pt.y = in_cloud->points[i].y;
@@ -260,7 +260,7 @@ class PrincipleComponentAnalysis
 			features[i].close_to_query_point.resize(search_indices.size());
 			for (int j = 0; j < search_indices.size(); j++)
 			{
-				if (sqaured_distances[j] < 0.25 * radius * radius)
+				if (squared_distances[j] < 0.64 * radius * radius) // 0.5^(2/3)
 					features[i].close_to_query_point[j] = true;
 				else
 					features[i].close_to_query_point[j] = false;
@@ -273,7 +273,7 @@ class PrincipleComponentAnalysis
 
 			std::vector<int>().swap(search_indices);
 			std::vector<int>().swap(search_indices_used);
-			std::vector<float>().swap(sqaured_distances);
+			std::vector<float>().swap(squared_distances);
 
 			std::chrono::steady_clock::time_point toc_2 = std::chrono::steady_clock::now();
 			std::chrono::duration<double> time_pca = std::chrono::duration_cast<std::chrono::duration<double>>(toc_2 - toc_1);
@@ -299,14 +299,14 @@ class PrincipleComponentAnalysis
 		//LOG(INFO) << "[" << in_cloud->points.size() << "] points used for PCA, pca down rate is [" << pca_down_rate << "]";
 		features.resize(in_cloud->points.size());
 
-		omp_set_num_threads(min_(4, omp_get_max_threads()));
+		omp_set_num_threads(min_(6, omp_get_max_threads()));
 #pragma omp parallel for												 //Multi-thread
 		for (int i = 0; i < in_cloud->points.size(); i += pca_down_rate) //faster way
 		{
 			// if (i % pca_down_rate == 0) {//this way is much slower
 			std::vector<int> search_indices_used; //points would be stored in sequence (from the closest point to the farthest point within the neighborhood)
 			std::vector<int> search_indices;	  //point index vector
-			std::vector<float> sqaured_distances; //distance vector
+			std::vector<float> squared_distances; //distance vector
 
 			float neighborhood_r = radius;
 			int neighborhood_k = nearest_k;
@@ -323,7 +323,7 @@ class PrincipleComponentAnalysis
 				}
 			}
 			//nearest_k=0 --> the knn is disabled, only the rnn is used
-			tree->radiusSearch(i, neighborhood_r, search_indices, sqaured_distances, neighborhood_k);
+			tree->radiusSearch(i, neighborhood_r, search_indices, squared_distances, neighborhood_k);
 
 			features[i].pt.x = in_cloud->points[i].x;
 			features[i].pt.y = in_cloud->points[i].y;
@@ -335,7 +335,7 @@ class PrincipleComponentAnalysis
 			features[i].close_to_query_point.resize(search_indices.size());
 			for (int j = 0; j < search_indices.size(); j++)
 			{
-				if (sqaured_distances[j] < 0.25 * radius * radius)
+				if (squared_distances[j] < 0.64 * radius * radius) // 0.5^(2/3)
 					features[i].close_to_query_point[j] = true;
 				else
 					features[i].close_to_query_point[j] = false;
@@ -347,7 +347,7 @@ class PrincipleComponentAnalysis
 				assign_normal(in_cloud->points[i], features[i]);
 			std::vector<int>().swap(search_indices);
 			std::vector<int>().swap(search_indices_used);
-			std::vector<float>().swap(sqaured_distances);
+			std::vector<float>().swap(squared_distances);
 		}
 		//}
 		return true;

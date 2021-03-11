@@ -34,7 +34,7 @@ DEFINE_double(gf_neigh_grid_h_thre, 2.2, "height threshold(m) among neighbor gri
 DEFINE_double(gf_max_h, DBL_MAX, "max height(m) allowed for ground point");
 DEFINE_int32(gf_ground_down_rate, 10, "downsampling decimation rate for target ground point cloud");
 DEFINE_int32(gf_nonground_down_rate, 3, "downsampling decimation rate for nonground point cloud");
-DEFINE_int32(dist_inverse_sampling_method, 0 , "use distance inverse sampling or not (0: disabled, 1: linear weight, 2: quadratic weight)");
+DEFINE_int32(dist_inverse_sampling_method, 0, "use distance inverse sampling or not (0: disabled, 1: linear weight, 2: quadratic weight)");
 DEFINE_double(unit_dist, 15.0, "distance that correspoinding to unit weight in inverse distance downsampling");
 DEFINE_bool(pca_distance_adpative_on, false, "enable the distance adpative pca or not. It is preferred to be on if the point cloud is collected by a spining scanner located at origin point");
 DEFINE_double(pca_neighbor_radius, 1.0, "pca neighborhood searching radius(m) for target point cloud");
@@ -46,12 +46,12 @@ DEFINE_int32(corr_num, 3000, "fixed number of the correspondence for global coar
 DEFINE_bool(reciprocal_corr_on, false, "Using reciprocal correspondence");
 DEFINE_bool(fixed_num_corr_on, false, "Using fixed number correspondece (best k matches)");
 DEFINE_double(corr_dis_thre, 2.0, "distance threshold between correspondence points");
-DEFINE_int32(reg_max_iter_num, 25, "Max iteration number for icp-based registration");
+DEFINE_int32(reg_max_iter_num, 25, "max iteration number for icp-based registration");
 DEFINE_double(converge_tran, 0.001, "convergence threshold for translation (in m)");
 DEFINE_double(converge_rot_d, 0.01, "convergence threshold for rotation (in degree)");
 DEFINE_double(heading_change_step_degree, 15, "The step for the rotation of heading");
-DEFINE_bool(is_global_reg, false, "Allow the global registration without good enough initial guess or not");
-DEFINE_bool(teaser_on, false, "Using TEASER++ to do the global coarse registration or not");
+DEFINE_bool(is_global_reg, true, "Allow the global registration without good enough initial guess or not");
+DEFINE_bool(teaser_on, false, "Using TEASER++ or to do the global coarse registration or not (using RANSAC instead)");
 //visualizer parameters
 DEFINE_bool(realtime_viewer_on, false, "Launch the real-time registration(correspondence) viewer or not");
 DEFINE_int32(screen_width, 1920, "monitor horizontal resolution (pixel)");
@@ -100,11 +100,11 @@ int main(int argc, char **argv)
     int max_iteration_num = FLAGS_reg_max_iter_num;
     float heading_step_d = FLAGS_heading_change_step_degree;
     bool launch_realtime_viewer = FLAGS_realtime_viewer_on;
-    bool is_global_registration = FLAGS_is_global_reg;
-    bool teaser_global_regsitration_on = FLAGS_teaser_on;
+    bool global_registration_on = FLAGS_is_global_reg;
+    bool teaser_on = FLAGS_teaser_on;
     float pca_linearity_thre_down = pca_linearity_thre + 0.1;
     float pca_planarity_thre_down = pca_planarity_thre + 0.1;
-    float keypoint_nms_radius = 0.1 * pca_neigh_r;
+    float keypoint_nms_radius = 0.25 * pca_neigh_r;
 
     DataIo<Point_T> dataio;
     MapViewer<Point_T> viewer(FLAGS_vis_intensity_scale, 0, 1, 1);
@@ -142,7 +142,7 @@ int main(int argc, char **argv)
                                  pca_linearity_thre_down, pca_planarity_thre_down, pca_distance_adpative_on,
                                  dist_inv_sampling_method, dist_inv_sampling_dist);
 
-    if (teaser_global_regsitration_on) //refine keypoints
+    if (global_registration_on) //refine keypoints
     {
         cfilter.non_max_suppress(cblock_1->pc_vertex, keypoint_nms_radius);
         cfilter.non_max_suppress(cblock_2->pc_vertex, keypoint_nms_radius);
@@ -152,16 +152,14 @@ int main(int argc, char **argv)
     constraint_t reg_con;
 
     //Assign target (cblock1) and source (cblock2) point cloud for registration
-    if (!is_global_registration)
-        creg.determine_source_target_cloud(cblock_1, cblock_2, reg_con);
-    else
-    {
-        creg.assign_source_target_cloud(cblock_1, cblock_2, reg_con);
-        dataio.read_station_position(appro_coordinate_file, "test_station", reg_con.block2->local_station, 1);
-    }
+    creg.determine_source_target_cloud(cblock_1, cblock_2, reg_con);
+
+    // creg.assign_source_target_cloud(cblock_1, cblock_2, reg_con);
+    // dataio.read_station_position(appro_coordinate_file, "test_station", reg_con.block2->local_station, 1);
 
     if (launch_realtime_viewer)
     {
+        LOG(WARNING) << "Press [Space] with your mouse on the viewer to go on";
         viewer.set_pause(1);
         viewer.display_feature_pts_compare_realtime(reg_con.block1, reg_con.block2, feature_viewer);
     }
@@ -169,37 +167,41 @@ int main(int argc, char **argv)
     Eigen::Matrix4d init_mat, ident_mat;
     init_mat.setIdentity();
     ident_mat.setIdentity();
-    if (teaser_global_regsitration_on)
+    if (global_registration_on)
     {
         pcTPtr target_cor(new pcT()), source_cor(new pcT()), pc_s_init(new pcT()), source_cor_tran(new pcT());
         creg.find_feature_correspondence_ncc(reg_con.block1->pc_vertex, reg_con.block2->pc_vertex, target_cor, source_cor,
                                              FLAGS_fixed_num_corr_on, feature_correspondence_num, FLAGS_reciprocal_corr_on);
-        creg.coarse_reg_teaser(target_cor, source_cor, init_mat, 3.0 * keypoint_nms_radius);
+        
+        if(teaser_on)
+            creg.coarse_reg_teaser(target_cor, source_cor, init_mat, 4.0 * keypoint_nms_radius);
+        else
+            creg.coarse_reg_ransac(target_cor, source_cor, init_mat, 4.0 * keypoint_nms_radius);
         if (launch_realtime_viewer)
         {
             pcl::transformPointCloud(*reg_con.block2->pc_down, *pc_s_init, init_mat);
             pcl::transformPointCloud(*source_cor, *source_cor_tran, init_mat);
+            LOG(WARNING) << "Press [Space] with your mouse on the viewer to go on";
             viewer.set_pause(1);
             viewer.display_correspondences_compare(feature_viewer, source_cor, target_cor, source_cor_tran,
                                                    reg_con.block2->pc_down, reg_con.block1->pc_down, pc_s_init, ident_mat, 5);
+            LOG(WARNING) << "Press [Space] with your mouse on the viewer to go on";
             viewer.set_pause(1);
             viewer.display_2_pc_compare_realtime(reg_con.block2->pc_down, reg_con.block1->pc_down, pc_s_init, reg_con.block1->pc_down, reg_viewer);
         }
     }
 
-    float reg_corr_dis_thre_min_thre = 0.25 * reg_corr_dis_thre;
-    if (!is_global_registration)
-        creg.mm_lls_icp(reg_con, max_iteration_num, reg_corr_dis_thre, converge_tran, converge_rot_d, reg_corr_dis_thre_min_thre,
+    creg.mm_lls_icp(reg_con, max_iteration_num, reg_corr_dis_thre, converge_tran, converge_rot_d, 0.25 * reg_corr_dis_thre,
                         1.1, "111110", "1101", 1.0, 0.1, 0.1, 0.1, init_mat);
 
-    else
-        creg.mm_lls_icp_4dof_global(reg_con, heading_step_d, max_iteration_num, reg_corr_dis_thre, converge_tran, converge_rot_d, reg_corr_dis_thre_min_thre);
+    //creg.mm_lls_icp_4dof_global(reg_con, heading_step_d, max_iteration_num, reg_corr_dis_thre, converge_tran, converge_rot_d, 0.25 * reg_corr_dis_thre);
 
     pcTPtr pc_s_tran(new pcT());
     pcl::transformPointCloud(*reg_con.block2->pc_down, *pc_s_tran, reg_con.Trans1_2);
 
     if (launch_realtime_viewer)
     {
+        LOG(WARNING)<< "Press [Space] with your mouse on the viewer to go on";
         viewer.set_pause(1);
         viewer.display_2_pc_compare_realtime(reg_con.block2->pc_down, reg_con.block1->pc_down, pc_s_tran, reg_con.block1->pc_down, reg_viewer);
     }

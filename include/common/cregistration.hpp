@@ -392,7 +392,6 @@ class CRegistration : public CloudUtility<PointT>
 		sac_ia.setCorrespondenceRandomness(15);
 		sac_ia.align(*traned_source);
 		transformationS2T = sac_ia.getFinalTransformation().template cast<double>();
-		;
 		double fitness_score = sac_ia.getFitnessScore();
 
 		std::chrono::steady_clock::time_point toc = std::chrono::steady_clock::now();
@@ -553,29 +552,22 @@ class CRegistration : public CloudUtility<PointT>
 		for (int i = 0; i < target_kpts_num; i++)
 		{
 			Eigen::VectorXf temp_descriptor(11);
-			int temp_descriptor_long = (int)target_kpts->points[i].curvature;
-			int temp_descriptor_long_close = (int)target_kpts->points[i].normal[0];
-			int temp_descriptor_long_far = (int)target_kpts->points[i].normal[1];
+			int temp_descriptor_close = (int)target_kpts->points[i].normal[0];
+			int temp_descriptor_far = (int)target_kpts->points[i].normal[1];
 			// neighborhood category with its distance to the query point
-			temp_descriptor(0) = temp_descriptor_long_close / 1000000;
-			temp_descriptor(1) = (temp_descriptor_long_close % 1000000) / 10000;
-			temp_descriptor(2) = (temp_descriptor_long_close % 10000) / 100;
-			temp_descriptor(3) = temp_descriptor_long_close % 100;
-			temp_descriptor(4) = temp_descriptor_long_far / 1000000;
-			temp_descriptor(5) = (temp_descriptor_long_far % 1000000) / 10000;
-			temp_descriptor(6) = (temp_descriptor_long_far % 10000) / 100;
-			temp_descriptor(7) = temp_descriptor_long_far % 100;
-			// neighborhood category
-			// temp_descriptor[5] = temp_descriptor_long / 1000000;
-			// temp_descriptor[6] = (temp_descriptor_long % 1000000) / 10000;
-			// temp_descriptor[7] = (temp_descriptor_long % 10000) / 100;
-			// temp_descriptor[8] = temp_descriptor_long % 100;
+			temp_descriptor(0) = temp_descriptor_close / 1000000;
+			temp_descriptor(1) = (temp_descriptor_close % 1000000) / 10000;
+			temp_descriptor(2) = (temp_descriptor_close % 10000) / 100;
+			temp_descriptor(3) = temp_descriptor_close % 100;
+			temp_descriptor(4) = temp_descriptor_far / 1000000;
+			temp_descriptor(5) = (temp_descriptor_far % 1000000) / 10000;
+			temp_descriptor(6) = (temp_descriptor_far % 10000) / 100;
+			temp_descriptor(7) = temp_descriptor_far % 100;
 			// other properties
 			float cur_i = target_kpts->points[i].intensity;
-			temp_descriptor(8) = (cur_i - intensity_min) / (intensity_max - intensity_min) * 255.0; //[0 - 255] //intensity //TODO: add the intensity scale input paremeter
-			temp_descriptor(9) = target_kpts->points[i].normal[3] * 200;							//[0 - 100] //curvature
-			temp_descriptor(10) = target_kpts->points[i].data[3] * 20;								//[0 - 100] //height above ground
-
+			temp_descriptor(8) = (cur_i - intensity_min) / (intensity_max - intensity_min) * 255.0; //[0 - 255] //normalized intensity 
+			temp_descriptor(9) = target_kpts->points[i].normal[3] * 100;							//[0 - 100] //curvature
+			temp_descriptor(10) = target_kpts->points[i].data[3] * 30;								//[0 - 100] //height above ground
 			//LOG(INFO) << temp_descriptor[1] << "," << temp_descriptor[2] << "," << temp_descriptor[3] << "," << temp_descriptor[4] << "," << temp_descriptor[5] << "," << temp_descriptor[6] << "," << temp_descriptor[7] << "," << temp_descriptor[8] << "," << temp_descriptor[9] << "," << temp_descriptor[10] << "," << temp_descriptor[11];
 			target_kpts_descriptors.push_back(temp_descriptor);
 		}
@@ -584,31 +576,22 @@ class CRegistration : public CloudUtility<PointT>
 		for (int i = 0; i < source_kpts_num; i++)
 		{
 			Eigen::VectorXf temp_descriptor(11);
-			int temp_descriptor_long = (int)source_kpts->points[i].curvature;
-			int temp_descriptor_long_close = (int)source_kpts->points[i].normal[0];
-			int temp_descriptor_long_far = (int)source_kpts->points[i].normal[1];
+			int temp_descriptor_close = (int)source_kpts->points[i].normal[0];
+			int temp_descriptor_far = (int)source_kpts->points[i].normal[1];
 			// neighborhood category with its distance to the query point
-			temp_descriptor(0) = temp_descriptor_long_close / 1000000;
-			temp_descriptor(1) = (temp_descriptor_long_close % 1000000) / 10000;
-			temp_descriptor(2) = (temp_descriptor_long_close % 10000) / 100;
-			temp_descriptor(3) = temp_descriptor_long_close % 100;
-			temp_descriptor(4) = temp_descriptor_long_far / 1000000;
-			temp_descriptor(5) = (temp_descriptor_long_far % 1000000) / 10000;
-			temp_descriptor(6) = (temp_descriptor_long_far % 10000) / 100;
-			temp_descriptor(7) = temp_descriptor_long_far % 100;
-			// neighborhood category
-			// temp_descriptor[5] = temp_descriptor_long / 1000000;
-			// temp_descriptor[6] = (temp_descriptor_long % 1000000) / 10000;
-			// temp_descriptor[7] = (temp_descriptor_long % 10000) / 100;
-			// temp_descriptor[8] = temp_descriptor_long % 100;
+			temp_descriptor(0) = temp_descriptor_close / 1000000;
+			temp_descriptor(1) = (temp_descriptor_close % 1000000) / 10000;
+			temp_descriptor(2) = (temp_descriptor_close % 10000) / 100;
+			temp_descriptor(3) = temp_descriptor_close % 100;
+			temp_descriptor(4) = temp_descriptor_far / 1000000;
+			temp_descriptor(5) = (temp_descriptor_far % 1000000) / 10000;
+			temp_descriptor(6) = (temp_descriptor_far % 10000) / 100;
+			temp_descriptor(7) = temp_descriptor_far % 100;
 			// other properties
 			float cur_i = source_kpts->points[i].intensity;
-			temp_descriptor(8) = (cur_i - intensity_min) / (intensity_max - intensity_min) * 255.0;
-			temp_descriptor(9) = source_kpts->points[i].normal[3] * 200; //[0 - 100] //curvature
-			temp_descriptor(10) = source_kpts->points[i].data[3] * 20;   //[0 - 100] //height above ground
-
-			//LOG(INFO)<< "i:" << temp_descriptor(8);
-
+			temp_descriptor(8) = (cur_i - intensity_min) / (intensity_max - intensity_min) * 255.0; //[0 - 255] //normalized intensity 
+			temp_descriptor(9) = source_kpts->points[i].normal[3] * 100; //[0 - 100] //curvature
+			temp_descriptor(10) = source_kpts->points[i].data[3] * 30;   //[0 - 100] //height above ground
 			//LOG(INFO) << temp_descriptor[1] << "," << temp_descriptor[2] << "," << temp_descriptor[3] << "," << temp_descriptor[4] << "," << temp_descriptor[5] << "," << temp_descriptor[6] << "," << temp_descriptor[7] << "," << temp_descriptor[8] << "," << temp_descriptor[9] << "," << temp_descriptor[10] << "," << temp_descriptor[11];
 			source_kpts_descriptors.push_back(temp_descriptor);
 		}
@@ -618,10 +601,12 @@ class CRegistration : public CloudUtility<PointT>
 			dist_table[i].resize(source_kpts_num);
 
 		std::vector<std::pair<int, float>> dist_array;
+        
 
-		int i;
-#pragma omp parallel for private(i) //Multi-thread
-		for (i = 0; i < target_kpts_num; i++)
+        //TODO: speed up
+		omp_set_num_threads(min_(6, omp_get_max_threads()));
+#pragma omp parallel for  //Multi-thread
+		for (int i = 0; i < target_kpts_num; i++)
 		{
 			for (int j = 0; j < source_kpts_num; j++)
 			{
@@ -692,7 +677,7 @@ class CRegistration : public CloudUtility<PointT>
 			std::vector<int> count_target_kpt(target_kpts_num, 0);
 			std::vector<int> count_source_kpt(source_kpts_num, 0);
 
-			int max_corr_num = 5;
+			int max_corr_num = 6;
 
 			for (int k = 0; k < corr_num; k++)
 			{
@@ -724,126 +709,71 @@ class CRegistration : public CloudUtility<PointT>
 
 		return true;
 	}
+    
 
-#if 0
-	bool find_feature_correspondence_bsc(const doubleVectorSBF &target_bscs, const doubleVectorSBF &source_bscs, int dof,
-										 const typename pcl::PointCloud<PointT>::Ptr &target_kpts, const typename pcl::PointCloud<PointT>::Ptr &source_kpts,
-										 typename pcl::PointCloud<PointT>::Ptr &target_corrs, typename pcl::PointCloud<PointT>::Ptr &source_corrs,
-										 bool reciprocal_on = true)
-
+    //coarse global registration using RANSAC
+	int coarse_reg_ransac(const typename pcl::PointCloud<PointT>::Ptr &target_pts,
+						  const typename pcl::PointCloud<PointT>::Ptr &source_pts,
+						  Eigen::Matrix4d &tran_mat, float noise_bound = 0.2, int min_inlier_num = 8, int max_iter_num = 10000)
 	{
-		LOG(INFO) << "[" << target_bscs[0].size() << "] bsc features in target point cloud and [" << source_bscs[0].size() << "] bsc features in source point cloud.";
+        std::chrono::steady_clock::time_point tic = std::chrono::steady_clock::now();
+		
+        int N = target_pts->points.size();
 
-		//LOG(INFO) << "bsc's dimension: [" << target_bscs.size() << "] , [" << source_bscs.size() << "]";
-		//TODO: speed up
-
-		std::chrono::steady_clock::time_point tic = std::chrono::steady_clock::now();
-
-		std::vector<std::vector<int>> dist_table(target_bscs[0].size());
-		for (int i = 0; i < target_bscs[0].size(); i++)
-			dist_table[i].resize(source_bscs[0].size());
-
-		StereoBinaryFeature sbf_operator;
-
-		int num_bsc;
-		if (dof < 4)
-			num_bsc = 1;
-		else if (dof == 4)
-			num_bsc = 2;
-		else
-			num_bsc = 4;
-
-		int dist_margin_thre = 5;
-
-		//assign distance
-
-		int i;
-#pragma omp parallel for private(i) //Multi-thread
-		for (i = 0; i < target_bscs[0].size(); i++)
+	    pcl::registration::CorrespondenceRejectorSampleConsensus<PointT> ransac_rej;
+		ransac_rej.setInputSource(source_pts);
+		ransac_rej.setInputTarget(target_pts);
+		ransac_rej.setInlierThreshold(noise_bound);
+		ransac_rej.setMaximumIterations(max_iter_num);
+		ransac_rej.setRefineModel(true);//false
+        
+		boost::shared_ptr<pcl::Correspondences> init_corres(new pcl::Correspondences);
+        for (int i=0; i< N; i++)
 		{
-			for (int j = 0; j < source_bscs[0].size(); j++)
-			{
-				if (target_bscs[0][i].keypointIndex_ == -1 || source_bscs[0][j].keypointIndex_ == -1)
-					dist_table[i][j] = 99999;
-				else
-				{
-					int min_dist_index = 0;
-					int min_dist = 99999;
-					for (int k = 0; k < num_bsc; k++)
-					{
-						int dist_temp = sbf_operator.hammingDistance(target_bscs[0][i], source_bscs[k][j]);
-						//LOG(INFO) << "hamming distance:" << dist_temp;
-						if (dist_temp < min_dist)
-						{
-							min_dist = dist_temp;
-							min_dist_index = k;
-						}
-					}
-					dist_table[i][j] = min_dist;
-				}
-			}
+			pcl::Correspondence cur_corr;
+			cur_corr.index_query=i;
+			cur_corr.index_match=i;
+			init_corres->push_back(cur_corr);
 		}
 
-		//find correspondence
-		for (int i = 0; i < target_bscs[0].size(); i++)
-		{
-			//LOG(INFO) << "keypoint indice: " << target_bscs[0][i].keypointIndex_;
+		boost::shared_ptr<pcl::Correspondences> final_corres(new pcl::Correspondences);
 
-			if (target_bscs[0][i].keypointIndex_ == -1)
-			{
-				//LOG(WARNING) << "not an correct index";
-				continue;
-			}
-
-			int min_dist_col_index = 0;
-			int min_dist_row = 99999;
-			for (int j = 0; j < source_bscs[0].size(); j++)
-			{
-				if (dist_table[i][j] < min_dist_row)
-				{
-					min_dist_row = dist_table[i][j];
-					min_dist_col_index = j;
-				}
-			}
-
-			bool refined_corr = true;
-
-			if (reciprocal_on)
-			{
-				for (int j = 0; j < target_bscs[0].size(); j++)
-				{
-					if (min_dist_row > dist_table[j][min_dist_col_index] + dist_margin_thre)
-					{
-						refined_corr = false;
-						break;
-					}
-				}
-			}
-
-			if (refined_corr)
-			{
-				LOG(WARNING) << "[" << i << "] - [" << min_dist_col_index << "]:" << min_dist_row;
-
-				target_corrs->points.push_back(target_kpts->points[i]);
-				source_corrs->points.push_back(source_kpts->points[min_dist_col_index]);
-			}
-		}
-
-		std::vector<std::vector<int>>().swap(dist_table);
+		ransac_rej.setInputCorrespondences(init_corres);
+		ransac_rej.getCorrespondences(*final_corres);
 
 		std::chrono::steady_clock::time_point toc = std::chrono::steady_clock::now();
 		std::chrono::duration<double> time_used = std::chrono::duration_cast<std::chrono::duration<double>>(toc - tic);
 
-		LOG(INFO) << "[" << source_corrs->points.size() << "] correspondences found by BSC feature matching in [" << time_used.count() * 1000.0 << "] ms";
+		LOG(INFO) << "----------------------------------------------------------------------------";
+		LOG(INFO) << "Begin RANSAC global coarse registration with [" << N << "] pairs of correspondence";
+		LOG(INFO) << "RANSAC global coarse registration done in [" << time_used.count() * 1000.0 << "] ms.";
+		LOG(INFO) << "[" << final_corres->size() << "] inlier correspondences found.";
 
-		return true;
+		if(final_corres->size() >= min_inlier_num)
+		{
+            Eigen::Matrix4f best_tran =ransac_rej.getBestTransformation();
+
+		    tran_mat = best_tran.cast<double>();
+
+			LOG(INFO) << "Estimated transformation by RANSAC is :\n"
+					  << tran_mat;
+
+            if (final_corres->size() >= 2 * min_inlier_num)
+				return (1); //reliable
+			else
+				return (0); //need check
+		}
+		else
+		{
+			LOG(WARNING) << "RANSAC failed";
+			return (-1);
+		}
 	}
-#endif
 
-	//coarse global registration using TEASER ++
+	//coarse global registration using TEASER ++ 
 	int coarse_reg_teaser(const typename pcl::PointCloud<PointT>::Ptr &target_pts,
 						  const typename pcl::PointCloud<PointT>::Ptr &source_pts,
-						  Eigen::Matrix4d &tran_mat, float noise_bound = 0.1, int min_inlier_num = 8)
+						  Eigen::Matrix4d &tran_mat, float noise_bound = 0.2, int min_inlier_num = 8)
 	{
 		//reference: https://github.com/MIT-SPARK/TEASER-plusplus
 		//TEASER: Fast and Certifiable Point Cloud Registration, Heng Yang et al.
@@ -880,7 +810,7 @@ class CRegistration : public CloudUtility<PointT>
 		// Prepare solver parameters
 		teaser::RobustRegistrationSolver::Params params;
 		params.noise_bound = noise_bound;
-		params.cbar2 = 1;
+		params.cbar2 = 1.0;
 		params.estimate_scaling = false;
 		params.rotation_max_iterations = 100;
 		params.rotation_gnc_factor = 1.4;
@@ -1315,8 +1245,8 @@ class CRegistration : public CloudUtility<PointT>
 		int process_code = 0;
 
 		//at least ${min_neccessary_corr_ratio} source points should have a match
-		int min_total_corr_num = 100;
-		int min_neccessary_corr_num = 25;
+		int min_total_corr_num = 50;
+		int min_neccessary_corr_num = 20;
 
 		float neccessary_corr_ratio = 1.0; //posterior unground points overlapping ratio
 
@@ -1360,21 +1290,11 @@ class CRegistration : public CloudUtility<PointT>
 		registration_cons.block2->clone_feature(pc_ground_sc, pc_pillar_sc, pc_beam_sc, pc_facade_sc, pc_roof_sc, pc_vertex_sc, !use_more_points); //source (point cloud used for a specific iteration)
 
 		batch_transform_feature_points(pc_ground_sc, pc_pillar_sc, pc_beam_sc, pc_facade_sc, pc_roof_sc, pc_vertex_sc, initial_guess); //apply initial guess
-
+        
+		//Filter the point cloud laying far away from the overlapping region
 		if (apply_intersection_filter && !apply_motion_undistortion_while_registration)
-		{
-			bounds_t intersection_bbx, source_init_guess_bbx_merged;
-			std::vector<bounds_t> source_init_guess_bbxs(3);
-			cfilter.get_cloud_bbx(pc_ground_sc, source_init_guess_bbxs[0]);
-			cfilter.get_cloud_bbx(pc_pillar_sc, source_init_guess_bbxs[1]);
-			cfilter.get_cloud_bbx(pc_facade_sc, source_init_guess_bbxs[2]);
-			cfilter.merge_bbx(source_init_guess_bbxs, source_init_guess_bbx_merged);
-			cfilter.get_intersection_bbx(registration_cons.block1->local_bound, source_init_guess_bbx_merged, intersection_bbx, 1.0);
-			cfilter.get_cloud_pair_intersection(intersection_bbx,
-												pc_ground_tc, pc_pillar_tc, pc_beam_tc, pc_facade_tc, pc_roof_tc, pc_vertex_tc,
-												pc_ground_sc, pc_pillar_sc, pc_beam_sc, pc_facade_sc, pc_roof_sc, pc_vertex_sc);
-			LOG(INFO) << "Intersection local bounding box filtering done";
-		}
+			intersection_filter(registration_cons, pc_ground_tc, pc_pillar_tc, pc_beam_tc, pc_facade_tc, pc_roof_tc, pc_vertex_tc,
+								pc_ground_sc, pc_pillar_sc, pc_beam_sc, pc_facade_sc, pc_roof_sc, pc_vertex_sc);
 
 		//Downsample source cloud if its point number is larger than target's
 		if (keep_less_source_points && !apply_motion_undistortion_while_registration)
@@ -1460,14 +1380,27 @@ class CRegistration : public CloudUtility<PointT>
 
 			// First, find coorespondences (nearest neighbor [for line] or normal shooting [for plane])
 			// We need to check the normal compatibility of the plane correspondences
-			if (used_feature_type[0] == '1' && pc_ground_sc->size() > 0)
-				determine_corres(pc_ground_sc, pc_ground_tc, registration_cons.block1->tree_ground, dis_thre_ground, corrs_ground, normal_shooting_on, true, normal_bearing); //Check normal vector
-			if (used_feature_type[1] == '1' && pc_pillar_sc->size() > 0)
-				determine_corres(pc_pillar_sc, pc_pillar_tc, registration_cons.block1->tree_pillar, dis_thre_pillar, corrs_pillar, false, true, normal_bearing); //Check primary vector
-			if (used_feature_type[2] == '1' && pc_facade_sc->size() > 0)
-				determine_corres(pc_facade_sc, pc_facade_tc, registration_cons.block1->tree_facade, dis_thre_facade, corrs_facade, normal_shooting_on, true, normal_bearing); //Check normal vector
-			if (used_feature_type[3] == '1' && pc_beam_sc->size() > 0)
-				determine_corres(pc_beam_sc, pc_beam_tc, registration_cons.block1->tree_beam, dis_thre_beam, corrs_beam, false, true, normal_bearing); //Check primary vector
+			#pragma omp parallel sections
+			{
+				#pragma omp section
+				{
+					if (used_feature_type[0] == '1' && pc_ground_sc->size() > 0)
+						determine_corres(pc_ground_sc, pc_ground_tc, registration_cons.block1->tree_ground, dis_thre_ground, corrs_ground, normal_shooting_on, true, normal_bearing); //Check normal vector
+				}			
+				#pragma omp section
+				{
+					if (used_feature_type[1] == '1' && pc_pillar_sc->size() > 0)
+						determine_corres(pc_pillar_sc, pc_pillar_tc, registration_cons.block1->tree_pillar, dis_thre_pillar, corrs_pillar, false, true, normal_bearing); //Check primary vector
+				}
+				#pragma omp section
+				{
+					if (used_feature_type[2] == '1' && pc_facade_sc->size() > 0)
+						determine_corres(pc_facade_sc, pc_facade_tc, registration_cons.block1->tree_facade, dis_thre_facade, corrs_facade, normal_shooting_on, true, normal_bearing); //Check normal vector
+
+					if (used_feature_type[3] == '1' && pc_beam_sc->size() > 0)
+						determine_corres(pc_beam_sc, pc_beam_tc, registration_cons.block1->tree_beam, dis_thre_beam, corrs_beam, false, true, normal_bearing); //Check primary vector
+				}
+			}
 			if (used_feature_type[4] == '1' && pc_roof_sc->size() > 0)
 				determine_corres(pc_roof_sc, pc_roof_tc, registration_cons.block1->tree_roof, dis_thre_roof, corrs_roof, normal_shooting_on, true, normal_bearing); //Check normal vector
 			if (used_feature_type[5] == '1' && pc_vertex_sc->size() > 0)
@@ -1516,7 +1449,7 @@ class CRegistration : public CloudUtility<PointT>
 			//....
 			//1111: all in
 
-			//roll, pitch, yaw, tx, ty, tz --> Transformation matrix [4x4]
+			//tx, ty, tz, roll, pitch, yaw --> Transformation matrix [4x4]
 			construct_trans_a(transform_x(0), transform_x(1), transform_x(2), transform_x(3), transform_x(4), transform_x(5), TempTran);
 
 			LOG(INFO) << "tx(m):" << transform_x(0) << ",ty(m):" << transform_x(1) << ",tz(m):" << transform_x(2)
@@ -1674,21 +1607,6 @@ class CRegistration : public CloudUtility<PointT>
 		*pc_ground_tc = *registration_cons.block1->pc_ground;
 
 		pcl::transformPointCloudWithNormals(*pc_ground_sc, *pc_ground_sc, initial_guess);
-
-		//Preprocessing for reg
-		// //Use bounding box to filter the outlier points
-		// bounds_t intersection_bbx;
-		// float bbx_boundary_pad = 1.0;
-		// intersection_bbx.min_x = max_(registration_cons.block1->local_bound.min_x, registration_cons.block2->local_bound.min_x) - bbx_boundary_pad;
-		// intersection_bbx.min_y = max_(registration_cons.block1->local_bound.min_y, registration_cons.block2->local_bound.min_y) - bbx_boundary_pad;
-		// intersection_bbx.min_z = max_(registration_cons.block1->local_bound.min_z, registration_cons.block2->local_bound.min_z) - bbx_boundary_pad;
-		// intersection_bbx.max_x = min_(registration_cons.block1->local_bound.max_x, registration_cons.block2->local_bound.max_x) + bbx_boundary_pad;
-		// intersection_bbx.max_y = min_(registration_cons.block1->local_bound.max_y, registration_cons.block2->local_bound.max_y) + bbx_boundary_pad;
-		// intersection_bbx.max_z = min_(registration_cons.block1->local_bound.max_z, registration_cons.block2->local_bound.max_z) + bbx_boundary_pad;
-		// CFilter<PointT> cfilter;
-		// cfilter.bbx_filter(registration_cons.block2->pc_ground, pc_ground_sc, intersection_bbx);
-		// cfilter.bbx_filter(registration_cons.block1->pc_ground, pc_ground_tc, intersection_bbx);
-		//LOG(INFO) << "Intersection Bounding box filtering done";
 
 		if (keep_less_source_points)
 			cfilter.random_downsample_pcl(pc_ground_sc, (int)(pc_ground_tc->points.size() / down_rate));
@@ -1886,6 +1804,1250 @@ class CRegistration : public CloudUtility<PointT>
 				  << registration_con.Trans1_2;
 
 		return true;
+	}
+
+  protected:
+  private:
+	void batch_transform_feature_points(typename pcl::PointCloud<PointT>::Ptr pc_ground, typename pcl::PointCloud<PointT>::Ptr pc_pillar,
+										typename pcl::PointCloud<PointT>::Ptr pc_beam, typename pcl::PointCloud<PointT>::Ptr pc_facade,
+										typename pcl::PointCloud<PointT>::Ptr pc_roof, typename pcl::PointCloud<PointT>::Ptr pc_vertex,
+										Eigen::Matrix4d &Tran)
+	{
+		pcl::transformPointCloudWithNormals(*pc_ground, *pc_ground, Tran);
+		pcl::transformPointCloudWithNormals(*pc_pillar, *pc_pillar, Tran);
+		pcl::transformPointCloudWithNormals(*pc_beam, *pc_beam, Tran);
+		pcl::transformPointCloudWithNormals(*pc_facade, *pc_facade, Tran);
+		pcl::transformPointCloudWithNormals(*pc_roof, *pc_roof, Tran);
+		pcl::transformPointCloudWithNormals(*pc_vertex, *pc_vertex, Tran);
+	}
+
+	//Time complexity of kdtree (in this case, the target point cloud [n points] is used for construct the tree while each point in source point cloud acts as a query point)
+	//build tree: O(nlogn) ---> so it's better to build the tree only once
+	//searching 1-nearest neighbor: O(logn) in average ---> so we can bear a larger number of target points
+	bool determine_corres(typename pcl::PointCloud<PointT>::Ptr &Source_Cloud, typename pcl::PointCloud<PointT>::Ptr &Target_Cloud,
+						  const typename pcl::search::KdTree<PointT>::Ptr &target_kdtree, float dis_thre,
+						  boost::shared_ptr<pcl::Correspondences> &Corr_f, bool normal_shooting_on, bool normal_check = true,
+						  float angle_thre_degree = 40, bool duplicate_check = true, int K_filter_distant_point = 500)
+	{
+		int K_min = 3;
+		float filter_dis_times = 2.5;
+		int normal_shooting_candidate_count = 10;
+
+		typename pcl::registration::CorrespondenceEstimation<PointT, PointT> corr_est; //for nearest neighbor searching
+
+		//CorrespondenceEstimationNormalShooting computes correspondences as points in the target cloud which have minimum distance to normals computed on the input cloud
+		typename pcl::registration::CorrespondenceEstimationNormalShooting<PointT, PointT, PointT> corr_est_ns; //for normal shooting searching
+
+		pcl::registration::CorrespondenceRejectorDistance corr_rej_dist;
+
+		// Add a median distance rejector (deprecated)
+		// pcl::registration::CorrespondenceRejectorMedianDistance::Ptr corr_rej_med (new pcl::registration::CorrespondenceRejectorMedianDistance);
+		// rej_med->setMedianFactor (4.0);
+		// reg.addCorrespondenceRejector (rej_med);
+
+		boost::shared_ptr<pcl::Correspondences> Corr(new pcl::Correspondences);
+
+		typename pcl::PointCloud<PointT>::Ptr Source_Cloud_f(new pcl::PointCloud<PointT>);
+		typename pcl::PointCloud<PointT>::Ptr Target_Cloud_f(new pcl::PointCloud<PointT>); //target point cloud would never change
+
+		if (Source_Cloud->points.size() >= K_min &&
+			Target_Cloud->points.size() >= K_min)
+		{
+			if (normal_shooting_on) // Normal Shooting
+			{
+				corr_est_ns.setInputSource(Source_Cloud);
+				corr_est_ns.setInputTarget(Target_Cloud);
+				corr_est_ns.setSourceNormals(Source_Cloud);
+				corr_est_ns.setSearchMethodTarget(target_kdtree, true);					  //saving the time of rebuilding kd-tree
+				corr_est_ns.setKSearch(normal_shooting_candidate_count);				  // Among the K nearest neighbours find the one with minimum perpendicular distance to the normal
+				corr_est_ns.determineCorrespondences(*Corr, filter_dis_times * dis_thre); //base on KDtreeNSearch
+																						  //corr_est_ns.determineReciprocalCorrespondences(*Corr);
+			}
+			else //Nearest Neighbor
+			{
+				corr_est.setInputCloud(Source_Cloud);
+				corr_est.setInputTarget(Target_Cloud);
+				corr_est.setSearchMethodTarget(target_kdtree, true);				   //saving the time of rebuilding kd-tree
+				corr_est.determineCorrespondences(*Corr, filter_dis_times * dis_thre); //base on KDtreeNSearch
+																					   //corr_est.determineReciprocalCorrespondences(*Corr);
+			}
+
+			// std::chrono::steady_clock::time_point toc = std::chrono::steady_clock::now();
+			// std::chrono::duration<double> determine_corr_time = std::chrono::duration_cast<std::chrono::duration<double>>(toc - tic);
+			// LOG(WARNING) << "Correspondence time 1: [" << determine_corr_time.count() * 1000 << "] ms";
+
+			//Filter outlier source points (they would not appear throughout the registration anymore)
+#if 1
+			if (Source_Cloud->points.size() >= K_filter_distant_point)
+			{
+				int count = 0;
+
+				//duplicate check -> just keep one source point corresponding to one target point
+				std::vector<unsigned int> duplicate_check_table(Target_Cloud->points.size(), 0);
+
+				for (auto iter = Corr->begin(); iter != Corr->end();)
+				{
+					int s_index, t_index;
+					s_index = (*iter).index_query;
+					t_index = (*iter).index_match;
+
+					if (t_index != -1)
+					{
+						if (duplicate_check && duplicate_check_table[t_index] > 0)
+							iter = Corr->erase(iter);
+						else
+						{
+							duplicate_check_table[t_index]++;
+
+							Source_Cloud_f->points.push_back(Source_Cloud->points[s_index]);
+							//Target_Cloud_f->points.push_back(Target_Cloud->points[t_index]);
+							(*iter).index_query = count;
+							//(*iter).index_match = count;
+							count++;
+							iter++;
+						}
+					}
+					else
+						iter++;
+				}
+				Corr->resize(count);
+
+				Source_Cloud_f->points.swap(Source_Cloud->points);
+				//Target_Cloud_f->points.swap(Target_Cloud->points);
+				std::vector<unsigned int>().swap(duplicate_check_table);
+			}
+#endif
+			corr_rej_dist.setInputCorrespondences(Corr);
+			corr_rej_dist.setMaximumDistance(dis_thre);
+			corr_rej_dist.getCorrespondences(*Corr_f);
+
+			if (normal_check) //only for planar points
+			{
+				int count = 0;
+				//Normal direction consistency check
+				for (auto iter = Corr_f->begin(); iter != Corr_f->end();)
+				{
+					int s_index, t_index;
+					s_index = (*iter).index_query;
+					t_index = (*iter).index_match;
+
+					if (t_index != -1)
+					{
+
+						Eigen::Vector3d n1;
+						Eigen::Vector3d n2;
+						n1 << Source_Cloud->points[s_index].normal[0], Source_Cloud->points[s_index].normal[1], Source_Cloud->points[s_index].normal[2];
+						n2 << Target_Cloud->points[t_index].normal[0], Target_Cloud->points[t_index].normal[1], Target_Cloud->points[t_index].normal[2];
+
+						float cos_intersection_angle = std::abs(n1.dot(n2)); // n1.norm()=n2.norm()=1
+
+						if (cos_intersection_angle < cos(angle_thre_degree / 180.0 * M_PI))
+						{
+							count++;
+							iter = Corr_f->erase(iter);
+						}
+						else
+							iter++;
+					}
+					else
+						iter++;
+				}
+				//LOG(INFO) << count << " correspondences are rejected by normal check";
+			}
+		}
+		else
+			return 0;
+		return 1;
+	}
+
+	bool add_corre_points(const typename pcl::PointCloud<PointT>::Ptr &sc, const typename pcl::PointCloud<PointT>::Ptr &tc, boost::shared_ptr<pcl::Correspondences> &corrs,
+						  const typename pcl::PointCloud<PointT>::Ptr &pc_sc_temp, const typename pcl::PointCloud<PointT>::Ptr &pc_tc_temp)
+	{
+		for (int i = 0; i < (*corrs).size(); i++)
+		{
+			int s_index, t_index;
+			s_index = (*corrs)[i].index_query;
+			t_index = (*corrs)[i].index_match;
+
+			if (t_index != -1)
+			{
+				pc_sc_temp->points.push_back(sc->points[s_index]);
+				pc_tc_temp->points.push_back(tc->points[t_index]);
+			}
+		}
+		return 1;
+	}
+
+	void update_corr_dist_thre(float &dis_thre_ground, float &dis_thre_pillar, float &dis_thre_beam,
+							   float &dis_thre_facade, float &dis_thre_roof, float &dis_thre_vertex,
+							   float dis_thre_update_rate, float dis_thre_min)
+
+	{
+		dis_thre_ground = max_(1.0 * dis_thre_ground / dis_thre_update_rate, dis_thre_min);
+		dis_thre_facade = max_(1.0 * dis_thre_facade / dis_thre_update_rate, dis_thre_min);
+		dis_thre_roof = max_(1.0 * dis_thre_roof / dis_thre_update_rate, dis_thre_min);
+		dis_thre_pillar = max_(1.0 * dis_thre_pillar / dis_thre_update_rate, dis_thre_min);
+		dis_thre_beam = max_(1.0 * dis_thre_beam / dis_thre_update_rate, dis_thre_min);
+		dis_thre_vertex = max_(1.0 * dis_thre_vertex / dis_thre_update_rate, dis_thre_min);
+	}
+
+	//brief: entrance to mulls transformation estimation
+	bool multi_metrics_lls_tran_estimation(const typename pcl::PointCloud<PointT>::Ptr &Source_Ground, const typename pcl::PointCloud<PointT>::Ptr &Target_Ground, boost::shared_ptr<pcl::Correspondences> &Corr_Ground,
+										   const typename pcl::PointCloud<PointT>::Ptr &Source_Pillar, const typename pcl::PointCloud<PointT>::Ptr &Target_Pillar, boost::shared_ptr<pcl::Correspondences> &Corr_Pillar,
+										   const typename pcl::PointCloud<PointT>::Ptr &Source_Beam, const typename pcl::PointCloud<PointT>::Ptr &Target_Beam, boost::shared_ptr<pcl::Correspondences> &Corr_Beam,
+										   const typename pcl::PointCloud<PointT>::Ptr &Source_Facade, const typename pcl::PointCloud<PointT>::Ptr &Target_Facade, boost::shared_ptr<pcl::Correspondences> &Corr_Facade,
+										   const typename pcl::PointCloud<PointT>::Ptr &Source_Roof, const typename pcl::PointCloud<PointT>::Ptr &Target_Roof, boost::shared_ptr<pcl::Correspondences> &Corr_Roof,
+										   const typename pcl::PointCloud<PointT>::Ptr &Source_Vertex, const typename pcl::PointCloud<PointT>::Ptr &Target_Vertex, boost::shared_ptr<pcl::Correspondences> &Corr_Vertex,
+										   Vector6d &unknown_x, Matrix6d &cofactor_matrix, int iter_num, std::string weight_strategy, float z_xy_balance_ratio = 1.0,
+										   float pt2pt_residual_window = 0.1, float pt2pl_residual_window = 0.1, float pt2li_residual_window = 0.1)
+	{
+		Matrix6d ATPA;
+		Vector6d ATPb;
+		ATPA.setZero();
+		ATPb.setZero();
+
+		//Deal with weight (contribution of each correspondence in the transformation estimation)
+		float w_ground = 1.0, w_facade = 1.0, w_roof = 1.0, w_pillar = 1.0, w_beam = 1.0, w_vertex = 1.0; //initialization
+
+		int m1 = (*Corr_Ground).size() + (*Corr_Roof).size();
+		int m2 = (*Corr_Facade).size();
+		int m3 = (*Corr_Pillar).size();
+		int m4 = (*Corr_Beam).size();
+		int m5 = (*Corr_Vertex).size();
+
+		if (weight_strategy[0] == '1') //x,y,z directional balanced weighting (guarantee the observability of the scene)
+		{
+			//deprecated
+			//w_ground = z_xy_balance_ratio * (0.0001 + 0.7 * m2 - 0.3 * m3 + m4) / (1.0 * m1); // x <-> y <-> z
+			//w_ground = z_xy_balance_ratio * (0.0001 + 1.414 / 2 * m2 - 0.414 / 2 * m3 + 1.414 / 2 * m4 ) / (1.0 * m1); // x <-> y <-> z
+			//float w_ground_square = z_xy_balance_ratio * (m2 + 2 * m3 - m4) / (0.0001 + 2.0 * m1);
+			w_ground = max_(0.01, z_xy_balance_ratio * (m2 + 2 * m3 - m4) / (0.0001 + 2.0 * m1));
+			w_roof = w_ground;
+			w_facade = 1.0;
+			w_pillar = 1.0;
+			w_beam = 1.0;
+			w_vertex = 1.0;
+		}
+
+		bool dist_weight = false;
+		bool residual_weight = false;
+		bool intensity_weight = false;
+		int iter_thre = 2; //the residual based weighting would only be applied after this number of iteration
+		if (weight_strategy[1] == '1' && iter_num > iter_thre) //weight according to residual 
+			residual_weight = true;
+		if (weight_strategy[2] == '1') //weight according to distance
+			dist_weight = true;
+		if (weight_strategy[3] == '1') //weight according to intensity
+			intensity_weight = true;
+
+		//point to plane
+		pt2pl_lls_summation(Source_Ground, Target_Ground, Corr_Ground, ATPA, ATPb, iter_num, w_ground, dist_weight, residual_weight, intensity_weight, pt2pl_residual_window);
+		pt2pl_lls_summation(Source_Facade, Target_Facade, Corr_Facade, ATPA, ATPb, iter_num, w_facade, dist_weight, residual_weight, intensity_weight, pt2pl_residual_window);
+		pt2pl_lls_summation(Source_Roof, Target_Roof, Corr_Roof, ATPA, ATPb, iter_num, w_roof, dist_weight, residual_weight, intensity_weight, pt2pl_residual_window);
+		//point to line
+		pt2li_lls_pri_direction_summation(Source_Pillar, Target_Pillar, Corr_Pillar, ATPA, ATPb, iter_num, w_pillar, dist_weight, residual_weight, intensity_weight, pt2li_residual_window);
+		pt2li_lls_pri_direction_summation(Source_Beam, Target_Beam, Corr_Beam, ATPA, ATPb, iter_num, w_beam, dist_weight, residual_weight, intensity_weight, pt2li_residual_window);
+		//point to point
+		pt2pt_lls_summation(Source_Vertex, Target_Vertex, Corr_Vertex, ATPA, ATPb, iter_num, w_vertex, dist_weight, residual_weight, intensity_weight, pt2pt_residual_window);
+
+		//ATPA is a symmetric matrix
+		ATPA.coeffRef(6) = ATPA.coeffRef(1);
+		ATPA.coeffRef(12) = ATPA.coeffRef(2);
+		ATPA.coeffRef(13) = ATPA.coeffRef(8);
+		ATPA.coeffRef(18) = ATPA.coeffRef(3);
+		ATPA.coeffRef(19) = ATPA.coeffRef(9);
+		ATPA.coeffRef(20) = ATPA.coeffRef(15);
+		ATPA.coeffRef(24) = ATPA.coeffRef(4);
+		ATPA.coeffRef(25) = ATPA.coeffRef(10);
+		ATPA.coeffRef(26) = ATPA.coeffRef(16);
+		ATPA.coeffRef(27) = ATPA.coeffRef(22);
+		ATPA.coeffRef(30) = ATPA.coeffRef(5);
+		ATPA.coeffRef(31) = ATPA.coeffRef(11);
+		ATPA.coeffRef(32) = ATPA.coeffRef(17);
+		ATPA.coeffRef(33) = ATPA.coeffRef(23);
+		ATPA.coeffRef(34) = ATPA.coeffRef(29);
+
+		//LOG(INFO) << "ATPA=" << std::endl << ATPA;
+		//LOG(INFO) << "ATPb=" << std::endl << ATPb;
+	
+		// Solve A*x = b  x= (ATPA)^(-1)ATPb
+		// x: tx ty tz alpha beta gamma (alpha beta gamma corresponding to roll, pitch and yaw)
+		// the approximated rotation matrix is
+		// |   1    -gamma   beta  |
+		// | gamma     1    -alpha |
+		// | -beta   alpha     1   |
+		//reference: A Review of Point Cloud Registration Algorithms for Mobile Robotics, Appendix
+
+		unknown_x = ATPA.inverse() * ATPb;
+
+		Eigen::Vector3d euler_angle(unknown_x(3), unknown_x(4), unknown_x(5));
+		Eigen::Matrix3d Jacobi;
+		get_quat_euler_jacobi(euler_angle, Jacobi);
+
+		//Qxx=(ATPA)^-1
+		//information matrix = Dxx^(-1)=Qxx^(-1)/(sigma_post)^2=ATPA/(sigma_post)^2
+		cofactor_matrix = ATPA.inverse();
+
+		//convert to the cofactor matrix with regard to quaternion from euler angle
+		cofactor_matrix.block<3, 3>(3, 3) = Jacobi * cofactor_matrix.block<3, 3>(3, 3) * Jacobi.transpose();
+		cofactor_matrix.block<3, 3>(0, 3) = cofactor_matrix.block<3, 3>(0, 3) * Jacobi.transpose();
+		cofactor_matrix.block<3, 3>(3, 0) = Jacobi * cofactor_matrix.block<3, 3>(3, 0);
+
+		return 1;
+	}
+
+	//Linearization of Rotation Matrix
+	//R = I + (alpha, beta, gamma) ^
+	//  = | 1      -gamma    beta |
+	//    | gamma   1       -alpha|
+	//    |-beta    alpha     1   |
+
+	//point-to-point LLS
+	bool pt2pt_lls_summation(const typename pcl::PointCloud<PointT>::Ptr &Source_Cloud, const typename pcl::PointCloud<PointT>::Ptr &Target_Cloud,
+							 boost::shared_ptr<pcl::Correspondences> &Corr, Matrix6d &ATPA, Vector6d &ATPb, int iter_num,
+							 float weight, bool dist_weight_or_not = false, bool residual_weight_or_not = false,
+							 bool intensity_weight_or_not = false,
+							 float residual_window_size = 0.1)
+	{
+		for (int i = 0; i < (*Corr).size(); i++)
+		{
+			int s_index, t_index;
+			s_index = (*Corr)[i].index_query;
+			t_index = (*Corr)[i].index_match;
+
+			if (t_index != -1)
+			{
+
+				float px = Source_Cloud->points[s_index].x;
+				float py = Source_Cloud->points[s_index].y;
+				float pz = Source_Cloud->points[s_index].z;
+				float qx = Target_Cloud->points[t_index].x;
+				float qy = Target_Cloud->points[t_index].y;
+				float qz = Target_Cloud->points[t_index].z;
+
+				float pi = Source_Cloud->points[s_index].intensity;
+				float qi = Target_Cloud->points[t_index].intensity;
+
+				float dx = px - qx;
+				float dy = py - qy;
+				float dz = pz - qz;
+
+				float wx, wy, wz;
+				wx = weight;
+
+				float dist = std::sqrt(qx * qx + qy * qy + qz * qz);
+
+				if (dist_weight_or_not)
+					wx = wx * get_weight_by_dist_adaptive(dist, iter_num);
+				//wx = wx * get_weight_by_dist(dist);
+
+				if (residual_weight_or_not)
+					wx = wx * get_weight_by_residual(std::sqrt(dx * dx + dy * dy + dz * dz), residual_window_size);
+				if (intensity_weight_or_not)
+					wx = wx * get_weight_by_intensity(pi + 0.0001, qi + 0.0001);
+
+				wy = wx;
+				wz = wx;
+                
+				// unknown x: [tx ty tz alpha beta gama] 
+
+				//    0  1  2  3  4  5
+				//    6  7  8  9 10 11
+				//   12 13 14 15 16 17
+				//   18 19 20 21 22 23
+				//   24 25 26 27 28 29
+				//   30 31 32 33 34 35
+
+				ATPA.coeffRef(0) += wx;
+				ATPA.coeffRef(1) += 0;
+				ATPA.coeffRef(2) += 0;
+				ATPA.coeffRef(3) += 0;
+				ATPA.coeffRef(4) += wx * pz;
+				ATPA.coeffRef(5) += (-wx * py);
+				ATPA.coeffRef(7) += wy;
+				ATPA.coeffRef(8) += 0;
+				ATPA.coeffRef(9) += (-wy * pz);
+				ATPA.coeffRef(10) += 0;
+				ATPA.coeffRef(11) += wy * px;
+				ATPA.coeffRef(14) += wz;
+				ATPA.coeffRef(15) += wz * py;
+				ATPA.coeffRef(16) += (-wz * px);
+				ATPA.coeffRef(17) += 0;
+				ATPA.coeffRef(21) += wy * pz * pz + wz * py * py;
+				ATPA.coeffRef(22) += (-wz * px * py);
+				ATPA.coeffRef(23) += (-wy * px * pz);
+				ATPA.coeffRef(28) += wx * pz * pz + wz * px * px;
+				ATPA.coeffRef(29) += (-wx * py * pz);
+				ATPA.coeffRef(35) += wx * py * py + wy * px * px;
+
+				ATPb.coeffRef(0) += (-wx * dx);
+				ATPb.coeffRef(1) += (-wy * dy);
+				ATPb.coeffRef(2) += (-wz * dz);
+				ATPb.coeffRef(3) += wy * pz * dy - wz * py * dz;
+				ATPb.coeffRef(4) += wz * px * dz - wx * pz * dx;
+				ATPb.coeffRef(5) += wx * py * dx - wy * px * dy;
+			}
+		}
+
+		return 1;
+	}
+
+	//point-to-plane LLS
+	bool pt2pl_lls_summation(const typename pcl::PointCloud<PointT>::Ptr &Source_Cloud, const typename pcl::PointCloud<PointT>::Ptr &Target_Cloud,
+							 boost::shared_ptr<pcl::Correspondences> &Corr, Matrix6d &ATPA, Vector6d &ATPb, int iter_num,
+							 float weight, bool dist_weight_or_not = false, bool residual_weight_or_not = false,
+							 bool intensity_weight_or_not = false,
+							 float residual_window_size = 0.1)
+	{
+		for (int i = 0; i < (*Corr).size(); i++)
+		{
+			int s_index, t_index;
+			s_index = (*Corr)[i].index_query;
+			t_index = (*Corr)[i].index_match;
+
+			if (t_index != -1)
+			{
+				float px = Source_Cloud->points[s_index].x;
+				float py = Source_Cloud->points[s_index].y;
+				float pz = Source_Cloud->points[s_index].z;
+				float qx = Target_Cloud->points[t_index].x;
+				float qy = Target_Cloud->points[t_index].y;
+				float qz = Target_Cloud->points[t_index].z;
+				float ntx = Target_Cloud->points[t_index].normal_x;
+				float nty = Target_Cloud->points[t_index].normal_y;
+				float ntz = Target_Cloud->points[t_index].normal_z;
+
+				float pi = Source_Cloud->points[s_index].intensity;
+				float qi = Target_Cloud->points[t_index].intensity;
+
+				float w = weight;
+
+				float a = ntz * py - nty * pz;
+				float b = ntx * pz - ntz * px;
+				float c = nty * px - ntx * py;
+
+				float d = ntx * qx + nty * qy + ntz * qz - ntx * px - nty * py - ntz * pz;
+
+				float dist = std::sqrt(qx * qx + qy * qy + qz * qz);
+
+				if (dist_weight_or_not)
+					w = w * get_weight_by_dist_adaptive(dist, iter_num);
+				//w = w * get_weight_by_dist(dist);
+
+				if (residual_weight_or_not)
+					w = w * get_weight_by_residual(std::abs(d), residual_window_size);
+				//w = w * get_weight_by_residual_general(std::abs(d), residual_window_size, 1.0);
+
+				if (intensity_weight_or_not)
+					w = w * get_weight_by_intensity(pi + 0.0001, qi + 0.0001);
+
+				(*Corr)[i].weight = w;
+
+
+				//    0  1  2  3  4  5
+				//    6  7  8  9 10 11
+				//   12 13 14 15 16 17
+				//   18 19 20 21 22 23
+				//   24 25 26 27 28 29
+				//   30 31 32 33 34 35
+
+				ATPA.coeffRef(0) += w * ntx * ntx;
+				ATPA.coeffRef(1) += w * ntx * nty;
+				ATPA.coeffRef(2) += w * ntx * ntz;
+				ATPA.coeffRef(3) += w * a * ntx;
+				ATPA.coeffRef(4) += w * b * ntx;
+				ATPA.coeffRef(5) += w * c * ntx;
+				ATPA.coeffRef(7) += w * nty * nty;
+				ATPA.coeffRef(8) += w * nty * ntz;
+				ATPA.coeffRef(9) += w * a * nty;
+				ATPA.coeffRef(10) += w * b * nty;
+				ATPA.coeffRef(11) += w * c * nty;
+				ATPA.coeffRef(14) += w * ntz * ntz;
+				ATPA.coeffRef(15) += w * a * ntz;
+				ATPA.coeffRef(16) += w * b * ntz;
+				ATPA.coeffRef(17) += w * c * ntz;
+				ATPA.coeffRef(21) += w * a * a;
+				ATPA.coeffRef(22) += w * a * b;
+				ATPA.coeffRef(23) += w * a * c;
+				ATPA.coeffRef(28) += w * b * b;
+				ATPA.coeffRef(29) += w * b * c;
+				ATPA.coeffRef(35) += w * c * c;
+
+				ATPb.coeffRef(0) += w * d * ntx;
+				ATPb.coeffRef(1) += w * d * nty;
+				ATPb.coeffRef(2) += w * d * ntz;
+				ATPb.coeffRef(3) += w * d * a;
+				ATPb.coeffRef(4) += w * d * b;
+				ATPb.coeffRef(5) += w * d * c;
+			}
+		}
+
+		return 1;
+	}
+
+	//point-to-line LLS (calculated using primary direction vector), used now
+	//the normal vector here actually stores the primary direcyion vector (for easier calculation of the residual)
+	bool pt2li_lls_pri_direction_summation(const typename pcl::PointCloud<PointT>::Ptr &Source_Cloud, const typename pcl::PointCloud<PointT>::Ptr &Target_Cloud,
+										   boost::shared_ptr<pcl::Correspondences> &Corr, Matrix6d &ATPA, Vector6d &ATPb, int iter_num,
+										   float weight, bool dist_weight_or_not = false, bool residual_weight_or_not = false,
+										   bool intensity_weight_or_not = false,
+										   float residual_window_size = 0.1)
+	{
+		for (int i = 0; i < (*Corr).size(); i++)
+		{
+			int s_index, t_index;
+			s_index = (*Corr)[i].index_query;
+			t_index = (*Corr)[i].index_match;
+
+			if (t_index != -1)
+			{
+				float px = Source_Cloud->points[s_index].x;
+				float py = Source_Cloud->points[s_index].y;
+				float pz = Source_Cloud->points[s_index].z;
+				float qx = Target_Cloud->points[t_index].x;
+				float qy = Target_Cloud->points[t_index].y;
+				float qz = Target_Cloud->points[t_index].z;
+
+				//primary direction (in this case, we save the primary direction of linear feature points in the normal vector)
+				float vx = Target_Cloud->points[t_index].normal_x;
+				float vy = Target_Cloud->points[t_index].normal_y;
+				float vz = Target_Cloud->points[t_index].normal_z;
+
+				//LOG(INFO) << nx << "," << ny<< "," <<nz;
+
+				float pi = Source_Cloud->points[s_index].intensity;
+				float qi = Target_Cloud->points[t_index].intensity;
+
+				float dx = px - qx;
+				float dy = py - qy;
+				float dz = pz - qz;
+
+				Eigen::Matrix<double, 3, 6> Amat;
+				Eigen::Matrix<double, 3, 1> bvec;
+				Eigen::Matrix<double, 3, 1> evec;
+				Eigen::Matrix<double, 3, 3> Imat;
+				Eigen::Matrix<double, 3, 3> Wmat;
+				Imat.setIdentity();
+				Wmat.setIdentity();
+
+				Amat(0, 0) = 0;
+				Amat(0, 1) = -vz;
+				Amat(0, 2) = vy;
+				Amat(0, 3) = vy * py + vz * pz;
+				Amat(0, 4) = -vy * px;
+				Amat(0, 5) = -vz * px;
+				Amat(1, 0) = vz;
+				Amat(1, 1) = 0;
+				Amat(1, 2) = -vx;
+				Amat(1, 3) = -vx * py;
+				Amat(1, 4) = vz * pz + vx * px;
+				Amat(1, 5) = -vz * py;
+				Amat(2, 0) = -vy;
+				Amat(2, 1) = vx;
+				Amat(2, 2) = 0;
+				Amat(2, 3) = -vx * pz;
+				Amat(2, 4) = -vy * pz;
+				Amat(2, 5) = vx * px + vy * py;
+
+				bvec(0, 0) = -vy * dz + vz * dy;
+				bvec(1, 0) = -vz * dx + vx * dz;
+				bvec(2, 0) = -vx * dy + vy * dx;
+
+				//evec = (Amat * (Amat.transpose() * Amat).inverse() * Amat.transpose() - Imat) * bvec; //posterior residual
+				//we'd like to directly use the prior residual
+				float ex = std::abs(bvec(0, 0));
+				float ey = std::abs(bvec(1, 0));
+				float ez = std::abs(bvec(2, 0));
+				float ed = std::sqrt(ex * ex + ey * ey + ez * ez);
+
+				float wx, wy, wz, w;
+				wx = weight;
+
+				float dist = std::sqrt(qx * qx + qy * qy + qz * qz);
+
+				if (dist_weight_or_not)
+					//wx *= get_weight_by_dist(dist);
+					wx *= get_weight_by_dist_adaptive(dist, iter_num);
+
+				if (intensity_weight_or_not)
+					wx *= get_weight_by_intensity(pi + 0.0001, qi + 0.0001);
+
+				if (residual_weight_or_not)
+				{
+					// wx *= get_weight_by_residual(ex, residual_window_size);
+					// wy *= get_weight_by_residual(ey, residual_window_size);
+					// wz *= get_weight_by_residual(ez, residual_window_size);
+
+					wx = wx * get_weight_by_residual(ed, residual_window_size); //original huber
+																				// wx = wx * get_weight_by_residual_general(ed, residual_window_size, 1.0);
+				}
+				wy = wx;
+				wz = wx;
+				(*Corr)[i].weight = wx;
+
+				Wmat(0, 0) = std::sqrt(wx);
+				Wmat(1, 1) = std::sqrt(wy);
+				Wmat(2, 2) = std::sqrt(wz);
+
+				Amat = Wmat * Amat;
+				bvec = Wmat * bvec;
+
+				for (int j = 0; j < 6; j++)
+				{
+					for (int k = j; k < 6; k++)
+						ATPA(j, k) += ((Amat.block<3, 1>(0, j)).transpose() * (Amat.block<3, 1>(0, k)));
+				}
+				for (int j = 0; j < 6; j++)
+					ATPb.coeffRef(j) += ((Amat.block<3, 1>(0, j)).transpose() * (bvec));
+			}
+		}
+		return 1;
+	}
+
+
+	bool ground_3dof_lls_tran_estimation(const typename pcl::PointCloud<PointT>::Ptr &Source_Ground,
+										 const typename pcl::PointCloud<PointT>::Ptr &Target_Ground,
+										 boost::shared_ptr<pcl::Correspondences> &Corr_Ground,
+										 Eigen::Vector3d &unknown_x, Eigen::Matrix3d &cofactor_matrix,
+										 int iter_num, std::string weight_strategy)
+	{
+		Eigen::Matrix3d ATPA;
+		Eigen::Vector3d ATPb;
+		ATPA.setZero();
+		ATPb.setZero();
+
+		bool dist_weight = false;
+		bool residual_weight = false;
+		bool intensity_weight = false;
+
+		if (weight_strategy[1] == '1') //weight according to residual
+			residual_weight = true;
+
+		if (weight_strategy[2] == '1') //weight according to distance
+			dist_weight = true;
+
+		if (weight_strategy[3] == '1') //weight according to intensity
+			intensity_weight = true;
+
+		pt2pl_ground_3dof_lls_summation(Source_Ground, Target_Ground, Corr_Ground, ATPA, ATPb, iter_num, 1.0, dist_weight, residual_weight, intensity_weight);
+
+		//ATPA is a symmetric matrix
+		//    0  1  2
+		//   [3] 4  5
+		//   [6][7] 8
+		ATPA.coeffRef(3) = ATPA.coeffRef(1);
+		ATPA.coeffRef(6) = ATPA.coeffRef(2);
+		ATPA.coeffRef(7) = ATPA.coeffRef(5);
+
+		// Solve A*x = b  x= (ATPA)^(-1)ATPb
+		// x: tx ty tz alpha beta gamma
+		unknown_x = ATPA.inverse() * ATPb;
+
+		return 1;
+	}
+
+	//ground 3dof : roll, pitch, z
+	bool pt2pl_ground_3dof_lls_summation(const typename pcl::PointCloud<PointT>::Ptr &Source_Cloud, const typename pcl::PointCloud<PointT>::Ptr &Target_Cloud,
+										 boost::shared_ptr<pcl::Correspondences> &Corr, Eigen::Matrix3d &ATPA, Eigen::Vector3d &ATPb, int iter_num,
+										 float weight, bool dist_weight_or_not = false, bool residual_weight_or_not = false, bool intensity_weight_or_not = false,
+										 float residual_window_size = 0.1)
+	{
+		//unknown : roll (alpha), picth (beta) and tz
+		for (int i = 0; i < (*Corr).size(); i++)
+		{
+			int s_index, t_index;
+			s_index = (*Corr)[i].index_query;
+			t_index = (*Corr)[i].index_match;
+
+			if (t_index != -1)
+			{
+
+				float px = Source_Cloud->points[s_index].x;
+				float py = Source_Cloud->points[s_index].y;
+				float pz = Source_Cloud->points[s_index].z;
+				float qx = Target_Cloud->points[t_index].x;
+				float qy = Target_Cloud->points[t_index].y;
+				float qz = Target_Cloud->points[t_index].z;
+				float ntx = Target_Cloud->points[t_index].normal_x;
+				float nty = Target_Cloud->points[t_index].normal_y;
+				float ntz = Target_Cloud->points[t_index].normal_z;
+
+				float pi = Source_Cloud->points[s_index].intensity;
+				float qi = Target_Cloud->points[t_index].intensity;
+
+				float w = weight;
+
+				float a = ntz * py - nty * pz;
+				float b = ntx * pz - ntz * px;
+
+				float d = ntx * qx + nty * qy + ntz * qz - ntx * px - nty * py - ntz * pz;
+
+				float dist = std::sqrt(qx * qx + qy * qy + qz * qz);
+				if (dist_weight_or_not)
+					w = w * get_weight_by_dist_adaptive(dist, iter_num);
+				//w = w * get_weight_by_dist(dist);
+
+				if (residual_weight_or_not)
+					w = w * get_weight_by_residual(std::abs(d), residual_window_size);
+
+				if (intensity_weight_or_not)
+					w = w * get_weight_by_intensity(pi + 0.0001, qi + 0.0001);
+
+				//    0  1  2
+				//    3  4  5
+				//    6  7  8
+
+				(*Corr)[i].weight = w;
+
+				ATPA.coeffRef(0) += w * a * a;
+				ATPA.coeffRef(1) += w * a * b;
+				ATPA.coeffRef(2) += w * a * ntz;
+				ATPA.coeffRef(4) += w * b * b;
+				ATPA.coeffRef(5) += w * b * ntz;
+				ATPA.coeffRef(8) += w * ntz * ntz;
+
+				ATPb.coeffRef(0) += w * d * a;
+				ATPb.coeffRef(1) += w * d * b;
+				ATPb.coeffRef(2) += w * d * ntz;
+			}
+		}
+
+		return 1;
+	}
+
+	//point-to-line LLS (calculated using normal vector) , Deprecated
+	bool pt2li_lls_summation(const typename pcl::PointCloud<PointT>::Ptr &Source_Cloud, const typename pcl::PointCloud<PointT>::Ptr &Target_Cloud,
+							 boost::shared_ptr<pcl::Correspondences> &Corr, Matrix6d &ATPA, Vector6d &ATPb, int iter_num,
+							 float weight, bool dist_weight_or_not = false, bool residual_weight_or_not = false,
+							 bool intensity_weight_or_not = false,
+							 float residual_window_size = 0.1)
+	{
+		for (int i = 0; i < (*Corr).size(); i++)
+		{
+			int s_index, t_index;
+			s_index = (*Corr)[i].index_query;
+			t_index = (*Corr)[i].index_match;
+
+			if (t_index != -1)
+			{
+				float px = Source_Cloud->points[s_index].x;
+				float py = Source_Cloud->points[s_index].y;
+				float pz = Source_Cloud->points[s_index].z;
+				float qx = Target_Cloud->points[t_index].x;
+				float qy = Target_Cloud->points[t_index].y;
+				float qz = Target_Cloud->points[t_index].z;
+				float ntx = Target_Cloud->points[t_index].normal[0];
+				float nty = Target_Cloud->points[t_index].normal[1];
+				float ntz = Target_Cloud->points[t_index].normal[2];
+				float nsx = Source_Cloud->points[s_index].normal[0];
+				float nsy = Source_Cloud->points[s_index].normal[1];
+				float nsz = Source_Cloud->points[s_index].normal[2];
+
+				float pi = Source_Cloud->points[s_index].intensity;
+				float qi = Target_Cloud->points[t_index].intensity;
+
+				float dx = px - qx;
+				float dy = py - qy;
+				float dz = pz - qz;
+
+				// norm (nt * ns)
+				float nx = nty * nsz - ntz * nsy;
+				float ny = ntz * nsx - ntx * nsz;
+				float nz = ntx * nsy - nty * nsx;
+				float nd = sqrt(nx * nx + ny * ny + nz * nz);
+				nx /= nd;
+				ny /= nd;
+				nz /= nd; //normalize
+
+				double nxy = nx * ny;
+				double nxz = nx * nz;
+				double nyz = ny * nz;
+				double nx2 = nx * nx;
+				double ny2 = ny * ny;
+				double nz2 = nz * nz;
+				double px2 = px * px;
+				double py2 = py * py;
+				double pz2 = pz * pz;
+				double pxy = px * py;
+				double pxz = px * pz;
+				double pyz = py * pz;
+
+				float d = std::sqrt((nxz * dz - nz2 * dx - ny2 * dx + nxy * dy) * (nxz * dz - nz2 * dx - ny2 * dx + nxy * dy) +
+									(-nz2 * dy + nyz * dz + nxy * dx - nx2 * dy) * (-nz2 * dy + nyz * dz + nxy * dx - nx2 * dy) +
+									(nyz * dy - ny2 * dz - nx2 * dz + nxz * dx) * (nyz * dy - ny2 * dz - nx2 * dz + nxz * dx));
+
+				// float ex = std::abs(nxz * dz - nz2 * dx - ny2 * dx + nxy * dy);
+				// float ey = std::abs(-nz2 * dy + nyz * dz + nxy * dx - nx2 * dy);
+				// float ez = std::abs(nyz * dy - ny2 * dz - nx2 * dz + nxz * dx);
+
+				float wx, wy, wz;
+				wx = weight;
+
+				float dist = std::sqrt(qx * qx + qy * qy + qz * qz);
+				if (dist_weight_or_not)
+					wx = wx * get_weight_by_dist_adaptive(dist, iter_num);
+				//wx = wx * get_weight_by_dist(dist);
+
+				if (intensity_weight_or_not)
+					wx = wx * get_weight_by_intensity(pi + 0.0001, qi + 0.0001);
+
+				if (residual_weight_or_not)
+				{
+					wx = wx * get_weight_by_residual(d, residual_window_size);
+					// wy = wy * get_weight_by_residual(std::abs(evec(1, 0)), residual_window_size);
+					// wz = wz * get_weight_by_residual(std::abs(evec(2, 0)), residual_window_size);
+				}
+
+				wy = wx;
+				wz = wx;
+
+				(*Corr)[i].weight = wx;
+
+				//    0  1  2  3  4  5
+				//    6  7  8  9 10 11
+				//   12 13 14 15 16 17
+				//   18 19 20 21 22 23
+				//   24 25 26 27 28 29
+				//   30 31 32 33 34 35
+
+				ATPA.coeffRef(0) += (wy * nz2 + wz * ny2);
+				ATPA.coeffRef(1) += (-wz * nxy);
+				ATPA.coeffRef(2) += (-wy * nxz);
+				ATPA.coeffRef(3) += (-wy * nxz * py + wz * nxy * pz);
+				ATPA.coeffRef(4) += (wy * nxz * px + wy * nz2 * pz + wz * ny2 * pz);
+				ATPA.coeffRef(5) += (-wy * nz2 * py - wz * ny2 * py + wz * nxy * px);
+				ATPA.coeffRef(7) += (wx * nz2 + wz * nx2);
+				ATPA.coeffRef(8) += (-wx * nyz);
+				ATPA.coeffRef(9) += (-wx * nz2 * pz - wx * nyz * py - wz * nz2 * pz);
+				ATPA.coeffRef(10) += (wx * nyz * px - wz * nxy * pz);
+				ATPA.coeffRef(11) += (wx * nz2 * px + wz * nxy * py + wz * nx2 * px);
+				ATPA.coeffRef(14) += (wx * ny2 + wy * nx2);
+				ATPA.coeffRef(15) += (wx * nyz * pz + wx * ny2 * py + wy * nx2 * py);
+				ATPA.coeffRef(16) += (-wx * ny2 * px - wy * nx2 * px - wy * nxz * pz);
+				ATPA.coeffRef(17) += (-wx * nyz * px + wy * nxz * py);
+				ATPA.coeffRef(21) += (wx * (nz2 * pz2 + ny2 * py2 + 2 * nyz * pyz) + wy * nx2 * py2 + wz * nx2 * pz2);
+				ATPA.coeffRef(22) += (-wx * (nyz * pxz + ny2 * pxy) - wy * (nx2 * pxy + nxz * pyz) + wz * nxy * pz2);
+				ATPA.coeffRef(23) += (-wx * (nz2 * pxz + nyz * pxy) + wy * nxz * py2 - wz * (nxy * pyz + nx2 * pxz));
+				ATPA.coeffRef(28) += (wx * ny2 * px2 + wy * (nx2 * px2 + nz2 * pz2 + 2 * nxz * pxz) + wz * ny2 * pz2);
+				ATPA.coeffRef(29) += (wx * nyz * px2 - wy * (nxz * pxy + nz2 * pyz) - wz * (ny2 * pyz + nxy * pxz));
+				ATPA.coeffRef(35) += (wx * nz2 * px2 + wy * nz2 * py2 + wz * (ny2 * py2 + nx2 * px2 + 2 * nxy * pxy));
+
+				ATPb.coeffRef(0) += (wy * (nxz * dz - nz2 * dx) + wz * (-ny2 * dx + nxy * dy));
+				ATPb.coeffRef(1) += (wx * (-nz2 * dy + nyz * dz) + wz * (nxy * dx - nx2 * dy));
+				ATPb.coeffRef(2) += (wx * (nyz * dy - ny2 * dz) + wy * (-nx2 * dz + nxz * dx));
+				ATPb.coeffRef(3) += (wx * (nz * pz * ny * py) * (nz * dy - ny * dz) + wy * nx * py * (-nx * dz + nz * dx) + wz * nx * pz * (-ny * dx + nx * dy));
+				ATPb.coeffRef(4) += (wx * ny * px * (-nz * dy + ny * dz) + wy * (nx * px + nz * pz) * (nx * dz - nz * dx) + wz * ny * pz * (-ny * dx + nx * dy));
+				ATPb.coeffRef(5) += (wx * nz * px * (-nz * dy + ny * dz) + wy * nz * py * (-nx * dz + nz * dx) + wz * (ny * py + nx * px) * (ny * dx - nx * dy));
+			}
+		}
+
+		return 1;
+	}
+
+	//calculate residual v
+	bool get_multi_metrics_lls_residual(const typename pcl::PointCloud<PointT>::Ptr &Source_Ground, const typename pcl::PointCloud<PointT>::Ptr &Target_Ground, boost::shared_ptr<pcl::Correspondences> &Corr_Ground,
+										const typename pcl::PointCloud<PointT>::Ptr &Source_Pillar, const typename pcl::PointCloud<PointT>::Ptr &Target_Pillar, boost::shared_ptr<pcl::Correspondences> &Corr_Pillar,
+										const typename pcl::PointCloud<PointT>::Ptr &Source_Beam, const typename pcl::PointCloud<PointT>::Ptr &Target_Beam, boost::shared_ptr<pcl::Correspondences> &Corr_Beam,
+										const typename pcl::PointCloud<PointT>::Ptr &Source_Facade, const typename pcl::PointCloud<PointT>::Ptr &Target_Facade, boost::shared_ptr<pcl::Correspondences> &Corr_Facade,
+										const typename pcl::PointCloud<PointT>::Ptr &Source_Roof, const typename pcl::PointCloud<PointT>::Ptr &Target_Roof, boost::shared_ptr<pcl::Correspondences> &Corr_Roof,
+										const typename pcl::PointCloud<PointT>::Ptr &Source_Vertex, const typename pcl::PointCloud<PointT>::Ptr &Target_Vertex, boost::shared_ptr<pcl::Correspondences> &Corr_Vertex,
+										const Vector6d &transform_x, double &sigma_square_post, double sigma_thre = 0.2)
+	{
+		double VTPV = 0;
+		int obeservation_count = 0;
+
+		pt2pl_lls_residual(Source_Ground, Target_Ground, Corr_Ground, transform_x, VTPV, obeservation_count);
+		pt2pl_lls_residual(Source_Facade, Target_Facade, Corr_Facade, transform_x, VTPV, obeservation_count);
+		pt2pl_lls_residual(Source_Roof, Target_Roof, Corr_Roof, transform_x, VTPV, obeservation_count);
+		pt2li_lls_residual(Source_Pillar, Target_Pillar, Corr_Pillar, transform_x, VTPV, obeservation_count);
+		pt2li_lls_residual(Source_Beam, Target_Beam, Corr_Beam, transform_x, VTPV, obeservation_count);
+		pt2pt_lls_residual(Source_Vertex, Target_Vertex, Corr_Vertex, transform_x, VTPV, obeservation_count);
+
+		sigma_square_post = VTPV / (obeservation_count - 6); //   VTPV/(n-t) , t is the neccessary observation number (dof), here, t=6
+
+		LOG(INFO) << "The posterior unit weight standard deviation (m) is " << sqrt(sigma_square_post);
+
+		if (sqrt(sigma_square_post) < sigma_thre)
+			return 1;
+		else
+			return 0;
+	}
+
+	bool pt2pt_lls_residual(const typename pcl::PointCloud<PointT>::Ptr &Source_Cloud, const typename pcl::PointCloud<PointT>::Ptr &Target_Cloud,
+							boost::shared_ptr<pcl::Correspondences> &Corr, const Vector6d &transform_x, double &VTPV, int &observation_count)
+	{
+		//point-to-plane distance metrics
+		//3 observation equation for 1 pair of correspondence
+		for (int i = 0; i < (*Corr).size(); i++)
+		{
+			int s_index, t_index;
+			s_index = (*Corr)[i].index_query;
+			t_index = (*Corr)[i].index_match;
+
+			if (t_index != -1)
+			{
+				float px = Source_Cloud->points[s_index].x;
+				float py = Source_Cloud->points[s_index].y;
+				float pz = Source_Cloud->points[s_index].z;
+				float qx = Target_Cloud->points[t_index].x;
+				float qy = Target_Cloud->points[t_index].y;
+				float qz = Target_Cloud->points[t_index].z;
+
+				float dx = px - qx;
+				float dy = py - qy;
+				float dz = pz - qz;
+
+				Eigen::Matrix<double, 3, 6> A_Matrix;
+				Eigen::Matrix<double, 3, 1> b_vector;
+				Eigen::Matrix<double, 3, 1> residual_vector;
+
+				A_Matrix << 1, 0, 0, 0, pz, -py,
+					0, 1, 0, -pz, 0, px,
+					0, 0, 1, py, -px, 0;
+				b_vector << -dx, -dy, -dz;
+
+				residual_vector = A_Matrix * transform_x - b_vector;
+
+				VTPV += (*Corr)[i].weight * (residual_vector(0) * residual_vector(0) + residual_vector(1) * residual_vector(1) + residual_vector(2) * residual_vector(2));
+
+				observation_count += 3;
+			}
+		}
+
+		return 1;
+	}
+
+	bool pt2pl_lls_residual(const typename pcl::PointCloud<PointT>::Ptr &Source_Cloud, const typename pcl::PointCloud<PointT>::Ptr &Target_Cloud,
+							boost::shared_ptr<pcl::Correspondences> &Corr, const Vector6d &transform_x, double &VTPV, int &observation_count)
+	{
+		//point-to-plane distance metrics
+		//1 observation equation for 1 pair of correspondence
+		for (int i = 0; i < (*Corr).size(); i++)
+		{
+			int s_index, t_index;
+			s_index = (*Corr)[i].index_query;
+			t_index = (*Corr)[i].index_match;
+			if (t_index != -1)
+			{
+				float px = Source_Cloud->points[s_index].x;
+				float py = Source_Cloud->points[s_index].y;
+				float pz = Source_Cloud->points[s_index].z;
+				float qx = Target_Cloud->points[t_index].x;
+				float qy = Target_Cloud->points[t_index].y;
+				float qz = Target_Cloud->points[t_index].z;
+				float ntx = Target_Cloud->points[t_index].normal_x;
+				float nty = Target_Cloud->points[t_index].normal_y;
+				float ntz = Target_Cloud->points[t_index].normal_z;
+
+				float a = ntz * py - nty * pz;
+				float b = ntx * pz - ntz * px;
+				float c = nty * px - ntx * py;
+				float d = ntx * qx + nty * qy + ntz * qz - ntx * px - nty * py - ntz * pz;
+
+				float residual = ntx * transform_x(0) + nty * transform_x(1) + ntz * transform_x(2) + a * transform_x(3) + b * transform_x(4) + c * transform_x(5) - d;
+
+				//LOG(INFO) << "final weight (pt-pl): " << (*Corr)[i].weight;
+
+				VTPV += (*Corr)[i].weight * residual * residual;
+
+				observation_count++;
+			}
+		}
+
+		return 1;
+	}
+
+	//primary vector stored as point normal
+	bool pt2li_lls_residual(const typename pcl::PointCloud<PointT>::Ptr &Source_Cloud, const typename pcl::PointCloud<PointT>::Ptr &Target_Cloud,
+							boost::shared_ptr<pcl::Correspondences> &Corr, const Vector6d &transform_x, double &VTPV, int &observation_count)
+	{
+		//point-to-line distance metrics
+		//3 observation equation for 1 pair of correspondence
+		for (int i = 0; i < (*Corr).size(); i++)
+		{
+			int s_index, t_index;
+			s_index = (*Corr)[i].index_query;
+			t_index = (*Corr)[i].index_match;
+			if (t_index != -1)
+			{
+				float px = Source_Cloud->points[s_index].x;
+				float py = Source_Cloud->points[s_index].y;
+				float pz = Source_Cloud->points[s_index].z;
+				float qx = Target_Cloud->points[t_index].x;
+				float qy = Target_Cloud->points[t_index].y;
+				float qz = Target_Cloud->points[t_index].z;
+				float vx = Target_Cloud->points[t_index].normal_x; //actually primary directional vector 
+				float vy = Target_Cloud->points[t_index].normal_y;
+				float vz = Target_Cloud->points[t_index].normal_z;
+
+				float dx = px - qx;
+				float dy = py - qy;
+				float dz = pz - qz;
+
+				Eigen::Matrix<double, 3, 6> A_Matrix;
+				Eigen::Matrix<double, 3, 1> b_vector;
+				Eigen::Matrix<double, 3, 1> residual_vector;
+
+				A_Matrix << 0, vz, -vy, -vz * pz - vy * py, vy * px, vz * px,
+					-vz, 0, vx, vx * py, -vx * px - vz * pz, vz * py,
+					vy, -vx, 0, vx * pz, vy * pz, -vy * py - vx * px;
+				b_vector << -vz * dy + vy * dz, -vx * dz + vz * dx, -vy * dx + vx * dy;
+
+				residual_vector = A_Matrix * transform_x - b_vector;
+
+				//LOG(INFO) << "final weight (pt-li): " << (*Corr)[i].weight;
+
+				//VTPV is the sum of square of the residuals
+				VTPV += (*Corr)[i].weight * (residual_vector(0) * residual_vector(0) + residual_vector(1) * residual_vector(1) + residual_vector(2) * residual_vector(2));
+
+				observation_count += 3;
+			}
+		}
+		return 1;
+	}
+
+	// the following lines contain the various weighting functions: distance weight, intensity-compatible weight and residual weight
+
+	// Intuition: three part, near , medium , far
+	// near used to control translation
+	// far used to control rotation
+	// medium used to control both
+	//TODO: change the distance weight according to the iteration number (mathematic deducing)
+	float get_weight_by_dist_adaptive(float dist, int iter_num, float unit_dist = 30.0, float b_min = 0.7, float b_max = 1.3, float b_step = 0.05)
+	{
+		float b_current = min_(b_min + b_step * iter_num, b_max);
+		float temp_weight = b_current + (1.0 - b_current) * dist / unit_dist;
+		temp_weight = max_(temp_weight, 0.01);
+		return temp_weight;
+	}
+
+	//standard
+	inline float get_weight_by_dist(float dist, float unit_dist = 60.0, float base_value = 0.7) //unit_dist = 60.0 (is just a multiplier constant)
+	{
+		return (base_value + (1 - base_value) * dist / unit_dist);
+		//return (base_value + (1 - base_value) * unit_dist / dist);
+	}
+
+	inline float get_weight_by_intensity(float intensity_1, float intensity_2, float base_value = 0.6, float intensity_scale = 255.0)
+	{
+		float intensity_diff_ratio = std::fabs(intensity_1 - intensity_2) / intensity_scale;
+		float intensity_weight = std::exp(-1.0 * intensity_diff_ratio);
+		return intensity_weight;
+		//return (base_value + (1 - base_value) * min_(intensity_1 / intensity_2, intensity_2 / intensity_1));
+	}
+
+	//By huber loss function
+	inline float get_weight_by_residual(float res, float huber_thre = 0.05, int delta = 1) //test different kind of robust kernel function here
+	{
+		//return ((res > huber_thre) ? (std::sqrt(1.0 + (res / huber_thre - 1.0)) / (res / huber_thre)) : (1.0));
+		//return ((res > huber_thre) ? (1.0 + (res / huber_thre - 1.0) / (res / huber_thre) / (res / huber_thre)) : (1.0)); //this function (naive huber) is better
+		//return ((res > huber_thre) ? (huber_thre / res) : (1.0));
+
+		//Huber Loss
+		//y=0.5*x^2        , x<d
+		//y=0.5*d^2+|x|-d  , x>=d
+		//d= 1, |x|= res/huber_thre
+		//weight=(0.5*d^2+|x|-d)/(0.5*x^2) = (2*res*huber_thre-huber_thre*huber_thre)/res/res)
+		return ((res > huber_thre) ? ((2 * res * huber_thre + (delta * delta - 2 * delta) * (huber_thre * huber_thre)) / res / res) : (1.0));
+	}
+
+	//general function for m-estimation
+	float get_weight_by_residual_general(float res, float thre = 0.05, float alpha = 2.0) //test different kind of robust kernel function here
+	{
+		float weight;
+		res = res / thre;
+		if (alpha == 2)
+			weight = 1.0;
+		else if (alpha == 0)
+			weight = 2.0 / (res * res + 2.0);
+		else
+			weight = 1.0 * std::pow((res * res / std::abs(alpha - 2.0) + 1.0), (alpha * 0.5 - 1.0));
+
+		return weight;
+	}
+
+	//roll - pitch - yaw rotation (x - y' - z'') ----> this is for our tiny angle approximation
+	bool construct_trans_a(const double &tx, const double &ty, const double &tz,
+						   const double &alpha, const double &beta, const double &gamma,
+						   Eigen::Matrix4d &transformation_matrix)
+	{
+		// Construct the transformation matrix from rotation and translation
+		transformation_matrix = Eigen::Matrix<double, 4, 4>::Zero();
+		// From euler angle to rotation matrix
+
+		transformation_matrix(0, 0) = std::cos(gamma) * std::cos(beta);
+		transformation_matrix(0, 1) = -std::sin(gamma) * std::cos(alpha) + std::cos(gamma) * std::sin(beta) * std::sin(alpha);
+		transformation_matrix(0, 2) = std::sin(gamma) * std::sin(alpha) + std::cos(gamma) * std::sin(beta) * std::cos(alpha);
+		transformation_matrix(1, 0) = std::sin(gamma) * std::cos(beta);
+		transformation_matrix(1, 1) = std::cos(gamma) * std::cos(alpha) + std::sin(gamma) * std::sin(beta) * std::sin(alpha);
+		transformation_matrix(1, 2) = -std::cos(gamma) * std::sin(alpha) + std::sin(gamma) * std::sin(beta) * std::cos(alpha);
+		transformation_matrix(2, 0) = -std::sin(beta);
+		transformation_matrix(2, 1) = std::cos(beta) * std::sin(alpha);
+		transformation_matrix(2, 2) = std::cos(beta) * std::cos(alpha);
+
+		transformation_matrix(0, 3) = tx;
+		transformation_matrix(1, 3) = ty;
+		transformation_matrix(2, 3) = tz;
+		transformation_matrix(3, 3) = 1.0;
+
+		return 1;
+	}
+
+	bool construct_trans_b(const float &tx, const float &ty, const float &tz,
+						   const float &alpha, const float &beta, const float &gamma,
+						   Eigen::Matrix4d &transformation_matrix)
+	{
+		// Construct the transformation matrix from rotation and translation
+		transformation_matrix.setIdentity();
+
+		//tiny angle simplified version
+		transformation_matrix(0, 1) = -gamma;
+		transformation_matrix(0, 2) = beta;
+		transformation_matrix(1, 0) = gamma;
+		transformation_matrix(1, 2) = -alpha;
+		transformation_matrix(2, 0) = -beta;
+		transformation_matrix(2, 1) = alpha;
+
+		transformation_matrix(0, 3) = static_cast<double>(tx);
+		transformation_matrix(1, 3) = static_cast<double>(ty);
+		transformation_matrix(2, 3) = static_cast<double>(tz);
+		transformation_matrix(3, 3) = static_cast<double>(1);
+
+		return 1;
+	}
+
+	//Brief: calculate the Jacobi Matrix of the imaginary part of a quaternion (q1,q2,q3) with regard to its corresponding euler angle (raw,pitch,yaw)
+	//for converting the euler angle variance-covariance matrix to quaternion variance-covariance matrix using variance-covariance propagation law
+	//Log: Pay attetion to the euler angle order here. I originally use yaw, pitch, roll (z, y', x'') here, the correct one should be roll, pitch, yaw (x, y', z'')
+	//reference:
+	//1 . http://easyspin.org/easyspin/documentation/eulerangles.html
+	//2 . https://en.wikipedia.org/wiki/Euler_angles
+	bool get_quat_euler_jacobi(const Eigen::Vector3d &euler_angle, Eigen::Matrix3d &Jacobi, bool xyz_sequence_or_not = true)
+	{
+		float sin_half_roll, cos_half_roll, sin_half_pitch, cos_half_pitch, sin_half_yaw, cos_half_yaw;
+
+		sin_half_roll = sin(0.5 * euler_angle(0));
+		sin_half_pitch = sin(0.5 * euler_angle(1));
+		sin_half_yaw = sin(0.5 * euler_angle(2));
+		cos_half_roll = cos(0.5 * euler_angle(0));
+		cos_half_pitch = cos(0.5 * euler_angle(1));
+		cos_half_yaw = cos(0.5 * euler_angle(2));
+
+		//roll pitch yaw (x, y', z'') , used
+		if(xyz_sequence_or_not)
+		{
+			Jacobi(0, 0) = 0.5 * (cos_half_roll * cos_half_pitch * cos_half_yaw + sin_half_roll * sin_half_pitch * sin_half_yaw);
+			Jacobi(0, 1) = 0.5 * (-sin_half_roll * sin_half_pitch * cos_half_yaw - cos_half_roll * cos_half_pitch * sin_half_yaw);
+			Jacobi(0, 2) = 0.5 * (-sin_half_roll * cos_half_pitch * sin_half_yaw - cos_half_roll * sin_half_pitch * cos_half_yaw);
+
+			Jacobi(1, 0) = 0.5 * (-sin_half_roll * sin_half_pitch * cos_half_yaw + cos_half_roll * cos_half_pitch * sin_half_yaw);
+			Jacobi(1, 1) = 0.5 * (cos_half_roll * cos_half_pitch * cos_half_yaw - sin_half_roll * sin_half_pitch * sin_half_yaw);
+			Jacobi(1, 2) = 0.5 * (-cos_half_roll * sin_half_pitch * sin_half_yaw + sin_half_roll * cos_half_pitch * cos_half_yaw);
+
+			Jacobi(2, 0) = 0.5 * (-sin_half_roll * cos_half_pitch * sin_half_yaw - cos_half_roll * sin_half_pitch * cos_half_yaw);
+			Jacobi(2, 1) = 0.5 * (-cos_half_roll * sin_half_pitch * sin_half_yaw - sin_half_roll * cos_half_pitch * cos_half_yaw);
+			Jacobi(2, 2) = 0.5 * (cos_half_roll * cos_half_pitch * cos_half_yaw + sin_half_roll * sin_half_pitch * sin_half_yaw);
+		}
+		else //yaw pitch roll (z, y', x'') , not used
+		{
+		    Jacobi(0, 0) = 0.5 * (-sin_half_roll * cos_half_pitch * sin_half_yaw - cos_half_roll * sin_half_pitch * cos_half_yaw);
+			Jacobi(0, 1) = 0.5 * (-cos_half_roll * sin_half_pitch * sin_half_yaw - sin_half_roll * cos_half_pitch * cos_half_yaw);
+			Jacobi(0, 2) = 0.5 * (cos_half_roll * cos_half_pitch * cos_half_yaw + sin_half_roll * sin_half_pitch * sin_half_yaw);
+
+			Jacobi(1, 0) = 0.5 * (cos_half_roll * cos_half_pitch * sin_half_yaw - sin_half_roll * sin_half_pitch * cos_half_yaw);
+			Jacobi(1, 1) = 0.5 * (-sin_half_roll * sin_half_pitch * sin_half_yaw + cos_half_roll * cos_half_pitch * cos_half_yaw);
+			Jacobi(1, 2) = 0.5 * (sin_half_roll * cos_half_pitch * cos_half_yaw - cos_half_roll * sin_half_pitch * sin_half_yaw);
+
+			Jacobi(2, 0) = 0.5 * (cos_half_roll * cos_half_pitch * cos_half_yaw - sin_half_roll * sin_half_pitch * sin_half_yaw);
+			Jacobi(2, 1) = 0.5 * (-sin_half_roll * sin_half_pitch * cos_half_yaw + cos_half_roll * cos_half_pitch * sin_half_yaw);
+			Jacobi(2, 2) = 0.5 * (-sin_half_roll * cos_half_pitch * sin_half_yaw + cos_half_roll * sin_half_pitch * cos_half_yaw);
+		}
+		return 1;
+	}
+
+	bool get_translation_in_station_coor_sys(const Eigen::Matrix4d &T_world, const centerpoint_t &station_in_world, Eigen::Vector3d &t_station)
+	{
+		Eigen::Vector3d t_ws(station_in_world.x, station_in_world.y, station_in_world.z);
+		Eigen::Vector3d t_w(T_world(0, 3), T_world(1, 3), T_world(2, 3));
+		Eigen::Matrix3d R_w = T_world.block<3, 3>(0, 0);
+
+		t_station = t_w + R_w * t_ws - t_ws;
+
+		return 1;
+	}
+
+	void apply_cloudclock_cp_local_shift(cloudblock_Ptr &block, float shift_x, float shift_y, float shift_z)
+	{
+		if (block->station_position_available)
+		{
+			block->local_station.x += shift_x;
+			block->local_station.y += shift_y;
+			block->local_station.z += shift_z;
+		}
+		else
+		{
+			block->local_cp.x += shift_x;
+			block->local_cp.y += shift_y;
+			block->local_cp.z += shift_z;
+		}
+	}
+
+	//this function is for speed up the registration process when the point number is a bit too big
+	bool keep_less_source_pts(typename pcl::PointCloud<PointT>::Ptr &pc_ground_tc,
+							  typename pcl::PointCloud<PointT>::Ptr &pc_pillar_tc,
+							  typename pcl::PointCloud<PointT>::Ptr &pc_beam_tc,
+							  typename pcl::PointCloud<PointT>::Ptr &pc_facade_tc,
+							  typename pcl::PointCloud<PointT>::Ptr &pc_roof_tc,
+							  typename pcl::PointCloud<PointT>::Ptr &pc_vertex_tc,
+							  typename pcl::PointCloud<PointT>::Ptr &pc_ground_sc,
+							  typename pcl::PointCloud<PointT>::Ptr &pc_pillar_sc,
+							  typename pcl::PointCloud<PointT>::Ptr &pc_beam_sc,
+							  typename pcl::PointCloud<PointT>::Ptr &pc_facade_sc,
+							  typename pcl::PointCloud<PointT>::Ptr &pc_roof_sc,
+							  typename pcl::PointCloud<PointT>::Ptr &pc_vertex_sc,
+							  int ground_down_rate = 4, int facade_down_rate = 2, int target_down_rate = 2)
+	{
+		CFilter<PointT> cfilter;
+
+		cfilter.random_downsample_pcl(pc_ground_tc, (int)(pc_ground_tc->points.size() / target_down_rate));
+		cfilter.random_downsample_pcl(pc_facade_tc, (int)(pc_facade_tc->points.size() / target_down_rate));
+
+		cfilter.random_downsample_pcl(pc_ground_sc, (int)(pc_ground_tc->points.size() / ground_down_rate));
+		cfilter.random_downsample_pcl(pc_facade_sc, (int)(pc_facade_tc->points.size() / facade_down_rate));
+		cfilter.random_downsample_pcl(pc_pillar_sc, (int)(pc_pillar_tc->points.size()));
+		cfilter.random_downsample_pcl(pc_beam_sc, (int)(pc_beam_tc->points.size()));
+		cfilter.random_downsample_pcl(pc_roof_sc, (int)(pc_roof_tc->points.size()));
+		cfilter.random_downsample_pcl(pc_vertex_sc, (int)(pc_vertex_tc->points.size()));
+		return true;
+	}
+
+	bool intersection_filter( constraint_t &registration_cons,
+							  typename pcl::PointCloud<PointT>::Ptr &pc_ground_tc,
+							  typename pcl::PointCloud<PointT>::Ptr &pc_pillar_tc,
+							  typename pcl::PointCloud<PointT>::Ptr &pc_beam_tc,
+							  typename pcl::PointCloud<PointT>::Ptr &pc_facade_tc,
+							  typename pcl::PointCloud<PointT>::Ptr &pc_roof_tc,
+							  typename pcl::PointCloud<PointT>::Ptr &pc_vertex_tc,
+							  typename pcl::PointCloud<PointT>::Ptr &pc_ground_sc,
+							  typename pcl::PointCloud<PointT>::Ptr &pc_pillar_sc,
+							  typename pcl::PointCloud<PointT>::Ptr &pc_beam_sc,
+							  typename pcl::PointCloud<PointT>::Ptr &pc_facade_sc,
+							  typename pcl::PointCloud<PointT>::Ptr &pc_roof_sc,
+							  typename pcl::PointCloud<PointT>::Ptr &pc_vertex_sc,
+							  float bbx_pad = 1.0)
+	{
+		CFilter<PointT> cfilter;
+		bounds_t intersection_bbx, source_init_guess_bbx_merged;
+		std::vector<bounds_t> source_init_guess_bbxs(3);
+		cfilter.get_cloud_bbx(pc_ground_sc, source_init_guess_bbxs[0]);
+		cfilter.get_cloud_bbx(pc_pillar_sc, source_init_guess_bbxs[1]);
+		cfilter.get_cloud_bbx(pc_facade_sc, source_init_guess_bbxs[2]);
+		cfilter.merge_bbx(source_init_guess_bbxs, source_init_guess_bbx_merged);
+		cfilter.get_intersection_bbx(registration_cons.block1->local_bound, source_init_guess_bbx_merged, intersection_bbx, bbx_pad);
+		cfilter.get_cloud_pair_intersection(intersection_bbx,
+											pc_ground_tc, pc_pillar_tc, pc_beam_tc, pc_facade_tc, pc_roof_tc, pc_vertex_tc,
+											pc_ground_sc, pc_pillar_sc, pc_beam_sc, pc_facade_sc, pc_roof_sc, pc_vertex_sc);
+		LOG(INFO) << "Intersection local bounding box filtering done";
 	}
 
 	//Coordinate system covertation related functions
@@ -2343,1252 +3505,6 @@ class CRegistration : public CloudUtility<PointT>
 		}
 
 		return 1;
-	}
-
-  protected:
-  private:
-	void batch_transform_feature_points(typename pcl::PointCloud<PointT>::Ptr pc_ground, typename pcl::PointCloud<PointT>::Ptr pc_pillar,
-										typename pcl::PointCloud<PointT>::Ptr pc_beam, typename pcl::PointCloud<PointT>::Ptr pc_facade,
-										typename pcl::PointCloud<PointT>::Ptr pc_roof, typename pcl::PointCloud<PointT>::Ptr pc_vertex,
-										Eigen::Matrix4d &Tran)
-	{
-		pcl::transformPointCloudWithNormals(*pc_ground, *pc_ground, Tran);
-		pcl::transformPointCloudWithNormals(*pc_pillar, *pc_pillar, Tran);
-		pcl::transformPointCloudWithNormals(*pc_beam, *pc_beam, Tran);
-		pcl::transformPointCloudWithNormals(*pc_facade, *pc_facade, Tran);
-		pcl::transformPointCloudWithNormals(*pc_roof, *pc_roof, Tran);
-		pcl::transformPointCloudWithNormals(*pc_vertex, *pc_vertex, Tran);
-	}
-
-	//Time complexity of kdtree (in this case, the target point cloud [n points] is used for construct the tree while each point in source point cloud acts as a query point)
-	//build tree: O(nlogn) ---> so it's better to build the tree only once
-	//searching 1-nearest neighbor: O(logn) in average ---> so we can bear a larger number of target points
-	bool determine_corres(typename pcl::PointCloud<PointT>::Ptr &Source_Cloud, typename pcl::PointCloud<PointT>::Ptr &Target_Cloud,
-						  const typename pcl::search::KdTree<PointT>::Ptr &target_kdtree, float dis_thre,
-						  boost::shared_ptr<pcl::Correspondences> &Corr_f, bool normal_shooting_on, bool normal_check = true,
-						  float angle_thre_degree = 40, bool duplicate_check = true, int K_filter_distant_point = 800)
-	//for highway dataset, maybe the angle_thre_degree for normal check should be larger
-	{
-		int K_min = 3;
-		float filter_dis_times = 2.5;
-		int normal_shooting_candidate_count = 10;
-
-		typename pcl::registration::CorrespondenceEstimation<PointT, PointT> corr_est; //for nearest neighbor searching
-
-		//CorrespondenceEstimationNormalShooting computes correspondences as points in the target cloud which have minimum distance to normals computed on the input cloud
-		typename pcl::registration::CorrespondenceEstimationNormalShooting<PointT, PointT, PointT> corr_est_ns; //for normal shooting searching
-
-		pcl::registration::CorrespondenceRejectorDistance corr_rej_dist;
-
-		// Add a median distance rejector (deprecated)
-		// pcl::registration::CorrespondenceRejectorMedianDistance::Ptr corr_rej_med (new pcl::registration::CorrespondenceRejectorMedianDistance);
-		// rej_med->setMedianFactor (4.0);
-		// reg.addCorrespondenceRejector (rej_med);
-
-		boost::shared_ptr<pcl::Correspondences> Corr(new pcl::Correspondences);
-
-		typename pcl::PointCloud<PointT>::Ptr Source_Cloud_f(new pcl::PointCloud<PointT>);
-		typename pcl::PointCloud<PointT>::Ptr Target_Cloud_f(new pcl::PointCloud<PointT>); //target point cloud would never change
-
-		if (Source_Cloud->points.size() >= K_min &&
-			Target_Cloud->points.size() >= K_min)
-		{
-			if (normal_shooting_on) // Normal Shooting
-			{
-				corr_est_ns.setInputSource(Source_Cloud);
-				corr_est_ns.setInputTarget(Target_Cloud);
-				corr_est_ns.setSourceNormals(Source_Cloud);
-				corr_est_ns.setSearchMethodTarget(target_kdtree, true);					  //saving the time of rebuilding kd-tree
-				corr_est_ns.setKSearch(normal_shooting_candidate_count);				  // Among the K nearest neighbours find the one with minimum perpendicular distance to the normal
-				corr_est_ns.determineCorrespondences(*Corr, filter_dis_times * dis_thre); //base on KDtreeNSearch
-																						  //corr_est_ns.determineReciprocalCorrespondences(*Corr);
-			}
-			else //Nearest Neighbor
-			{
-				corr_est.setInputCloud(Source_Cloud);
-				corr_est.setInputTarget(Target_Cloud);
-				corr_est.setSearchMethodTarget(target_kdtree, true);				   //saving the time of rebuilding kd-tree
-				corr_est.determineCorrespondences(*Corr, filter_dis_times * dis_thre); //base on KDtreeNSearch
-																					   //corr_est.determineReciprocalCorrespondences(*Corr);
-			}
-
-			// std::chrono::steady_clock::time_point toc = std::chrono::steady_clock::now();
-			// std::chrono::duration<double> determine_corr_time = std::chrono::duration_cast<std::chrono::duration<double>>(toc - tic);
-			// LOG(WARNING) << "Correspondence time 1: [" << determine_corr_time.count() * 1000 << "] ms";
-
-			//Filter outlier source points (they would not appear throughout the registration anymore)
-#if 1
-			if (Source_Cloud->points.size() >= K_filter_distant_point)
-			{
-				int count = 0;
-
-				//duplicate check -> just keep one source point corresponding to one target point
-				std::vector<unsigned int> duplicate_check_table(Target_Cloud->points.size(), 0);
-
-				for (auto iter = Corr->begin(); iter != Corr->end();)
-				{
-					int s_index, t_index;
-					s_index = (*iter).index_query;
-					t_index = (*iter).index_match;
-
-					if (t_index != -1)
-					{
-						if (duplicate_check && duplicate_check_table[t_index] > 0)
-							iter = Corr->erase(iter);
-						else
-						{
-							duplicate_check_table[t_index]++;
-
-							Source_Cloud_f->points.push_back(Source_Cloud->points[s_index]);
-							//Target_Cloud_f->points.push_back(Target_Cloud->points[t_index]);
-							(*iter).index_query = count;
-							//(*iter).index_match = count;
-							count++;
-							iter++;
-						}
-					}
-					else
-						iter++;
-				}
-				Corr->resize(count);
-
-				Source_Cloud_f->points.swap(Source_Cloud->points);
-				//Target_Cloud_f->points.swap(Target_Cloud->points);
-				std::vector<unsigned int>().swap(duplicate_check_table);
-			}
-#endif
-			corr_rej_dist.setInputCorrespondences(Corr);
-			corr_rej_dist.setMaximumDistance(dis_thre);
-			corr_rej_dist.getCorrespondences(*Corr_f);
-
-			if (normal_check) //only for planar points
-			{
-				int count = 0;
-
-				//Normal direction consistency check
-				for (auto iter = Corr_f->begin(); iter != Corr_f->end();)
-				{
-					int s_index, t_index;
-					s_index = (*iter).index_query;
-					t_index = (*iter).index_match;
-
-					if (t_index != -1)
-					{
-
-						Eigen::Vector3d n1;
-						Eigen::Vector3d n2;
-						n1 << Source_Cloud->points[s_index].normal[0], Source_Cloud->points[s_index].normal[1], Source_Cloud->points[s_index].normal[2];
-						n2 << Target_Cloud->points[t_index].normal[0], Target_Cloud->points[t_index].normal[1], Target_Cloud->points[t_index].normal[2];
-
-						float cos_intersection_angle = std::abs(n1.dot(n2)); // n1.norm()=n2.norm()=1
-
-						if (cos_intersection_angle < cos(angle_thre_degree / 180.0 * M_PI))
-						{
-							count++;
-							iter = Corr_f->erase(iter);
-						}
-						else
-							iter++;
-					}
-					else
-						iter++;
-				}
-				//LOG(INFO) << count << " correspondences are rejected by normal check";
-			}
-		}
-		else
-			return 0;
-		return 1;
-	}
-
-	bool add_corre_points(const typename pcl::PointCloud<PointT>::Ptr &sc, const typename pcl::PointCloud<PointT>::Ptr &tc, boost::shared_ptr<pcl::Correspondences> &corrs,
-						  const typename pcl::PointCloud<PointT>::Ptr &pc_sc_temp, const typename pcl::PointCloud<PointT>::Ptr &pc_tc_temp)
-	{
-		for (int i = 0; i < (*corrs).size(); i++)
-		{
-			int s_index, t_index;
-			s_index = (*corrs)[i].index_query;
-			t_index = (*corrs)[i].index_match;
-
-			if (t_index != -1)
-			{
-				pc_sc_temp->points.push_back(sc->points[s_index]);
-				pc_tc_temp->points.push_back(tc->points[t_index]);
-			}
-		}
-		return 1;
-	}
-
-	void update_corr_dist_thre(float &dis_thre_ground, float &dis_thre_pillar, float &dis_thre_beam,
-							   float &dis_thre_facade, float &dis_thre_roof, float &dis_thre_vertex,
-							   float dis_thre_update_rate, float dis_thre_min)
-
-	{
-		dis_thre_ground = max_(1.0 * dis_thre_ground / dis_thre_update_rate, dis_thre_min);
-		dis_thre_facade = max_(1.0 * dis_thre_facade / dis_thre_update_rate, dis_thre_min);
-		dis_thre_roof = max_(1.0 * dis_thre_roof / dis_thre_update_rate, dis_thre_min);
-		dis_thre_pillar = max_(1.0 * dis_thre_pillar / dis_thre_update_rate, dis_thre_min);
-		dis_thre_beam = max_(1.0 * dis_thre_beam / dis_thre_update_rate, dis_thre_min);
-		dis_thre_vertex = max_(1.0 * dis_thre_vertex / dis_thre_update_rate, dis_thre_min);
-	}
-
-	void apply_cloudclock_cp_local_shift(cloudblock_Ptr &block, float shift_x, float shift_y, float shift_z)
-	{
-		if (block->station_position_available)
-		{
-			block->local_station.x += shift_x;
-			block->local_station.y += shift_y;
-			block->local_station.z += shift_z;
-		}
-		else
-		{
-			block->local_cp.x += shift_x;
-			block->local_cp.y += shift_y;
-			block->local_cp.z += shift_z;
-		}
-	}
-
-	//Brief: calculate the Jacobi Matrix of the imaginary part of a quaternion (q1,q2,q3) with regard to its corresponding euler angle (raw,pitch,yaw)
-	//for converting the euler angle variance-covariance matrix to quaternion variance-covariance matrix using variance-covariance propagation law
-	//Log: Pay attetion to the euler angle order here. I originally use yaw, pitch, roll (z, y', x'') here, the correct one should be roll, pitch, yaw (x, y', z'')
-	//reference:
-	//1 . http://easyspin.org/easyspin/documentation/eulerangles.html
-	//2 . https://en.wikipedia.org/wiki/Euler_angles
-	bool get_quat_euler_jacobi(const Eigen::Vector3d &euler_angle, Eigen::Matrix3d &Jacobi)
-	{
-		float sin_half_roll, cos_half_roll, sin_half_pitch, cos_half_pitch, sin_half_yaw, cos_half_yaw;
-
-		sin_half_roll = sin(0.5 * euler_angle(0));
-		sin_half_pitch = sin(0.5 * euler_angle(1));
-		sin_half_yaw = sin(0.5 * euler_angle(2));
-		cos_half_roll = cos(0.5 * euler_angle(0));
-		cos_half_pitch = cos(0.5 * euler_angle(1));
-		cos_half_yaw = cos(0.5 * euler_angle(2));
-
-		//yaw pitch roll (z, y', x'') , not used
-		// Jacobi(0, 0) = 0.5 * (-sin_half_roll * cos_half_pitch * sin_half_yaw - cos_half_roll * sin_half_pitch * cos_half_yaw);
-		// Jacobi(0, 1) = 0.5 * (-cos_half_roll * sin_half_pitch * sin_half_yaw - sin_half_roll * cos_half_pitch * cos_half_yaw);
-		// Jacobi(0, 2) = 0.5 * (cos_half_roll * cos_half_pitch * cos_half_yaw + sin_half_roll * sin_half_pitch * sin_half_yaw);
-
-		// Jacobi(1, 0) = 0.5 * (cos_half_roll * cos_half_pitch * sin_half_yaw - sin_half_roll * sin_half_pitch * cos_half_yaw);
-		// Jacobi(1, 1) = 0.5 * (-sin_half_roll * sin_half_pitch * sin_half_yaw + cos_half_roll * cos_half_pitch * cos_half_yaw);
-		// Jacobi(1, 2) = 0.5 * (sin_half_roll * cos_half_pitch * cos_half_yaw - cos_half_roll * sin_half_pitch * sin_half_yaw);
-
-		// Jacobi(2, 0) = 0.5 * (cos_half_roll * cos_half_pitch * cos_half_yaw - sin_half_roll * sin_half_pitch * sin_half_yaw);
-		// Jacobi(2, 1) = 0.5 * (-sin_half_roll * sin_half_pitch * cos_half_yaw + cos_half_roll * cos_half_pitch * sin_half_yaw);
-		// Jacobi(2, 2) = 0.5 * (-sin_half_roll * cos_half_pitch * sin_half_yaw + cos_half_roll * sin_half_pitch * cos_half_yaw);
-
-		//roll pitch yaw (x, y', z'') , used
-		Jacobi(0, 0) = 0.5 * (cos_half_roll * cos_half_pitch * cos_half_yaw + sin_half_roll * sin_half_pitch * sin_half_yaw);
-		Jacobi(0, 1) = 0.5 * (-sin_half_roll * sin_half_pitch * cos_half_yaw - cos_half_roll * cos_half_pitch * sin_half_yaw);
-		Jacobi(0, 2) = 0.5 * (-sin_half_roll * cos_half_pitch * sin_half_yaw - cos_half_roll * sin_half_pitch * cos_half_yaw);
-
-		Jacobi(1, 0) = 0.5 * (-sin_half_roll * sin_half_pitch * cos_half_yaw + cos_half_roll * cos_half_pitch * sin_half_yaw);
-		Jacobi(1, 1) = 0.5 * (cos_half_roll * cos_half_pitch * cos_half_yaw - sin_half_roll * sin_half_pitch * sin_half_yaw);
-		Jacobi(1, 2) = 0.5 * (-cos_half_roll * sin_half_pitch * sin_half_yaw + sin_half_roll * cos_half_pitch * cos_half_yaw);
-
-		Jacobi(2, 0) = 0.5 * (-sin_half_roll * cos_half_pitch * sin_half_yaw - cos_half_roll * sin_half_pitch * cos_half_yaw);
-		Jacobi(2, 1) = 0.5 * (-cos_half_roll * sin_half_pitch * sin_half_yaw - sin_half_roll * cos_half_pitch * cos_half_yaw);
-		Jacobi(2, 2) = 0.5 * (cos_half_roll * cos_half_pitch * cos_half_yaw + sin_half_roll * sin_half_pitch * sin_half_yaw);
-
-		return 1;
-	}
-
-	//brief: entrance to mulls transformation estimation
-	bool multi_metrics_lls_tran_estimation(const typename pcl::PointCloud<PointT>::Ptr &Source_Ground, const typename pcl::PointCloud<PointT>::Ptr &Target_Ground, boost::shared_ptr<pcl::Correspondences> &Corr_Ground,
-										   const typename pcl::PointCloud<PointT>::Ptr &Source_Pillar, const typename pcl::PointCloud<PointT>::Ptr &Target_Pillar, boost::shared_ptr<pcl::Correspondences> &Corr_Pillar,
-										   const typename pcl::PointCloud<PointT>::Ptr &Source_Beam, const typename pcl::PointCloud<PointT>::Ptr &Target_Beam, boost::shared_ptr<pcl::Correspondences> &Corr_Beam,
-										   const typename pcl::PointCloud<PointT>::Ptr &Source_Facade, const typename pcl::PointCloud<PointT>::Ptr &Target_Facade, boost::shared_ptr<pcl::Correspondences> &Corr_Facade,
-										   const typename pcl::PointCloud<PointT>::Ptr &Source_Roof, const typename pcl::PointCloud<PointT>::Ptr &Target_Roof, boost::shared_ptr<pcl::Correspondences> &Corr_Roof,
-										   const typename pcl::PointCloud<PointT>::Ptr &Source_Vertex, const typename pcl::PointCloud<PointT>::Ptr &Target_Vertex, boost::shared_ptr<pcl::Correspondences> &Corr_Vertex,
-										   Vector6d &unknown_x, Matrix6d &cofactor_matrix, int iter_num, std::string weight_strategy, float z_xy_balance_ratio = 1.0,
-										   float pt2pt_residual_window = 0.1, float pt2pl_residual_window = 0.1, float pt2li_residual_window = 0.1)
-	{
-		Matrix6d ATPA;
-		Vector6d ATPb;
-		ATPA.setZero();
-		ATPb.setZero();
-
-		//Deal with weight (contribution of each correspondence in the transformation estimation)
-		float w_ground = 1.0, w_facade = 1.0, w_roof = 1.0, w_pillar = 1.0, w_beam = 1.0, w_vertex = 1.0;
-
-		//point 3dof large weight
-		//line 2dof medium weight
-		//plane 1dof small weight
-
-		int m1 = (*Corr_Ground).size() + (*Corr_Roof).size();
-		int m2 = (*Corr_Facade).size();
-		int m3 = (*Corr_Pillar).size();
-		int m4 = (*Corr_Beam).size();
-		int m5 = (*Corr_Vertex).size();
-
-		//FOR LO
-		if (weight_strategy[0] == '1') //x,y,z balanced weighting
-		{
-			//w_ground = z_xy_balance_ratio * (0.0001 + 0.7 * m2 - 0.3 * m3 + m4) / (1.0 * m1); // x <-> y <-> z
-			//w_ground = z_xy_balance_ratio * (0.0001 + 1.414 / 2 * m2 - 0.414 / 2 * m3 + 1.414 / 2 * m4 ) / (1.0 * m1); // x <-> y <-> z
-			//float w_ground_square = z_xy_balance_ratio * (m2 + 2 * m3 - m4) / (0.0001 + 2.0 * m1);
-
-			w_ground = max_(0.01, z_xy_balance_ratio * (m2 + 2 * m3 - m4) / (0.0001 + 2.0 * m1));
-			w_roof = w_ground;
-			w_facade = 1.0;
-			w_pillar = 1.0;
-			w_beam = 1.0;
-			w_vertex = 1.0;
-		}
-
-		bool dist_weight = false;
-		bool residual_weight = false;
-		bool intensity_weight = false;
-		int iter_thre = 2; //the residual based weighting would only be applied after this number of iteration
-
-		if (weight_strategy[1] == '1' && iter_num > iter_thre) //weight according to residual //
-			residual_weight = true;
-
-		if (weight_strategy[2] == '1') //weight according to distance
-			dist_weight = true;
-
-		if (weight_strategy[3] == '1') //weight according to intensity
-			intensity_weight = true;
-
-		//point to plane
-		pt2pl_lls_summation(Source_Ground, Target_Ground, Corr_Ground, ATPA, ATPb, iter_num, w_ground, dist_weight, residual_weight, intensity_weight, pt2pl_residual_window);
-		pt2pl_lls_summation(Source_Facade, Target_Facade, Corr_Facade, ATPA, ATPb, iter_num, w_facade, dist_weight, residual_weight, intensity_weight, pt2pl_residual_window);
-		pt2pl_lls_summation(Source_Roof, Target_Roof, Corr_Roof, ATPA, ATPb, iter_num, w_roof, dist_weight, residual_weight, intensity_weight, pt2pl_residual_window);
-		//point to line
-		pt2li_lls_pri_direction_summation(Source_Pillar, Target_Pillar, Corr_Pillar, ATPA, ATPb, iter_num, w_pillar, dist_weight, residual_weight, intensity_weight, pt2li_residual_window);
-		pt2li_lls_pri_direction_summation(Source_Beam, Target_Beam, Corr_Beam, ATPA, ATPb, iter_num, w_beam, dist_weight, residual_weight, intensity_weight, pt2li_residual_window);
-		//point to point
-		pt2pt_lls_summation(Source_Vertex, Target_Vertex, Corr_Vertex, ATPA, ATPb, iter_num, w_vertex, dist_weight, residual_weight, intensity_weight, pt2pt_residual_window);
-
-		//ATPA is a symmetric matrix
-		ATPA.coeffRef(6) = ATPA.coeffRef(1);
-		ATPA.coeffRef(12) = ATPA.coeffRef(2);
-		ATPA.coeffRef(13) = ATPA.coeffRef(8);
-		ATPA.coeffRef(18) = ATPA.coeffRef(3);
-		ATPA.coeffRef(19) = ATPA.coeffRef(9);
-		ATPA.coeffRef(20) = ATPA.coeffRef(15);
-		ATPA.coeffRef(24) = ATPA.coeffRef(4);
-		ATPA.coeffRef(25) = ATPA.coeffRef(10);
-		ATPA.coeffRef(26) = ATPA.coeffRef(16);
-		ATPA.coeffRef(27) = ATPA.coeffRef(22);
-		ATPA.coeffRef(30) = ATPA.coeffRef(5);
-		ATPA.coeffRef(31) = ATPA.coeffRef(11);
-		ATPA.coeffRef(32) = ATPA.coeffRef(17);
-		ATPA.coeffRef(33) = ATPA.coeffRef(23);
-		ATPA.coeffRef(34) = ATPA.coeffRef(29);
-
-		//LOG(INFO) << "ATPA=" << std::endl
-		// << ATPA;
-		//LOG(INFO) << "ATPb=" << std::endl
-		// << ATPb;
-
-		// Solve A*x = b  x= (ATPA)^(-1)ATPb
-		// x: tx ty tz alpha beta gamma (alpha beta gamma corresponding to roll, pitch and yaw)
-		// the approximated rotation matrix is
-		// |   1    -gamma   beta  |
-		// | gamma     1    -alpha |
-		// | -beta   alpha     1   |
-
-		//reference: A Review of Point Cloud Registration Algorithms for Mobile Robotics, Appendix
-
-		unknown_x = ATPA.inverse() * ATPb;
-
-		Eigen::Vector3d euler_angle(unknown_x(3), unknown_x(4), unknown_x(5));
-		Eigen::Matrix3d Jacobi;
-		get_quat_euler_jacobi(euler_angle, Jacobi);
-
-		//LOG(INFO)<<"J:\n"<<Jacobi;
-
-		//Qxx=(ATPA)^-1
-		//information matrix = Dxx^(-1)=Qxx^(-1)/(sigma_post)^2=ATPA/(sigma_post)^2
-		cofactor_matrix = ATPA.inverse();
-
-		//convert to the cofactor matrix with regard to quaternion from euler angle
-		cofactor_matrix.block<3, 3>(3, 3) = Jacobi * cofactor_matrix.block<3, 3>(3, 3) * Jacobi.transpose();
-		cofactor_matrix.block<3, 3>(0, 3) = cofactor_matrix.block<3, 3>(0, 3) * Jacobi.transpose();
-		cofactor_matrix.block<3, 3>(3, 0) = Jacobi * cofactor_matrix.block<3, 3>(3, 0);
-
-		return 1;
-	}
-
-	bool ground_3dof_lls_tran_estimation(const typename pcl::PointCloud<PointT>::Ptr &Source_Ground,
-										 const typename pcl::PointCloud<PointT>::Ptr &Target_Ground,
-										 boost::shared_ptr<pcl::Correspondences> &Corr_Ground,
-										 Eigen::Vector3d &unknown_x, Eigen::Matrix3d &cofactor_matrix,
-										 int iter_num, std::string weight_strategy)
-	{
-		Eigen::Matrix3d ATPA;
-		Eigen::Vector3d ATPb;
-		ATPA.setZero();
-		ATPb.setZero();
-
-		bool dist_weight = false;
-		bool residual_weight = false;
-		bool intensity_weight = false;
-
-		if (weight_strategy[1] == '1') //weight according to residual
-			residual_weight = true;
-
-		if (weight_strategy[2] == '1') //weight according to distance
-			dist_weight = true;
-
-		if (weight_strategy[3] == '1') //weight according to intensity
-			intensity_weight = true;
-
-		pt2pl_ground_3dof_lls_summation(Source_Ground, Target_Ground, Corr_Ground, ATPA, ATPb, iter_num, 1.0, dist_weight, residual_weight, intensity_weight);
-
-		//ATPA is a symmetric matrix
-		//    0  1  2
-		//   [3] 4  5
-		//   [6][7] 8
-		ATPA.coeffRef(3) = ATPA.coeffRef(1);
-		ATPA.coeffRef(6) = ATPA.coeffRef(2);
-		ATPA.coeffRef(7) = ATPA.coeffRef(5);
-
-		// Solve A*x = b  x= (ATPA)^(-1)ATPb
-		// x: tx ty tz alpha beta gamma
-		unknown_x = ATPA.inverse() * ATPb;
-
-		return 1;
-	}
-
-	//Linearization of Rotation Matrix
-	//R = I + (alpha, beta, gamma) ^
-	//  = | 1      -gamma    beta |
-	//    | gamma   1       -alpha|
-	//    |-beta    alpha     1   |
-
-	//point-to-point LLS
-	bool pt2pt_lls_summation(const typename pcl::PointCloud<PointT>::Ptr &Source_Cloud, const typename pcl::PointCloud<PointT>::Ptr &Target_Cloud,
-							 boost::shared_ptr<pcl::Correspondences> &Corr, Matrix6d &ATPA, Vector6d &ATPb, int iter_num,
-							 float weight, bool dist_weight_or_not = false, bool residual_weight_or_not = false,
-							 bool intensity_weight_or_not = false,
-							 float residual_window_size = 0.1)
-	{
-		for (int i = 0; i < (*Corr).size(); i++)
-		{
-			int s_index, t_index;
-			s_index = (*Corr)[i].index_query;
-			t_index = (*Corr)[i].index_match;
-
-			if (t_index != -1)
-			{
-
-				float px = Source_Cloud->points[s_index].x;
-				float py = Source_Cloud->points[s_index].y;
-				float pz = Source_Cloud->points[s_index].z;
-				float qx = Target_Cloud->points[t_index].x;
-				float qy = Target_Cloud->points[t_index].y;
-				float qz = Target_Cloud->points[t_index].z;
-
-				float pi = Source_Cloud->points[s_index].intensity;
-				float qi = Target_Cloud->points[t_index].intensity;
-
-				float dx = px - qx;
-				float dy = py - qy;
-				float dz = pz - qz;
-
-				float wx, wy, wz;
-				wx = weight;
-
-				float dist = std::sqrt(qx * qx + qy * qy + qz * qz);
-
-				if (dist_weight_or_not)
-					wx = wx * get_weight_by_dist_adaptive(dist, iter_num);
-				//wx = wx * get_weight_by_dist(dist);
-
-				if (residual_weight_or_not)
-					wx = wx * get_weight_by_residual(std::sqrt(dx * dx + dy * dy + dz * dz), residual_window_size);
-				if (intensity_weight_or_not)
-					wx = wx * get_weight_by_intensity(pi + 0.0001, qi + 0.0001);
-
-				wy = wx;
-				wz = wx;
-
-				//    0  1  2  3  4  5
-				//    6  7  8  9 10 11
-				//   12 13 14 15 16 17
-				//   18 19 20 21 22 23
-				//   24 25 26 27 28 29
-				//   30 31 32 33 34 35
-
-				ATPA.coeffRef(0) += wx;
-				ATPA.coeffRef(1) += 0;
-				ATPA.coeffRef(2) += 0;
-				ATPA.coeffRef(3) += 0;
-				ATPA.coeffRef(4) += wx * pz;
-				ATPA.coeffRef(5) += (-wx * py);
-				ATPA.coeffRef(7) += wy;
-				ATPA.coeffRef(8) += 0;
-				ATPA.coeffRef(9) += (-wy * pz);
-				ATPA.coeffRef(10) += 0;
-				ATPA.coeffRef(11) += wy * px;
-				ATPA.coeffRef(14) += wz;
-				ATPA.coeffRef(15) += wz * py;
-				ATPA.coeffRef(16) += (-wz * px);
-				ATPA.coeffRef(17) += 0;
-				ATPA.coeffRef(21) += wy * pz * pz + wz * py * py;
-				ATPA.coeffRef(22) += (-wz * px * py);
-				ATPA.coeffRef(23) += (-wy * px * pz);
-				ATPA.coeffRef(28) += wx * pz * pz + wz * px * px;
-				ATPA.coeffRef(29) += (-wx * py * pz);
-				ATPA.coeffRef(35) += wx * py * py + wy * px * px;
-
-				ATPb.coeffRef(0) += (-wx * dx);
-				ATPb.coeffRef(1) += (-wy * dy);
-				ATPb.coeffRef(2) += (-wz * dz);
-				ATPb.coeffRef(3) += wy * pz * dy - wz * py * dz;
-				ATPb.coeffRef(4) += wz * px * dz - wx * pz * dx;
-				ATPb.coeffRef(5) += wx * py * dx - wy * px * dy;
-			}
-		}
-
-		return 1;
-	}
-
-	//point-to-plane LLS
-	bool pt2pl_lls_summation(const typename pcl::PointCloud<PointT>::Ptr &Source_Cloud, const typename pcl::PointCloud<PointT>::Ptr &Target_Cloud,
-							 boost::shared_ptr<pcl::Correspondences> &Corr, Matrix6d &ATPA, Vector6d &ATPb, int iter_num,
-							 float weight, bool dist_weight_or_not = false, bool residual_weight_or_not = false,
-							 bool intensity_weight_or_not = false,
-							 float residual_window_size = 0.1)
-	{
-		for (int i = 0; i < (*Corr).size(); i++)
-		{
-			int s_index, t_index;
-			s_index = (*Corr)[i].index_query;
-			t_index = (*Corr)[i].index_match;
-
-			if (t_index != -1)
-			{
-				float px = Source_Cloud->points[s_index].x;
-				float py = Source_Cloud->points[s_index].y;
-				float pz = Source_Cloud->points[s_index].z;
-				float qx = Target_Cloud->points[t_index].x;
-				float qy = Target_Cloud->points[t_index].y;
-				float qz = Target_Cloud->points[t_index].z;
-				float ntx = Target_Cloud->points[t_index].normal_x;
-				float nty = Target_Cloud->points[t_index].normal_y;
-				float ntz = Target_Cloud->points[t_index].normal_z;
-
-				float pi = Source_Cloud->points[s_index].intensity;
-				float qi = Target_Cloud->points[t_index].intensity;
-
-				float w = weight;
-
-				float a = ntz * py - nty * pz;
-				float b = ntx * pz - ntz * px;
-				float c = nty * px - ntx * py;
-
-				float d = ntx * qx + nty * qy + ntz * qz - ntx * px - nty * py - ntz * pz;
-
-				float dist = std::sqrt(qx * qx + qy * qy + qz * qz);
-
-				if (dist_weight_or_not)
-					w = w * get_weight_by_dist_adaptive(dist, iter_num);
-				//w = w * get_weight_by_dist(dist);
-
-				if (residual_weight_or_not)
-					w = w * get_weight_by_residual(std::abs(d), residual_window_size);
-				//w = w * get_weight_by_residual_general(std::abs(d), residual_window_size, 1.0);
-
-				if (intensity_weight_or_not)
-					w = w * get_weight_by_intensity(pi + 0.0001, qi + 0.0001);
-
-				(*Corr)[i].weight = w;
-
-				//    0  1  2  3  4  5
-				//    6  7  8  9 10 11
-				//   12 13 14 15 16 17
-				//   18 19 20 21 22 23
-				//   24 25 26 27 28 29
-				//   30 31 32 33 34 35
-
-				ATPA.coeffRef(0) += w * ntx * ntx;
-				ATPA.coeffRef(1) += w * ntx * nty;
-				ATPA.coeffRef(2) += w * ntx * ntz;
-				ATPA.coeffRef(3) += w * a * ntx;
-				ATPA.coeffRef(4) += w * b * ntx;
-				ATPA.coeffRef(5) += w * c * ntx;
-				ATPA.coeffRef(7) += w * nty * nty;
-				ATPA.coeffRef(8) += w * nty * ntz;
-				ATPA.coeffRef(9) += w * a * nty;
-				ATPA.coeffRef(10) += w * b * nty;
-				ATPA.coeffRef(11) += w * c * nty;
-				ATPA.coeffRef(14) += w * ntz * ntz;
-				ATPA.coeffRef(15) += w * a * ntz;
-				ATPA.coeffRef(16) += w * b * ntz;
-				ATPA.coeffRef(17) += w * c * ntz;
-				ATPA.coeffRef(21) += w * a * a;
-				ATPA.coeffRef(22) += w * a * b;
-				ATPA.coeffRef(23) += w * a * c;
-				ATPA.coeffRef(28) += w * b * b;
-				ATPA.coeffRef(29) += w * b * c;
-				ATPA.coeffRef(35) += w * c * c;
-
-				ATPb.coeffRef(0) += w * d * ntx;
-				ATPb.coeffRef(1) += w * d * nty;
-				ATPb.coeffRef(2) += w * d * ntz;
-				ATPb.coeffRef(3) += w * d * a;
-				ATPb.coeffRef(4) += w * d * b;
-				ATPb.coeffRef(5) += w * d * c;
-			}
-		}
-
-		return 1;
-	}
-
-	//TODO: add the non-rigid icp
-
-	//ground 3dof : roll, pitch, z
-	bool pt2pl_ground_3dof_lls_summation(const typename pcl::PointCloud<PointT>::Ptr &Source_Cloud, const typename pcl::PointCloud<PointT>::Ptr &Target_Cloud,
-										 boost::shared_ptr<pcl::Correspondences> &Corr, Eigen::Matrix3d &ATPA, Eigen::Vector3d &ATPb, int iter_num,
-										 float weight, bool dist_weight_or_not = false, bool residual_weight_or_not = false, bool intensity_weight_or_not = false,
-										 float residual_window_size = 0.1)
-	{
-		//unknown : roll (alpha), picth (beta) and tz
-		for (int i = 0; i < (*Corr).size(); i++)
-		{
-			int s_index, t_index;
-			s_index = (*Corr)[i].index_query;
-			t_index = (*Corr)[i].index_match;
-
-			if (t_index != -1)
-			{
-
-				float px = Source_Cloud->points[s_index].x;
-				float py = Source_Cloud->points[s_index].y;
-				float pz = Source_Cloud->points[s_index].z;
-				float qx = Target_Cloud->points[t_index].x;
-				float qy = Target_Cloud->points[t_index].y;
-				float qz = Target_Cloud->points[t_index].z;
-				float ntx = Target_Cloud->points[t_index].normal_x;
-				float nty = Target_Cloud->points[t_index].normal_y;
-				float ntz = Target_Cloud->points[t_index].normal_z;
-
-				float pi = Source_Cloud->points[s_index].intensity;
-				float qi = Target_Cloud->points[t_index].intensity;
-
-				float w = weight;
-
-				float a = ntz * py - nty * pz;
-				float b = ntx * pz - ntz * px;
-
-				float d = ntx * qx + nty * qy + ntz * qz - ntx * px - nty * py - ntz * pz;
-
-				float dist = std::sqrt(qx * qx + qy * qy + qz * qz);
-				if (dist_weight_or_not)
-					w = w * get_weight_by_dist_adaptive(dist, iter_num);
-				//w = w * get_weight_by_dist(dist);
-
-				if (residual_weight_or_not)
-					w = w * get_weight_by_residual(std::abs(d), residual_window_size);
-
-				if (intensity_weight_or_not)
-					w = w * get_weight_by_intensity(pi + 0.0001, qi + 0.0001);
-
-				//    0  1  2
-				//    3  4  5
-				//    6  7  8
-
-				(*Corr)[i].weight = w;
-
-				ATPA.coeffRef(0) += w * a * a;
-				ATPA.coeffRef(1) += w * a * b;
-				ATPA.coeffRef(2) += w * a * ntz;
-				ATPA.coeffRef(4) += w * b * b;
-				ATPA.coeffRef(5) += w * b * ntz;
-				ATPA.coeffRef(8) += w * ntz * ntz;
-
-				ATPb.coeffRef(0) += w * d * a;
-				ATPb.coeffRef(1) += w * d * b;
-				ATPb.coeffRef(2) += w * d * ntz;
-			}
-		}
-
-		return 1;
-	}
-
-	//point-to-line LLS (calculated using normal vector) , Deprecated
-	bool pt2li_lls_summation(const typename pcl::PointCloud<PointT>::Ptr &Source_Cloud, const typename pcl::PointCloud<PointT>::Ptr &Target_Cloud,
-							 boost::shared_ptr<pcl::Correspondences> &Corr, Matrix6d &ATPA, Vector6d &ATPb, int iter_num,
-							 float weight, bool dist_weight_or_not = false, bool residual_weight_or_not = false,
-							 bool intensity_weight_or_not = false,
-							 float residual_window_size = 0.1)
-	{
-		for (int i = 0; i < (*Corr).size(); i++)
-		{
-			int s_index, t_index;
-			s_index = (*Corr)[i].index_query;
-			t_index = (*Corr)[i].index_match;
-
-			if (t_index != -1)
-			{
-				float px = Source_Cloud->points[s_index].x;
-				float py = Source_Cloud->points[s_index].y;
-				float pz = Source_Cloud->points[s_index].z;
-				float qx = Target_Cloud->points[t_index].x;
-				float qy = Target_Cloud->points[t_index].y;
-				float qz = Target_Cloud->points[t_index].z;
-				float ntx = Target_Cloud->points[t_index].normal[0];
-				float nty = Target_Cloud->points[t_index].normal[1];
-				float ntz = Target_Cloud->points[t_index].normal[2];
-				float nsx = Source_Cloud->points[s_index].normal[0];
-				float nsy = Source_Cloud->points[s_index].normal[1];
-				float nsz = Source_Cloud->points[s_index].normal[2];
-
-				float pi = Source_Cloud->points[s_index].intensity;
-				float qi = Target_Cloud->points[t_index].intensity;
-
-				float dx = px - qx;
-				float dy = py - qy;
-				float dz = pz - qz;
-
-				// norm (nt * ns)
-				float nx = nty * nsz - ntz * nsy;
-				float ny = ntz * nsx - ntx * nsz;
-				float nz = ntx * nsy - nty * nsx;
-				float nd = sqrt(nx * nx + ny * ny + nz * nz);
-				nx /= nd;
-				ny /= nd;
-				nz /= nd; //normalize
-
-				double nxy = nx * ny;
-				double nxz = nx * nz;
-				double nyz = ny * nz;
-				double nx2 = nx * nx;
-				double ny2 = ny * ny;
-				double nz2 = nz * nz;
-				double px2 = px * px;
-				double py2 = py * py;
-				double pz2 = pz * pz;
-				double pxy = px * py;
-				double pxz = px * pz;
-				double pyz = py * pz;
-
-				float d = std::sqrt((nxz * dz - nz2 * dx - ny2 * dx + nxy * dy) * (nxz * dz - nz2 * dx - ny2 * dx + nxy * dy) +
-									(-nz2 * dy + nyz * dz + nxy * dx - nx2 * dy) * (-nz2 * dy + nyz * dz + nxy * dx - nx2 * dy) +
-									(nyz * dy - ny2 * dz - nx2 * dz + nxz * dx) * (nyz * dy - ny2 * dz - nx2 * dz + nxz * dx));
-
-				// float ex = std::abs(nxz * dz - nz2 * dx - ny2 * dx + nxy * dy);
-				// float ey = std::abs(-nz2 * dy + nyz * dz + nxy * dx - nx2 * dy);
-				// float ez = std::abs(nyz * dy - ny2 * dz - nx2 * dz + nxz * dx);
-
-				float wx, wy, wz;
-				wx = weight;
-
-				float dist = std::sqrt(qx * qx + qy * qy + qz * qz);
-				if (dist_weight_or_not)
-					wx = wx * get_weight_by_dist_adaptive(dist, iter_num);
-				//wx = wx * get_weight_by_dist(dist);
-
-				if (intensity_weight_or_not)
-					wx = wx * get_weight_by_intensity(pi + 0.0001, qi + 0.0001);
-
-				if (residual_weight_or_not)
-				{
-					wx = wx * get_weight_by_residual(d, residual_window_size);
-					// wy = wy * get_weight_by_residual(std::abs(evec(1, 0)), residual_window_size);
-					// wz = wz * get_weight_by_residual(std::abs(evec(2, 0)), residual_window_size);
-				}
-
-				wy = wx;
-				wz = wx;
-
-				(*Corr)[i].weight = wx;
-
-				//    0  1  2  3  4  5
-				//    6  7  8  9 10 11
-				//   12 13 14 15 16 17
-				//   18 19 20 21 22 23
-				//   24 25 26 27 28 29
-				//   30 31 32 33 34 35
-
-				ATPA.coeffRef(0) += (wy * nz2 + wz * ny2);
-				ATPA.coeffRef(1) += (-wz * nxy);
-				ATPA.coeffRef(2) += (-wy * nxz);
-				ATPA.coeffRef(3) += (-wy * nxz * py + wz * nxy * pz);
-				ATPA.coeffRef(4) += (wy * nxz * px + wy * nz2 * pz + wz * ny2 * pz);
-				ATPA.coeffRef(5) += (-wy * nz2 * py - wz * ny2 * py + wz * nxy * px);
-				ATPA.coeffRef(7) += (wx * nz2 + wz * nx2);
-				ATPA.coeffRef(8) += (-wx * nyz);
-				ATPA.coeffRef(9) += (-wx * nz2 * pz - wx * nyz * py - wz * nz2 * pz);
-				ATPA.coeffRef(10) += (wx * nyz * px - wz * nxy * pz);
-				ATPA.coeffRef(11) += (wx * nz2 * px + wz * nxy * py + wz * nx2 * px);
-				ATPA.coeffRef(14) += (wx * ny2 + wy * nx2);
-				ATPA.coeffRef(15) += (wx * nyz * pz + wx * ny2 * py + wy * nx2 * py);
-				ATPA.coeffRef(16) += (-wx * ny2 * px - wy * nx2 * px - wy * nxz * pz);
-				ATPA.coeffRef(17) += (-wx * nyz * px + wy * nxz * py);
-				ATPA.coeffRef(21) += (wx * (nz2 * pz2 + ny2 * py2 + 2 * nyz * pyz) + wy * nx2 * py2 + wz * nx2 * pz2);
-				ATPA.coeffRef(22) += (-wx * (nyz * pxz + ny2 * pxy) - wy * (nx2 * pxy + nxz * pyz) + wz * nxy * pz2);
-				ATPA.coeffRef(23) += (-wx * (nz2 * pxz + nyz * pxy) + wy * nxz * py2 - wz * (nxy * pyz + nx2 * pxz));
-				ATPA.coeffRef(28) += (wx * ny2 * px2 + wy * (nx2 * px2 + nz2 * pz2 + 2 * nxz * pxz) + wz * ny2 * pz2);
-				ATPA.coeffRef(29) += (wx * nyz * px2 - wy * (nxz * pxy + nz2 * pyz) - wz * (ny2 * pyz + nxy * pxz));
-				ATPA.coeffRef(35) += (wx * nz2 * px2 + wy * nz2 * py2 + wz * (ny2 * py2 + nx2 * px2 + 2 * nxy * pxy));
-
-				ATPb.coeffRef(0) += (wy * (nxz * dz - nz2 * dx) + wz * (-ny2 * dx + nxy * dy));
-				ATPb.coeffRef(1) += (wx * (-nz2 * dy + nyz * dz) + wz * (nxy * dx - nx2 * dy));
-				ATPb.coeffRef(2) += (wx * (nyz * dy - ny2 * dz) + wy * (-nx2 * dz + nxz * dx));
-				ATPb.coeffRef(3) += (wx * (nz * pz * ny * py) * (nz * dy - ny * dz) + wy * nx * py * (-nx * dz + nz * dx) + wz * nx * pz * (-ny * dx + nx * dy));
-				ATPb.coeffRef(4) += (wx * ny * px * (-nz * dy + ny * dz) + wy * (nx * px + nz * pz) * (nx * dz - nz * dx) + wz * ny * pz * (-ny * dx + nx * dy));
-				ATPb.coeffRef(5) += (wx * nz * px * (-nz * dy + ny * dz) + wy * nz * py * (-nx * dz + nz * dx) + wz * (ny * py + nx * px) * (ny * dx - nx * dy));
-			}
-		}
-
-		return 1;
-	}
-
-	//point-to-line LLS (calculated using primary direction vector), used now
-	//the normal vector here actually stores the primary direcyion vector (for easier calculation of the residual)
-	bool pt2li_lls_pri_direction_summation(const typename pcl::PointCloud<PointT>::Ptr &Source_Cloud, const typename pcl::PointCloud<PointT>::Ptr &Target_Cloud,
-										   boost::shared_ptr<pcl::Correspondences> &Corr, Matrix6d &ATPA, Vector6d &ATPb, int iter_num,
-										   float weight, bool dist_weight_or_not = false, bool residual_weight_or_not = false,
-										   bool intensity_weight_or_not = false,
-										   float residual_window_size = 0.1)
-	{
-		for (int i = 0; i < (*Corr).size(); i++)
-		{
-			int s_index, t_index;
-			s_index = (*Corr)[i].index_query;
-			t_index = (*Corr)[i].index_match;
-
-			if (t_index != -1)
-			{
-				float px = Source_Cloud->points[s_index].x;
-				float py = Source_Cloud->points[s_index].y;
-				float pz = Source_Cloud->points[s_index].z;
-				float qx = Target_Cloud->points[t_index].x;
-				float qy = Target_Cloud->points[t_index].y;
-				float qz = Target_Cloud->points[t_index].z;
-
-				//primary direction (in this case, we save the primary direction of linear feature points in the normal vector)
-				float nx = Target_Cloud->points[t_index].normal_x;
-				float ny = Target_Cloud->points[t_index].normal_y;
-				float nz = Target_Cloud->points[t_index].normal_z;
-
-				//LOG(INFO) << nx << "," << ny<< "," <<nz;
-
-				float pi = Source_Cloud->points[s_index].intensity;
-				float qi = Target_Cloud->points[t_index].intensity;
-
-				float dx = px - qx;
-				float dy = py - qy;
-				float dz = pz - qz;
-
-				Eigen::Matrix<double, 3, 6> Amat;
-				Eigen::Matrix<double, 3, 1> bvec;
-				Eigen::Matrix<double, 3, 1> evec;
-				Eigen::Matrix<double, 3, 3> Imat;
-				Eigen::Matrix<double, 3, 3> Wmat;
-				Imat.setIdentity();
-				Wmat.setIdentity();
-
-				Amat(0, 0) = 0;
-				Amat(0, 1) = -nz;
-				Amat(0, 2) = ny;
-				Amat(0, 3) = ny * py + nz * pz;
-				Amat(0, 4) = -ny * px;
-				Amat(0, 5) = -nz * px;
-				Amat(1, 0) = nz;
-				Amat(1, 1) = 0;
-				Amat(1, 2) = -nx;
-				Amat(1, 3) = -nx * py;
-				Amat(1, 4) = nz * pz + nx * px;
-				Amat(1, 5) = -nz * py;
-				Amat(2, 0) = -ny;
-				Amat(2, 1) = nx;
-				Amat(2, 2) = 0;
-				Amat(2, 3) = -nx * pz;
-				Amat(2, 4) = -ny * pz;
-				Amat(2, 5) = nx * px + ny * py;
-
-				bvec(0, 0) = -ny * dz + nz * dy;
-				bvec(1, 0) = -nz * dx + nx * dz;
-				bvec(2, 0) = -nx * dy + ny * dx;
-
-				//evec = (Amat * (Amat.transpose() * Amat).inverse() * Amat.transpose() - Imat) * bvec; //posterior residual
-				//we'd like to directly use the prior residual
-				float ex = std::abs(ny * dz - nz * dy);
-				float ey = std::abs(nz * dx - nx * dz);
-				float ez = std::abs(nx * dy - ny * dx);
-				float ed = std::sqrt(ex * ex + ey * ey + ez * ez);
-
-				float wx, wy, wz, w;
-				wx = weight;
-
-				float dist = std::sqrt(qx * qx + qy * qy + qz * qz);
-
-				if (dist_weight_or_not)
-					//wx *= get_weight_by_dist(dist);
-					wx *= get_weight_by_dist_adaptive(dist, iter_num);
-
-				if (intensity_weight_or_not)
-					wx *= get_weight_by_intensity(pi + 0.0001, qi + 0.0001);
-
-				if (residual_weight_or_not)
-				{
-					// wx *= get_weight_by_residual(ex, residual_window_size);
-					// wy *= get_weight_by_residual(ey, residual_window_size);
-					// wz *= get_weight_by_residual(ez, residual_window_size);
-
-					wx = wx * get_weight_by_residual(ed, residual_window_size); //original huber
-																				// wx = wx * get_weight_by_residual_general(ed, residual_window_size, 1.0);
-				}
-
-				wy = wx;
-				wz = wx;
-
-				(*Corr)[i].weight = wx;
-
-				Wmat(0, 0) = std::sqrt(wx);
-				Wmat(1, 1) = std::sqrt(wy);
-				Wmat(2, 2) = std::sqrt(wz);
-
-				Amat = Wmat * Amat;
-				bvec = Wmat * bvec;
-
-				//save the time --> don't do like this
-				for (int j = 0; j < 6; j++)
-				{
-					for (int k = j; k < 6; k++)
-						ATPA(j, k) += ((Amat.block<3, 1>(0, j)).transpose() * (Amat.block<3, 1>(0, k)));
-				}
-
-				for (int j = 0; j < 6; j++)
-					ATPb.coeffRef(j) += ((Amat.block<3, 1>(0, j)).transpose() * (bvec));
-			}
-		}
-
-		return 1;
-	}
-
-	//calculate residual v
-	bool get_multi_metrics_lls_residual(const typename pcl::PointCloud<PointT>::Ptr &Source_Ground, const typename pcl::PointCloud<PointT>::Ptr &Target_Ground, boost::shared_ptr<pcl::Correspondences> &Corr_Ground,
-										const typename pcl::PointCloud<PointT>::Ptr &Source_Pillar, const typename pcl::PointCloud<PointT>::Ptr &Target_Pillar, boost::shared_ptr<pcl::Correspondences> &Corr_Pillar,
-										const typename pcl::PointCloud<PointT>::Ptr &Source_Beam, const typename pcl::PointCloud<PointT>::Ptr &Target_Beam, boost::shared_ptr<pcl::Correspondences> &Corr_Beam,
-										const typename pcl::PointCloud<PointT>::Ptr &Source_Facade, const typename pcl::PointCloud<PointT>::Ptr &Target_Facade, boost::shared_ptr<pcl::Correspondences> &Corr_Facade,
-										const typename pcl::PointCloud<PointT>::Ptr &Source_Roof, const typename pcl::PointCloud<PointT>::Ptr &Target_Roof, boost::shared_ptr<pcl::Correspondences> &Corr_Roof,
-										const typename pcl::PointCloud<PointT>::Ptr &Source_Vertex, const typename pcl::PointCloud<PointT>::Ptr &Target_Vertex, boost::shared_ptr<pcl::Correspondences> &Corr_Vertex,
-										const Vector6d &transform_x, double &sigma_square_post, double sigma_thre = 0.2)
-	{
-		double VTPV = 0;
-		int obeservation_count = 0;
-
-		pt2pl_lls_residual(Source_Ground, Target_Ground, Corr_Ground, transform_x, VTPV, obeservation_count);
-		pt2pl_lls_residual(Source_Facade, Target_Facade, Corr_Facade, transform_x, VTPV, obeservation_count);
-		pt2pl_lls_residual(Source_Roof, Target_Roof, Corr_Roof, transform_x, VTPV, obeservation_count);
-		pt2li_lls_residual(Source_Pillar, Target_Pillar, Corr_Pillar, transform_x, VTPV, obeservation_count);
-		pt2li_lls_residual(Source_Beam, Target_Beam, Corr_Beam, transform_x, VTPV, obeservation_count);
-		pt2pt_lls_residual(Source_Vertex, Target_Vertex, Corr_Vertex, transform_x, VTPV, obeservation_count);
-
-		sigma_square_post = VTPV / (obeservation_count - 6); //   VTPV/(n-t) , t is the neccessary observation number (dof), here, t=6
-
-		LOG(INFO) << "The posterior unit weight standard deviation (m) is " << sqrt(sigma_square_post);
-
-		if (sqrt(sigma_square_post) < sigma_thre)
-			return 1;
-		else
-			return 0;
-	}
-
-	bool pt2pt_lls_residual(const typename pcl::PointCloud<PointT>::Ptr &Source_Cloud, const typename pcl::PointCloud<PointT>::Ptr &Target_Cloud,
-							boost::shared_ptr<pcl::Correspondences> &Corr, const Vector6d &transform_x, double &VTPV, int &observation_count)
-	{
-		//point-to-plane distance metrics
-		//3 observation equation for 1 pair of correspondence
-		for (int i = 0; i < (*Corr).size(); i++)
-		{
-			int s_index, t_index;
-			s_index = (*Corr)[i].index_query;
-			t_index = (*Corr)[i].index_match;
-
-			if (t_index != -1)
-			{
-				float px = Source_Cloud->points[s_index].x;
-				float py = Source_Cloud->points[s_index].y;
-				float pz = Source_Cloud->points[s_index].z;
-				float qx = Target_Cloud->points[t_index].x;
-				float qy = Target_Cloud->points[t_index].y;
-				float qz = Target_Cloud->points[t_index].z;
-
-				float dx = px - qx;
-				float dy = py - qy;
-				float dz = pz - qz;
-
-				Eigen::Matrix<double, 3, 6> A_Matrix;
-				Eigen::Matrix<double, 3, 1> b_vector;
-				Eigen::Matrix<double, 3, 1> residual_vector;
-
-				A_Matrix << 1, 0, 0, 0, pz, -py,
-					0, 1, 0, -pz, 0, px,
-					0, 0, 1, py, -px, 0;
-				b_vector << -dx, -dy, -dz;
-
-				residual_vector = A_Matrix * transform_x - b_vector;
-
-				VTPV += (*Corr)[i].weight * (residual_vector(0) * residual_vector(0) + residual_vector(1) * residual_vector(1) + residual_vector(2) * residual_vector(2));
-
-				observation_count += 3;
-			}
-		}
-
-		return 1;
-	}
-
-	bool pt2pl_lls_residual(const typename pcl::PointCloud<PointT>::Ptr &Source_Cloud, const typename pcl::PointCloud<PointT>::Ptr &Target_Cloud,
-							boost::shared_ptr<pcl::Correspondences> &Corr, const Vector6d &transform_x, double &VTPV, int &observation_count)
-	{
-		//point-to-plane distance metrics
-		//1 observation equation for 1 pair of correspondence
-		for (int i = 0; i < (*Corr).size(); i++)
-		{
-			int s_index, t_index;
-			s_index = (*Corr)[i].index_query;
-			t_index = (*Corr)[i].index_match;
-			if (t_index != -1)
-			{
-				float px = Source_Cloud->points[s_index].x;
-				float py = Source_Cloud->points[s_index].y;
-				float pz = Source_Cloud->points[s_index].z;
-				float qx = Target_Cloud->points[t_index].x;
-				float qy = Target_Cloud->points[t_index].y;
-				float qz = Target_Cloud->points[t_index].z;
-				float ntx = Target_Cloud->points[t_index].normal_x;
-				float nty = Target_Cloud->points[t_index].normal_y;
-				float ntz = Target_Cloud->points[t_index].normal_z;
-
-				float a = ntz * py - nty * pz;
-				float b = ntx * pz - ntz * px;
-				float c = nty * px - ntx * py;
-				float d = ntx * qx + nty * qy + ntz * qz - ntx * px - nty * py - ntz * pz;
-
-				float residual = ntx * transform_x(0) + nty * transform_x(1) + ntz * transform_x(2) + a * transform_x(3) + b * transform_x(4) + c * transform_x(5) - d;
-
-				//LOG(INFO) << "final weight (pt-pl): " << (*Corr)[i].weight;
-
-				VTPV += (*Corr)[i].weight * residual * residual;
-
-				observation_count++;
-			}
-		}
-
-		return 1;
-	}
-
-	//primary vector stored as point normal
-	bool pt2li_lls_residual(const typename pcl::PointCloud<PointT>::Ptr &Source_Cloud, const typename pcl::PointCloud<PointT>::Ptr &Target_Cloud,
-							boost::shared_ptr<pcl::Correspondences> &Corr, const Vector6d &transform_x, double &VTPV, int &observation_count)
-	{
-		//point-to-line distance metrics
-		//3 observation equation for 1 pair of correspondence
-		for (int i = 0; i < (*Corr).size(); i++)
-		{
-			int s_index, t_index;
-			s_index = (*Corr)[i].index_query;
-			t_index = (*Corr)[i].index_match;
-			if (t_index != -1)
-			{
-				float px = Source_Cloud->points[s_index].x;
-				float py = Source_Cloud->points[s_index].y;
-				float pz = Source_Cloud->points[s_index].z;
-				float qx = Target_Cloud->points[t_index].x;
-				float qy = Target_Cloud->points[t_index].y;
-				float qz = Target_Cloud->points[t_index].z;
-				float nx = Target_Cloud->points[t_index].normal_x;
-				float ny = Target_Cloud->points[t_index].normal_y;
-				float nz = Target_Cloud->points[t_index].normal_z;
-
-				// float ntx = Target_Cloud->points[t_index].normal_x;
-				// float nty = Target_Cloud->points[t_index].normal_y;
-				// float ntz = Target_Cloud->points[t_index].normal_z;
-				// float nsx = Source_Cloud->points[s_index].normal_x;
-				// float nsy = Source_Cloud->points[s_index].normal_y;
-				// float nsz = Source_Cloud->points[s_index].normal_z;
-
-				float dx = px - qx;
-				float dy = py - qy;
-				float dz = pz - qz;
-
-				// float nx = nty * nsz - ntz * nsy;
-				// float ny = ntz * nsx - ntx * nsz;
-				// float nz = ntx * nsy - nty * nsx;
-				// float nd = sqrt(nx * nx + ny * ny + nz * nz);
-				// nx /= nd;
-				// ny /= nd;
-				// nz /= nd;
-
-				Eigen::Matrix<double, 3, 6> A_Matrix;
-				Eigen::Matrix<double, 3, 1> b_vector;
-				Eigen::Matrix<double, 3, 1> residual_vector;
-
-				A_Matrix << 0, nz, -ny, -nz * pz - ny * py, ny * px, nz * px,
-					-nz, 0, nx, nx * py, -nx * px - nz * pz, nz * py,
-					ny, -nx, 0, nx * pz, ny * pz, -ny * py - nx * px;
-				b_vector << -nz * dy + ny * dz, -nx * dz + nz * dx, -ny * dx + nx * dy;
-
-				residual_vector = A_Matrix * transform_x - b_vector;
-
-				//LOG(INFO) << "final weight (pt-li): " << (*Corr)[i].weight;
-
-				//VTPV is the sum of square of the residuals
-				VTPV += (*Corr)[i].weight * (residual_vector(0) * residual_vector(0) + residual_vector(1) * residual_vector(1) + residual_vector(2) * residual_vector(2));
-
-				observation_count += 3;
-			}
-		}
-		return 1;
-	}
-
-	// the following lines contain the various weighting functions: distance weight, intensity-compatible weight and residual weight
-
-	// three part, near , medium , far
-	// near used to control translation
-	// far used to control rotation
-	// medium used to control both
-	//TODO: change thge distance weight according to the iteration number (mathematic deducing)
-	//Not very useful, the deducing should be more reasonable here
-	float get_weight_by_dist_adaptive(float dist, int iter_num, float unit_dist = 30.0, float b_min = 0.7, float b_max = 1.3, float b_step = 0.05)
-	{
-		float b_current = min_(b_min + b_step * iter_num, b_max);
-		float temp_weight = b_current + (1.0 - b_current) * dist / unit_dist;
-		temp_weight = max_(temp_weight, 0.01);
-		return temp_weight;
-	}
-
-	//standard
-	inline float get_weight_by_dist(float dist, float unit_dist = 60.0, float base_value = 0.7) //unit_dist = 60.0 (is just a multiplier constant)
-	{
-		return (base_value + (1 - base_value) * dist / unit_dist);
-		//return (base_value + (1 - base_value) * unit_dist / dist);
-	}
-
-	inline float get_weight_by_intensity(float intensity_1, float intensity_2, float base_value = 0.6, float intensity_scale = 255.0)
-	{
-		float intensity_diff_ratio = std::fabs(intensity_1 - intensity_2) / intensity_scale;
-		float intensity_weight = std::exp(-1.0 * intensity_diff_ratio);
-		return intensity_weight;
-		//return (base_value + (1 - base_value) * min_(intensity_1 / intensity_2, intensity_2 / intensity_1));
-	}
-
-	//By huber loss function
-	inline float get_weight_by_residual(float res, float huber_thre = 0.05, int delta = 1) //test different kind of robust kernel function here
-	{
-		//return ((res > huber_thre) ? (std::sqrt(1.0 + (res / huber_thre - 1.0)) / (res / huber_thre)) : (1.0));
-		//return ((res > huber_thre) ? (1.0 + (res / huber_thre - 1.0) / (res / huber_thre) / (res / huber_thre)) : (1.0)); //this function (naive huber) is better
-		//return ((res > huber_thre) ? (huber_thre / res) : (1.0));
-
-		//Huber Loss
-		//y=0.5*x^2        , x<d
-		//y=0.5*d^2+|x|-d  , x>=d
-		//d= 1, |x|= res/huber_thre
-		//weight=(0.5*d^2+|x|-d)/(0.5*x^2) = (2*res*huber_thre-huber_thre*huber_thre)/res/res)
-		return ((res > huber_thre) ? ((2 * res * huber_thre + (delta * delta - 2 * delta) * (huber_thre * huber_thre)) / res / res) : (1.0));
-	}
-
-	//general function for m-estimation
-	float get_weight_by_residual_general(float res, float thre = 0.05, float alpha = 2.0) //test different kind of robust kernel function here
-	{
-		float weight;
-		res = res / thre;
-		if (alpha == 2)
-			weight = 1.0;
-		else if (alpha == 0)
-			weight = 2.0 / (res * res + 2.0);
-		else
-			weight = 1.0 * std::pow((res * res / std::abs(alpha - 2.0) + 1.0), (alpha * 0.5 - 1.0));
-
-		return weight;
-	}
-
-	//roll - pitch - yaw rotation (x - y' - z'') ----> this is for our tiny angle approximation
-	bool construct_trans_a(const double &tx, const double &ty, const double &tz,
-						   const double &alpha, const double &beta, const double &gamma,
-						   Eigen::Matrix4d &transformation_matrix)
-	{
-		// Construct the transformation matrix from rotation and translation
-		transformation_matrix = Eigen::Matrix<double, 4, 4>::Zero();
-		// From euler angle to rotation matrix
-
-		transformation_matrix(0, 0) = std::cos(gamma) * std::cos(beta);
-		transformation_matrix(0, 1) = -std::sin(gamma) * std::cos(alpha) + std::cos(gamma) * std::sin(beta) * std::sin(alpha);
-		transformation_matrix(0, 2) = std::sin(gamma) * std::sin(alpha) + std::cos(gamma) * std::sin(beta) * std::cos(alpha);
-		transformation_matrix(1, 0) = std::sin(gamma) * std::cos(beta);
-		transformation_matrix(1, 1) = std::cos(gamma) * std::cos(alpha) + std::sin(gamma) * std::sin(beta) * std::sin(alpha);
-		transformation_matrix(1, 2) = -std::cos(gamma) * std::sin(alpha) + std::sin(gamma) * std::sin(beta) * std::cos(alpha);
-		transformation_matrix(2, 0) = -std::sin(beta);
-		transformation_matrix(2, 1) = std::cos(beta) * std::sin(alpha);
-		transformation_matrix(2, 2) = std::cos(beta) * std::cos(alpha);
-
-		transformation_matrix(0, 3) = tx;
-		transformation_matrix(1, 3) = ty;
-		transformation_matrix(2, 3) = tz;
-		transformation_matrix(3, 3) = 1.0;
-
-		return 1;
-	}
-
-	bool construct_trans_b(const float &tx, const float &ty, const float &tz,
-						   const float &alpha, const float &beta, const float &gamma,
-						   Eigen::Matrix4d &transformation_matrix)
-	{
-		// Construct the transformation matrix from rotation and translation
-		transformation_matrix.setIdentity();
-
-		//tiny angle simplified version
-		transformation_matrix(0, 1) = -gamma;
-		transformation_matrix(0, 2) = beta;
-		transformation_matrix(1, 0) = gamma;
-		transformation_matrix(1, 2) = -alpha;
-		transformation_matrix(2, 0) = -beta;
-		transformation_matrix(2, 1) = alpha;
-
-		transformation_matrix(0, 3) = static_cast<double>(tx);
-		transformation_matrix(1, 3) = static_cast<double>(ty);
-		transformation_matrix(2, 3) = static_cast<double>(tz);
-		transformation_matrix(3, 3) = static_cast<double>(1);
-
-		return 1;
-	}
-
-	bool get_translation_in_station_coor_sys(const Eigen::Matrix4d &T_world, const centerpoint_t &station_in_world, Eigen::Vector3d &t_station)
-	{
-		Eigen::Vector3d t_ws(station_in_world.x, station_in_world.y, station_in_world.z);
-		Eigen::Vector3d t_w(T_world(0, 3), T_world(1, 3), T_world(2, 3));
-		Eigen::Matrix3d R_w = T_world.block<3, 3>(0, 0);
-
-		t_station = t_w + R_w * t_ws - t_ws;
-
-		return 1;
-	}
-
-	//this function is for speed up the registration process when the point number is a bit too big
-	bool keep_less_source_pts(typename pcl::PointCloud<PointT>::Ptr &pc_ground_tc,
-							  typename pcl::PointCloud<PointT>::Ptr &pc_pillar_tc,
-							  typename pcl::PointCloud<PointT>::Ptr &pc_beam_tc,
-							  typename pcl::PointCloud<PointT>::Ptr &pc_facade_tc,
-							  typename pcl::PointCloud<PointT>::Ptr &pc_roof_tc,
-							  typename pcl::PointCloud<PointT>::Ptr &pc_vertex_tc,
-							  typename pcl::PointCloud<PointT>::Ptr &pc_ground_sc,
-							  typename pcl::PointCloud<PointT>::Ptr &pc_pillar_sc,
-							  typename pcl::PointCloud<PointT>::Ptr &pc_beam_sc,
-							  typename pcl::PointCloud<PointT>::Ptr &pc_facade_sc,
-							  typename pcl::PointCloud<PointT>::Ptr &pc_roof_sc,
-							  typename pcl::PointCloud<PointT>::Ptr &pc_vertex_sc,
-							  int ground_down_rate = 4, int facade_down_rate = 2, int target_down_rate = 2)
-	{
-		CFilter<PointT> cfilter;
-
-		cfilter.random_downsample_pcl(pc_ground_tc, (int)(pc_ground_tc->points.size() / target_down_rate));
-		cfilter.random_downsample_pcl(pc_facade_tc, (int)(pc_facade_tc->points.size() / target_down_rate));
-
-		cfilter.random_downsample_pcl(pc_ground_sc, (int)(pc_ground_tc->points.size() / ground_down_rate));
-		cfilter.random_downsample_pcl(pc_facade_sc, (int)(pc_facade_tc->points.size() / facade_down_rate));
-		cfilter.random_downsample_pcl(pc_pillar_sc, (int)(pc_pillar_tc->points.size()));
-		cfilter.random_downsample_pcl(pc_beam_sc, (int)(pc_beam_tc->points.size()));
-		cfilter.random_downsample_pcl(pc_roof_sc, (int)(pc_roof_tc->points.size()));
-		cfilter.random_downsample_pcl(pc_vertex_sc, (int)(pc_vertex_tc->points.size()));
-		return true;
 	}
 };
 

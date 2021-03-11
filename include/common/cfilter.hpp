@@ -1072,17 +1072,17 @@ class CFilter : public CloudUtility<PointT>
 							  typename pcl::PointCloud<PointT>::Ptr &cloud_out,
 							  const std::vector<pca_feature_t> &features,
 							  const std::vector<int> &index_with_feature,
-							  float stable_ratio_max, float min_curvature = 0.0,
+							  float min_curvature = 0.0,
 							  int min_feature_point_num_neighborhood = 4,
-							  int min_point_num_neighborhood = 10)
+							  int min_point_num_neighborhood = 8)
 	//extract stable points and then encode point cloud neighborhood feature descriptor (ncc: neighborhood category context) at the same time
 	{
 		for (int i = 0; i < features.size(); ++i)
 		{
 			float ratio1, ratio2;
-			ratio1 = features[i].values.lamada2 / features[i].values.lamada1;
-			ratio2 = features[i].values.lamada3 / features[i].values.lamada2;
-			if (ratio1 < stable_ratio_max && ratio2 < stable_ratio_max &&
+			// ratio1 = features[i].values.lamada2 / features[i].values.lamada1;
+			// ratio2 = features[i].values.lamada3 / features[i].values.lamada2;
+			if (//ratio1 < stable_ratio_max && ratio2 < stable_ratio_max &&
 				features[i].pt_num > min_point_num_neighborhood && features[i].curvature > min_curvature)
 			{
 
@@ -1174,8 +1174,6 @@ class CFilter : public CloudUtility<PointT>
 				pt.intensity = accu_intensity / neighbor_total_count; //mean intensity of the nrighborhood
 																	  //pt.normal[3] store the point curvature
 																	  //pt.data[3] store the height of the point above the ground
-
-				//LOG(WARNING) << (int)pt.normal[0]<< ","<< (int)pt.normal[1]  << "," << pt.normal[3] << "," << pt.data[3];
 
 				//!!! TODO: fix, use customed point type, you need a lot of porperties for saving linearity, planarity, curvature, semantic label and timestamp
 				//!!! However, within the template class, there might be a lot of problems (waiting for the code reproducing)
@@ -2229,14 +2227,13 @@ class CFilter : public CloudUtility<PointT>
 
 		//get the vertex keypoints and encode its neighborhood in a simple descriptor
 		encode_stable_points(cloud_in, cloud_vertex, cloud_features, index_with_feature,
-							 5.0 * curvature_thre, 0.3 * curvature_thre, min_neighbor_feature_pts, neigh_k_min); //encode the keypoints, we will get a simple descriptor of the putable keypoints
+							 0.3 * curvature_thre, min_neighbor_feature_pts, neigh_k_min); //encode the keypoints, we will get a simple descriptor of the putable keypoints
 
 		//LOG(WARNING)<< "encode ncc feature descriptor done";
 
 		std::chrono::steady_clock::time_point toc_2 = std::chrono::steady_clock::now();
 
-		//test non_max_suppression //TODO: add already built-kd tree here
-
+		//Non_max_suppression of the feature points //TODO: add already built-kd tree here
 		if (sharpen_with_nms)
 		{
 			float nms_radius = 0.2 * neighbor_searching_radius;
@@ -2313,7 +2310,7 @@ class CFilter : public CloudUtility<PointT>
 							  bool use_adpative_parameters = false, bool apply_scanner_filter = false, bool extract_curb_or_not = false,
 							  int extract_vertex_points_method = 2, //use the maximum curvature based keypoints
 							  int gf_grid_pt_num_thre = 8, int gf_reliable_neighbor_grid_thre = 0,
-							  int gf_down_down_rate_ground = 2, int pca_neighbor_k_min = 8, int pca_down_rate = 2,
+							  int gf_down_down_rate_ground = 2, int pca_neighbor_k_min = 8, int pca_down_rate = 1,
 							  float intensity_thre = FLT_MAX,														 //default intensity_thre means that highly-reflective objects would not be prefered
 							  float linear_vertical_sin_high_thre = 0.94, float linear_vertical_sin_low_thre = 0.17, //70 degree (pillar), 10 degree (beam)
 							  float planar_vertical_sin_high_thre = 0.98, float planar_vertical_sin_low_thre = 0.34, //80 degree (roof), 20 degree (facade)
@@ -2370,15 +2367,17 @@ class CFilter : public CloudUtility<PointT>
 
 		float vertex_curvature_non_max_r = 1.5 * pca_neighbor_radius;
 
-		// if (apply_roi_filtering) //Deprecated
-		// {
-		// 	bounds_t roi;
-		// 	roi.inf_z();
-		// 	roi.inf_x(); //moving dirction: x
-		// 	roi.min_y = roi_min_y;
-		// 	roi.max_y = roi_max_y;
-		// 	bbx_filter(in_block->pc_unground, roi, true);
-		// }
+# if 0  //ROI_filtering (Deprecated)
+		if (apply_roi_filtering) 
+		{
+			bounds_t roi;
+			roi.inf_z();
+			roi.inf_x(); //moving dirction: x
+			roi.min_y = roi_min_y;
+			roi.max_y = roi_max_y;
+			bbx_filter(in_block->pc_unground, roi, true);
+		}
+#endif
 
 		//non-ground points --> planar (facade, roof) & linear (pillar, beam) & spherical (vertex) points
 		classify_nground_pts(in_block->pc_unground, in_block->pc_pillar, in_block->pc_beam,
@@ -2397,7 +2396,7 @@ class CFilter : public CloudUtility<PointT>
 
 		//with semantic mask
 		//using semantic mask predicted by neural network to refine the detected geometric feature points
-		if (semantic_assisted)
+		if (semantic_assisted) //Deprecated
 			filter_with_semantic_mask(in_block); //currently disabled '000000'
 
 		//transform the feature points back to the scanner's coordinate system

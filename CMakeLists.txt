@@ -20,15 +20,15 @@ project(lidar_odom)
 #delte the cache to rebuild after changing the options
 
 OPTION(BUILD_WITH_CUDA "Build with CUDA for GPU computation" OFF)
-OPTION(BUILD_WITH_OPENCV "Build with OpenCV2 for Image related Processing" OFF)
+OPTION(BUILD_WITH_OPENCV "Build with OpenCV2 for Image related Processing" ON)
 OPTION(BUILD_WITH_LIBLAS "Build with LIBLAS for *.LAS point cloud data IO" OFF)
-OPTION(BUILD_WITH_HDF5 "Build with HDF5 for *.H5 point cloud data IO" OFF)
+OPTION(BUILD_WITH_HDF5 "Build with HDF5 for *.H5 point cloud data IO" ON)
 OPTION(BUILD_WITH_PROJ4 "Build with PROJ4 for Geo-coordinate Projection" OFF)
 OPTION(BUILD_WITH_CERES "Build with CERES for Non-linear Optimization" ON)
 OPTION(BUILD_WITH_G2O "Build with G2O for Non-linear Optimization" OFF)
 OPTION(BUILD_WITH_GTSAM "Build with GTSAM for Non-linear Optimization" OFF)
 OPTION(BUILD_WITH_SOPHUS "Build with SOPHUS for Lie-Group related Operations" OFF)
-OPTION(BUILD_WITH_TEASER "Build with TEASER++ for Global Registration" ON)
+OPTION(BUILD_WITH_TEASER "Build with TEASER++ for faster Global Registration (or RANSAC would be used)" ON)
 
 OPTION(BUILD_TOOLS "Build the point cloud format transformation tools" ON)
 OPTION(BUILD_PAIRWISE_REG "Build the pairwise registration test" ON)
