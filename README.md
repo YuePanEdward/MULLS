@@ -14,7 +14,7 @@ Codes are currently under refactoring for better readability and performance.
 
 -------
 
-<img src="assets/mulls_slam_demo.gif" alt="alt text" style="zoom:100%;">
+<img src="assets/mulls_slam_demo.gif" alt="alt text" style="zoom:50%;">
 
 ------
 
