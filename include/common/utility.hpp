@@ -1,7 +1,7 @@
 //
 // This file is a General Definition and Tool for Point Cloud Processing based on PCL.
 // Dependent 3rd Libs: PCL (>1.7)
-// By Yue Pan 
+// By Yue Pan et al.
 //
 #ifndef _INCLUDE_UTILITY_HPP_
 #define _INCLUDE_UTILITY_HPP_
@@ -282,22 +282,20 @@ struct cloudblock_t
 	//unground point cloud
 	pcTPtr pc_unground;
 
-	// All kinds of geometric feature points
+	// All kinds of geometric feature points (in target scan)
 	pcTPtr pc_ground;
 	pcTPtr pc_facade;
 	pcTPtr pc_roof;
 	pcTPtr pc_pillar;
 	pcTPtr pc_beam;
 	pcTPtr pc_vertex;
-
+    
+	//downsampled feature points (in source scan)
 	pcTPtr pc_ground_down;
 	pcTPtr pc_facade_down;
 	pcTPtr pc_roof_down;
 	pcTPtr pc_pillar_down;
 	pcTPtr pc_beam_down;
-
-	//keypoints's feature
-	//doubleVectorSBF keypoint_bsc;
 
 	//Kdtree of the feature points (denser ones)
 	pcTreePtr tree_ground;

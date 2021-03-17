@@ -711,10 +711,10 @@ class CRegistration : public CloudUtility<PointT>
 	}
     
 
-    //coarse global registration using RANSAC
+    //coarse global registration using RANSAC 
 	int coarse_reg_ransac(const typename pcl::PointCloud<PointT>::Ptr &target_pts,
 						  const typename pcl::PointCloud<PointT>::Ptr &source_pts,
-						  Eigen::Matrix4d &tran_mat, float noise_bound = 0.2, int min_inlier_num = 8, int max_iter_num = 10000)
+						  Eigen::Matrix4d &tran_mat, float noise_bound = 0.2, int min_inlier_num = 8, int max_iter_num = 20000)
 	{
         std::chrono::steady_clock::time_point tic = std::chrono::steady_clock::now();
 		
@@ -770,13 +770,13 @@ class CRegistration : public CloudUtility<PointT>
 		}
 	}
 
-	//coarse global registration using TEASER ++ 
+	//coarse global registration using TEASER ++  (faster and more robust to outlier than RANSAC)
 	int coarse_reg_teaser(const typename pcl::PointCloud<PointT>::Ptr &target_pts,
 						  const typename pcl::PointCloud<PointT>::Ptr &source_pts,
 						  Eigen::Matrix4d &tran_mat, float noise_bound = 0.2, int min_inlier_num = 8)
 	{
 		//reference: https://github.com/MIT-SPARK/TEASER-plusplus
-		//TEASER: Fast and Certifiable Point Cloud Registration, Heng Yang et al.
+		//TEASER: Fast and Certifiable Point Cloud Registration, TRO, Heng Yang et al.
 
 #if TEASER_ON
 
@@ -1441,15 +1441,10 @@ class CRegistration : public CloudUtility<PointT>
 											  pt2pt_residual_window, pt2pl_residual_window, pt2li_residual_window);
 
 			//About weight strategy:
-			//0000: equal weight
-			//1000: x,y,z balanced weight
-			//0100: residual weight
-			//0010: distance weight (adaptive)
-			//0001: intensity weight
-			//....
-			//1111: all in
-
-			//tx, ty, tz, roll, pitch, yaw --> Transformation matrix [4x4]
+			//0000: equal weight, // 1000: x,y,z balanced weight, //0100: residual weight, //0010: distance weight (adaptive), //0001: intensity weight	
+			//....  //1111: all in
+			
+			//transform_x [6x1]: tx, ty, tz, roll, pitch, yaw --> Transformation matrix TempTran [4x4]
 			construct_trans_a(transform_x(0), transform_x(1), transform_x(2), transform_x(3), transform_x(4), transform_x(5), TempTran);
 
 			LOG(INFO) << "tx(m):" << transform_x(0) << ",ty(m):" << transform_x(1) << ",tz(m):" << transform_x(2)
@@ -1498,27 +1493,21 @@ class CRegistration : public CloudUtility<PointT>
 				//For the adjustment problem : v=Ax-b
 				//A is the design matrix, b is the observation matrix, x is the vector for estimation, P is the original weight matrix
 				//Note that the information matrix is the inverse of the variance-covariance matrix ( Dxx ^ -1 ) of the estimated value (x,y,z,roll,pitch,yaw)
-				//Dxx = Qxx * (sigma_post)^2 = ATPA * VTPV/(n-t)
-				//Qxx = ATPA
+				//Dxx = Qxx * (sigma_post)^2 = ATPA * VTPV/(n-t) and Qxx = ATPA	
 				//sigma_post^2 = (vTPv)/(n-t) = VTPV/(n-t)
 				//v is the residual vector, n is the number of the observation equations and t is the number of the neccessary observation
 				//information_matrix = (Dxx) ^(-1) =  (Qxx * (sigma_post)^2)^(-1) = ATPA / (sigma_post)^2  = (n-t)/(VTPV)*(ATPA)
 				//because cofactor_matrix =  (ATPA)^(-1), so we get
 				information_matrix = (1.0 / sigma_square_post) * cofactor_matrix.inverse();
 
-				// LOG(INFO) << "sqrt information_matrix:\n"
-				// 		  << information_matrix;
-
 				Matrix6d vc_matrix = information_matrix.inverse(); //variance covariance matrix
 
 				LOG(INFO) << "Standard deviation of the registration result: \n"
 						  << "tx(m):" << sqrt(vc_matrix(0, 0)) << " ,ty(m):" << sqrt(vc_matrix(1, 1)) << " ,tz(m):" << sqrt(vc_matrix(2, 2));
-
 				//LOG(INFO)<< "\nroll(degree):" << 180.0 / M_PI * sqrt(vc_matrix(3, 3)) << " ,pitch(degree):" << 180.0 / M_PI * sqrt(vc_matrix(4, 4)) << " ,yaw(degree):" << 180.0 / M_PI * sqrt(vc_matrix(5, 5));
 
-				break; //OUT
+				break; 
 			}
-
 			//Update the source pointcloud
 			//batch_transform_feature_points(pc_ground_sc, pc_pillar_sc, pc_beam_sc, pc_facade_sc, pc_roof_sc, pc_vertex_sc, TempTran);
 

@@ -193,14 +193,15 @@ An example on TLS point cloud registration can be found [here](https://github.co
 
 ### Citation
 
-**[MULLS](https://arxiv.org/pdf/2102.03771.pdf)** has been accepted by **ICRA'21**. If you find this code useful for your work or use it in your project, please consider citing:
+If you find this code useful for your work or use it in your project, please consider citing:
 
 ```
-@article{pan2021mulls,
+@inproceedings{pan2021mulls,
   title={MULLS: Versatile LiDAR SLAM via Multi-metric Linear Least Square},
   author={Yue Pan, Pengchuan Xiao, Yujie He, Zhenlei Shao, Zesong Li},
-  journal={arXiv preprint arXiv:2102.03771},
-  year={2021}
+  booktitle={IEEE International Conference on Robotics and Automation (ICRA)},
+  year={2021},
+  organization={IEEE}
 }
 ```
 ---------
@@ -225,11 +226,12 @@ We thank the authors of [TEASER](https://github.com/MIT-SPARK/TEASER-plusplus) a
 - [x] Add preprint paper
 - [x] Add Wiki
 - [x] Add demo examples
-- [ ] Update camera-ready paper
+- [x] Update camera-ready paper
 - [ ] Code refactoring
 - [ ] Add ROS support
 - [ ] Add cross-platform support (run on windows)
 - [ ] Add sensor fusion module
+- [ ] Add localization module with built map
 
 -----
 

@@ -265,7 +265,7 @@ class CFilter : public CloudUtility<PointT>
 		//typename pcl::PointCloud<PointT>::Ptr cloud_temp(new pcl::PointCloud<PointT>);
 		double var_vertical_ang = var_vertical_ang_d / 180.0 * M_PI;
 
-		// 		int i;
+		// 	int i;
 		// #pragma omp parallel for private(i) //Multi-thread
 		for (int i = 0; i < cloud_in_out->points.size(); i++)
 		{
@@ -474,7 +474,7 @@ class CFilter : public CloudUtility<PointT>
 		Eigen::Vector3d d_translation;
 		estimated_quat2_1 = Eigen::Quaterniond(Tran.block<3, 3>(0, 0));
 
-		omp_set_num_threads(min_(4, omp_get_max_threads()));
+		omp_set_num_threads(min_(6, omp_get_max_threads()));
 #pragma omp parallel for //Multi-thread
 		for (int i = 0; i < pc_in_out->points.size(); i++)
 		{
@@ -499,7 +499,7 @@ class CFilter : public CloudUtility<PointT>
 		Eigen::Vector3d d_translation;
 		estimated_quat2_1 = Eigen::Quaterniond(Tran.block<3, 3>(0, 0));
 
-		omp_set_num_threads(min_(4, omp_get_max_threads()));
+		omp_set_num_threads(min_(6, omp_get_max_threads()));
 #pragma omp parallel for //Multi-thread
 		for (int i = 0; i < pc_in->points.size(); i++)
 		{
@@ -1079,15 +1079,13 @@ class CFilter : public CloudUtility<PointT>
 	{
 		for (int i = 0; i < features.size(); ++i)
 		{
-			float ratio1, ratio2;
+			// float ratio1, ratio2;
 			// ratio1 = features[i].values.lamada2 / features[i].values.lamada1;
 			// ratio2 = features[i].values.lamada3 / features[i].values.lamada2;
-			if (//ratio1 < stable_ratio_max && ratio2 < stable_ratio_max &&
-				features[i].pt_num > min_point_num_neighborhood && features[i].curvature > min_curvature)
+			//if (ratio1 < stable_ratio_max && ratio2 < stable_ratio_max &&
+			if(features[i].pt_num > min_point_num_neighborhood && features[i].curvature > min_curvature)
 			{
-
 				float accu_intensity = 0.0;
-
 				PointT pt;
 				pt = cloud_in->points[i];
 				pt.normal[3] = features[i].curvature; //save in normal[3]
@@ -1146,11 +1144,11 @@ class CFilter : public CloudUtility<PointT>
 				if (pillar_count + beam_count + facade_count + roof_count < min_feature_point_num_neighborhood)
 					continue;
 
+                //TODO: it's a very stupid way to doing so, change the feature encoding in code refactoring
 				pillar_count = 100 * pillar_count / neighbor_total_count;
 				beam_count = 100 * beam_count / neighbor_total_count;
 				facade_count = 100 * facade_count / neighbor_total_count;
 				roof_count = 100 * roof_count / neighbor_total_count;
-
 				pillar_close_count = 100 * pillar_close_count / neighbor_total_count;
 				beam_close_count = 100 * beam_close_count / neighbor_total_count;
 				facade_close_count = 100 * facade_close_count / neighbor_total_count;
@@ -1159,9 +1157,7 @@ class CFilter : public CloudUtility<PointT>
 				beam_far_count = 100 * beam_far_count / neighbor_total_count;
 				facade_far_count = 100 * facade_far_count / neighbor_total_count;
 				roof_far_count = 100 * roof_far_count / neighbor_total_count;
-
-				//point_height_on_ground
-
+                
 				int descriptor = pillar_count * 1000000 + beam_count * 10000 + facade_count * 100 + roof_count; //the neighborhood discriptor (8 numbers)
 				int descriptor_1 = pillar_close_count * 1000000 + beam_close_count * 10000 + facade_close_count * 100 + roof_close_count;
 				int descriptor_2 = pillar_far_count * 1000000 + beam_far_count * 10000 + facade_far_count * 100 + roof_far_count;
@@ -1830,7 +1826,7 @@ class CFilter : public CloudUtility<PointT>
 		std::chrono::steady_clock::time_point toc_1 = std::chrono::steady_clock::now();
 
 		//For each grid
-		omp_set_num_threads(min_(4, omp_get_max_threads()));
+		omp_set_num_threads(min_(6, omp_get_max_threads()));
 #pragma omp parallel for
 		for (int i = 0; i < num_grid; i++)
 		{
@@ -1989,7 +1985,7 @@ class CFilter : public CloudUtility<PointT>
 			// LOG(INFO) << "Ground segmentation done in [" << ground_seg_time.count() * 1000.0 - consuming_time_ransac << "] ms.";
 			// LOG(INFO) << "Ground Normal Estimation done in [" << consuming_time_ransac << "] ms.";
 			LOG(INFO) << "Ground segmentation and normal estimation in [" << ground_seg_time.count() * 1000.0 << "] ms."
-					  << " preparation in [" << ground_seg_prepare_time.count() * 1000.0 << "] ms.";
+					  << ",in which preparation costs [" << ground_seg_prepare_time.count() * 1000.0 << "] ms.";
 			//output detailed consuming time
 			//LOG(INFO) << prepare_1.count() * 1000.0 << "," << prepare_2.count() * 1000.0 << "," << prepare_3.count() * 1000.0 << "," << prepare_4.count() * 1000.0 << "," << prepare_5.count() * 1000.0;
 		}
@@ -2221,7 +2217,7 @@ class CFilter : public CloudUtility<PointT>
 		std::chrono::steady_clock::time_point toc_1 = std::chrono::steady_clock::now();
 		//extract neighborhood feature descriptor for pillar points
 		//Find Vertex (Edge) points by picking points with maximum local curvature (1)
-		//if (extract_vertex_points_method == 1)
+		//if (extract_vertex_points_method == 1) //Deprecated
 		//detect_key_pts(cloud_in, cloud_features, index_with_feature,cloud_vertex, 4.0 * curvature_thre, vertex_curvature_non_max_radius, 0.5 * curvature_thre);
 		int min_neighbor_feature_pts = (int)(feature_pts_ratio_guess / pca_down_rate * neighbor_k) - 1;
 
@@ -2236,7 +2232,7 @@ class CFilter : public CloudUtility<PointT>
 		//Non_max_suppression of the feature points //TODO: add already built-kd tree here
 		if (sharpen_with_nms)
 		{
-			float nms_radius = 0.2 * neighbor_searching_radius;
+			float nms_radius = 0.25 * neighbor_searching_radius;
 #pragma omp parallel sections
 			{
 #pragma omp section
@@ -2757,7 +2753,6 @@ class CFilter : public CloudUtility<PointT>
 		//TODO: fix problem here (shift)
 		float shift_x;
 		float shift_y;
-
 		if (shift_or_not)
 		{
 			centerpoint_t cpt;
@@ -2770,7 +2765,6 @@ class CFilter : public CloudUtility<PointT>
 			shift_x = 0.;
 			shift_y = 0.;
 		}
-
 		cv::Mat map(map_height, map_width, CV_32SC1, cv::Scalar::all(0));
 
 		for (int i = 0; i < cloud->points.size(); i++)

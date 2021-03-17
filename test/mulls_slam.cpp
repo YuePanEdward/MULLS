@@ -84,12 +84,12 @@ DEFINE_int32(cloud_pca_neigh_k_min, 8, "the min number of points in the neighbor
 DEFINE_int32(pca_down_rate, 2, "Downsampling rate of the pca querying points and the points used to calculate pca and build the kd-tree");
 DEFINE_bool(sharpen_with_nms_on, true, "using non-maximum supression to get the sharpen feature points from unsharpen points or not (use higher threshold)");
 DEFINE_bool(fixed_num_downsampling_on, true, "enable/disable the fixed point number downsampling (processing time's standard deviation would br smaller)");
-DEFINE_int32(ground_down_fixed_num, 400, "fixed number of the detected ground feature points (for source)");
-DEFINE_int32(pillar_down_fixed_num, 200, "fixed number of the detected pillar feature points (for source)");
-DEFINE_int32(facade_down_fixed_num, 600, "fixed number of the detected facade feature points (for source)");
+DEFINE_int32(ground_down_fixed_num, 300, "fixed number of the detected ground feature points (for source)");
+DEFINE_int32(pillar_down_fixed_num, 100, "fixed number of the detected pillar feature points (for source)");
+DEFINE_int32(facade_down_fixed_num, 400, "fixed number of the detected facade feature points (for source)");
 DEFINE_int32(beam_down_fixed_num, 100, "fixed number of the detected beam feature points (for source)");
 DEFINE_int32(roof_down_fixed_num, 0, "fixed number of the detected roof feature points (for source)");
-DEFINE_int32(unground_down_fixed_num, 15000, "fixed number of the unground points used for PCA calculation");
+DEFINE_int32(unground_down_fixed_num, 10000, "fixed number of the unground points used for PCA calculation");
 DEFINE_double(gf_grid_size, 3.0, "grid size(m) of ground segmentation");
 DEFINE_double(gf_in_grid_h_thre, 0.3, "height threshold(m) above the lowest point in a grid for ground segmentation");
 DEFINE_double(gf_neigh_grid_h_thre, 1.5, "height threshold(m) among neighbor grids for ground segmentation");
@@ -107,7 +107,7 @@ DEFINE_double(linearity_thre, 0.65, "pca linearity threshold for target point cl
 DEFINE_double(planarity_thre, 0.65, "pca planarity threshold for target point cloud");
 DEFINE_double(linearity_thre_down, 0.75, "pca linearity threshold for source point cloud");
 DEFINE_double(planarity_thre_down, 0.75, "pca planarity threshold for source point cloud");
-DEFINE_double(curvature_thre, 0.1, "pca local curvature threshold");
+DEFINE_double(curvature_thre, 0.12, "pca local curvature threshold");
 DEFINE_int32(bsc_grid_num_per_side, 7, "numbder of grid per side in BSC feature");
 DEFINE_double(beam_direction_ang, 25, "the verticle angle threshold for the direction vector of beam-type feature points");
 DEFINE_double(pillar_direction_ang, 60, "the verticle angle threshold for the direction vector of pillar-type feature points");
@@ -131,14 +131,14 @@ DEFINE_double(z_xy_balance_ratio, 1.0, "the weight ratio of the error along z an
 DEFINE_double(pt2pt_res_window, 0.1, "residual window size for the residual robust kernel function of point to point correspondence");
 DEFINE_double(pt2pl_res_window, 0.1, "residual window size for the residual robust kernel function of point to plane correspondence");
 DEFINE_double(pt2li_res_window, 0.1, "residual window size for the residual robust kernel function of point to line correspondence");
-DEFINE_int32(reg_max_iter_num_s2s, 15, "max iteration number for icp-based registration (scan to scan)");
-DEFINE_int32(reg_max_iter_num_s2m, 15, "max iteration number for icp-based registration (scan to map)");
-DEFINE_int32(reg_max_iter_num_m2m, 15, "max iteration number for icp-based registration (map to map)");
+DEFINE_int32(reg_max_iter_num_s2s, 1, "max iteration number for icp-based registration (scan to scan)");
+DEFINE_int32(reg_max_iter_num_s2m, 1, "max iteration number for icp-based registration (scan to map)");
+DEFINE_int32(reg_max_iter_num_m2m, 3, "max iteration number for icp-based registration (map to map)");
 DEFINE_double(converge_tran, 0.001, "convergence threshold for translation (in m)");
 DEFINE_double(converge_rot_d, 0.01, "convergence threshold for rotation (in degree)");
-DEFINE_double(post_sigma_thre, 0.25, "the maximum threshold for the posterior standard deviation of the least square adjustment during the registration.(unit:m)");
-DEFINE_double(local_map_radius, 60.0, "the radius of the local map (regarded as a sphere aera)");
-DEFINE_int32(local_map_max_pt_num, 10000, "max point number allowed for the local map");
+DEFINE_double(post_sigma_thre, 0.35, "the maximum threshold for the posterior standard deviation of the least square adjustment during the registration.(unit:m)");
+DEFINE_double(local_map_radius, 50.0, "the radius of the local map (regarded as a sphere aera)");
+DEFINE_int32(local_map_max_pt_num, 8000, "max point number allowed for the local map");
 DEFINE_int32(local_map_max_vertex_pt_num, 1000, "max vertex point number allowed for the local map");
 DEFINE_double(append_frame_radius, 60.0, "the radius of the frame that used to append into the local map");
 DEFINE_bool(apply_map_based_dynamic_removal, false, "use map based dynamic object removal or not");
@@ -153,7 +153,7 @@ DEFINE_double(approx_scanner_height, 1.5, "approximate height of the scanner (m)
 DEFINE_double(underground_height_thre, -6.0, "z-axis threshold for rejecting underground ghost points (lines)");
 //loop closure and pose graph optimization related
 DEFINE_bool(loop_closure_detection_on, false, "do loop closure detection and pose graph optimization or not");
-DEFINE_double(submap_accu_tran, 15.0, "accumulated translation (m) for generating a new submap"); 
+DEFINE_double(submap_accu_tran, 15.0, "accumulated translation (m) for generating a new submap");
 DEFINE_double(submap_accu_rot, 90.0, "accumulated rotation (deg) for generating a new submap");
 DEFINE_int32(submap_accu_frame, 150, "accumulated frame number for generating a new submap");
 DEFINE_double(map2map_reliable_sigma_thre, 0.04, "if the standard deviation of the map to map registration is smaller than this value, we would use it as odometry result");
@@ -174,10 +174,10 @@ DEFINE_int32(feature_corr_num, 1000, "number of the correspondence for global co
 DEFINE_bool(teaser_based_global_registration_on, true, "Using TEASER++ to do the global coarse registration or not");
 DEFINE_int32(global_reg_min_inlier_count, 7, "min inlier correspondence for a successful feature based registration (for teaser or ransac)");
 DEFINE_string(pose_graph_optimization_method, "ceres", "use which library to do pgo (select from g2o, ceres and gtsam)");
-DEFINE_double(inter_submap_t_limit, 1.0, "the submap node's limit of translation variation, unit:m");
-DEFINE_double(inter_submap_r_limit, 0.02, "the submap node's limit of rotation variation, unit quaternion");
-DEFINE_double(inner_submap_t_limit, 0.05, "the inner submap frame node's limit of translation variation, unit:m");
-DEFINE_double(inner_submap_r_limit, 0.005, "the inner submap frame node's limit of rotation variation, unit:m");
+DEFINE_double(inter_submap_t_limit, 2.0, "the submap node's limit of translation variation, unit:m");
+DEFINE_double(inter_submap_r_limit, 0.05, "the submap node's limit of rotation variation, unit quaternion");
+DEFINE_double(inner_submap_t_limit, 0.1, "the inner submap frame node's limit of translation variation, unit:m");
+DEFINE_double(inner_submap_r_limit, 0.01, "the inner submap frame node's limit of rotation variation, unit:m");
 DEFINE_int32(max_iter_inter_submap, 100, "max iteration number for inter submap pgo");
 DEFINE_int32(max_iter_inner_submap, 100, "max iteration number for inner submap pgo");
 DEFINE_double(first_time_cov_update_ratio, 1.0, "edge covariance update (at first pgo)");
@@ -185,8 +185,8 @@ DEFINE_double(life_long_cov_update_ratio, 1.0, "edge covariance update (after fi
 DEFINE_bool(diagonal_information_matrix_on, false, "use diagonal information matrix in pgo or not");
 DEFINE_double(wrong_edge_tran_thre, 5.0, "translation threshold for judging if a edge is wrong or not");
 DEFINE_double(wrong_edge_rot_thre_deg, 25.0, "rotation threshold for judging if a edge is wrong or not");
-DEFINE_double(frame_estimated_error_tran, 0.5, "estimated max translation error of the lidar odometry per frame");
-DEFINE_double(frame_estimated_error_rot_deg, 1.0, "estimated max rotation error of the lidar odometry per frame");
+DEFINE_double(frame_estimated_error_tran, 1.0, "estimated max translation error of the lidar odometry per frame");
+DEFINE_double(frame_estimated_error_rot_deg, 2.0, "estimated max rotation error of the lidar odometry per frame");
 DEFINE_bool(robust_kernel_on, false, "turn on the robust kernel function in pgo");
 DEFINE_bool(free_node_on, false, "enable the free node module or not");
 DEFINE_bool(transfer_correct_reg_tran_on, true, "enable the registration tranformation transfer (only do global reg. once for each query submap)");
@@ -331,25 +331,13 @@ int main(int argc, char **argv)
     Eigen::Matrix4d first_frame_body = Eigen::Matrix4d::Identity();
     LOG(WARNING) << "[" << omp_get_max_threads() << "] threads availiable in total";
 
-    bool seg_new_submap = false;
-    int submap_count = 0;
-    int cooling_index = 0;
-    float accu_tran = 0.0;
-    float accu_rot_deg = 0.0;
-    int accu_frame = 0;
-    float current_linear_velocity = 0.0;
-    float current_angular_velocity = 0.0;
-    bool local_map_recalculate_feature_on = false;
-    bool apply_motion_compensation_while_registration = false;
-    float add_length = 0.0;
-    int accu_frame_count_without_optimization = 0;
-    bool lo_status_healthy = true;
+    bool seg_new_submap = false, local_map_recalculate_feature_on = false, motion_com_while_reg_on = false, apply_roi_filter = false, lo_status_healthy =true;
+    int submap_count = 0, cooling_index =0, accu_frame = 0, accu_frame_count_wo_opt =0;
+    float accu_tran = 0.0, accu_rot_deg = 0.0, current_linear_velocity=0.0, current_angular_velocity =0.0, add_length=0.0, roi_min_y = 0.0, roi_max_y = 0.0;
     float non_max_suppresssion_radius = 0.25 * pca_neigh_r;
-    float roi_min_y = 0.0, roi_max_y = 0.0;
-    bool apply_roi_filter = false;
 
     if (FLAGS_motion_compensation_method > 0)
-        apply_motion_compensation_while_registration = true;
+        motion_com_while_reg_on = true;
     cblock_target->filename = filenames[0];
     cblock_target->unique_id = FLAGS_frame_num_begin;
     cblock_target->is_single_scanline = false; //multi-scanline lidar
@@ -365,7 +353,6 @@ int main(int argc, char **argv)
         poses_gt_lidar_cs[0] = cblock_target->pose_gt;
     else
         poses_gt_lidar_cs.push_back(cblock_target->pose_gt);
-
     dataio.read_pc_cloud_block(cblock_target);
 
     std::chrono::steady_clock::time_point tic_feature_extraction_init = std::chrono::steady_clock::now();
@@ -387,19 +374,19 @@ int main(int argc, char **argv)
                                  FLAGS_sharpen_with_nms_on, FLAGS_fixed_num_downsampling_on, FLAGS_ground_down_fixed_num, FLAGS_pillar_down_fixed_num,
                                  FLAGS_facade_down_fixed_num, FLAGS_beam_down_fixed_num, FLAGS_roof_down_fixed_num, FLAGS_unground_down_fixed_num,
                                  FLAGS_beam_max_height, FLAGS_approx_scanner_height + 0.5, FLAGS_approx_scanner_height, FLAGS_underground_height_thre,
-                                 FLAGS_feature_pts_ratio_guess, FLAGS_semantic_assist_on, FLAGS_apply_roi_filter, FLAGS_roi_min_y, FLAGS_roi_max_y);
+                                 FLAGS_feature_pts_ratio_guess, FLAGS_semantic_assist_on, apply_roi_filter, roi_min_y, roi_max_y);
+                                 
     std::chrono::steady_clock::time_point toc_feature_extraction_init = std::chrono::steady_clock::now();
     std::chrono::duration<double> time_used_init_feature_extraction = std::chrono::duration_cast<std::chrono::duration<double>>(toc_feature_extraction_init - tic_feature_extraction_init);
     timing_array[0].push_back(time_used_init_feature_extraction.count());
     for (int k = 0; k < 3; k++) //for the first frame, we only extract its feature points
         timing_array[0].push_back(0.0);
 
-    initial_guess_tran(0, 3) = 0.5; //initialization
-
+    initial_guess_tran(0, 3) = 0.5;     //initialization
     for (int i = 1; i < frame_num; i++) //throughout all the used frames
     {
         std::chrono::steady_clock::time_point tic = std::chrono::steady_clock::now();
-        accu_frame_count_without_optimization++;
+        accu_frame_count_wo_opt++;
         if (i == 1) // for the first scan matching (no initial guess avaliable --> larger corr distance)
             add_length = 1.0;
         cblock_source->filename = filenames[i];
@@ -439,7 +426,6 @@ int main(int argc, char **argv)
                                          FLAGS_pillar_down_fixed_num, FLAGS_facade_down_fixed_num, FLAGS_beam_down_fixed_num, FLAGS_roof_down_fixed_num, FLAGS_unground_down_fixed_num,
                                          FLAGS_beam_max_height, FLAGS_approx_scanner_height + 0.5, FLAGS_approx_scanner_height, FLAGS_underground_height_thre, FLAGS_feature_pts_ratio_guess, FLAGS_semantic_assist_on,
                                          apply_roi_filter, roi_min_y, roi_max_y);
-        // FLAGS_apply_roi_filter, FLAGS_roi_min_y, FLAGS_roi_max_y);
         std::chrono::steady_clock::time_point toc_feature_extraction = std::chrono::steady_clock::now();
 
         //update local map
@@ -519,7 +505,7 @@ int main(int argc, char **argv)
                 {
                     bool overall_loop_searching_on = false;
                     int reg_edge_count = 0;
-                    if (accu_frame_count_without_optimization > FLAGS_num_frame_thre_large_drift && FLAGS_overall_loop_closure_searching_on) //expand the loop closure searching area
+                    if (accu_frame_count_wo_opt > FLAGS_num_frame_thre_large_drift && FLAGS_overall_loop_closure_searching_on) //expand the loop closure searching area
                     {
                         overall_loop_searching_on = true;
                         reg_edge_count = confinder.find_overlap_registration_constraint(cblock_submaps, current_registration_edges, 1.5 * FLAGS_neighbor_search_dist, 0.0, FLAGS_min_submap_id_diff, true, 20);
@@ -542,7 +528,7 @@ int main(int argc, char **argv)
                         Eigen::Matrix4d init_mat = current_registration_edges[j].Trans1_2;
                         if (stable_reg_found)                                                                                                  //infer the init guess according to a already successfully registered loop edge for current submap
                             init_mat = current_registration_edges[j].block1->pose_lo.inverse() * reference_pose_mat * reference_loop_tran_mat; //T23 = T21 * T13 = T2w * Tw1 * T13
-                        // global (coarse) registration by teaser or ransac (using ncc, bsc or fpfh as feature) 
+                        // global (coarse) registration by teaser or ransac (using ncc, bsc or fpfh as feature)
                         LOG(INFO) << "Transformation initial guess predicted by lidar odometry:\n"
                                   << init_mat;
                         bool global_reg_on = false;
@@ -551,10 +537,10 @@ int main(int argc, char **argv)
                             creg.find_feature_correspondence_ncc(current_registration_edges[j].block1->pc_vertex, current_registration_edges[j].block2->pc_vertex,
                                                                  target_cor, source_cor, FLAGS_best_n_feature_match_on, FLAGS_feature_corr_num, FLAGS_reciprocal_feature_match_on);
                             int global_reg_status = -1;
-                            if(FLAGS_teaser_based_global_registration_on)
-                               global_reg_status = creg.coarse_reg_teaser(target_cor, source_cor, init_mat, pca_neigh_r, FLAGS_global_reg_min_inlier_count);
+                            if (FLAGS_teaser_based_global_registration_on)
+                                global_reg_status = creg.coarse_reg_teaser(target_cor, source_cor, init_mat, pca_neigh_r, FLAGS_global_reg_min_inlier_count);
                             else // using ransac, a bit slower than teaser
-                               global_reg_status = creg.coarse_reg_ransac(target_cor, source_cor, init_mat, pca_neigh_r, FLAGS_global_reg_min_inlier_count);
+                                global_reg_status = creg.coarse_reg_ransac(target_cor, source_cor, init_mat, pca_neigh_r, FLAGS_global_reg_min_inlier_count);
                             if (FLAGS_real_time_viewer_on)
                             {
                                 pcl::transformPointCloud(*source_cor, *kp_guess, init_mat);
@@ -572,7 +558,7 @@ int main(int argc, char **argv)
                             else if (global_reg_status == 1) //reliable
                                 global_reg_on = true;
                         }
-                        if (!global_reg_on && !stable_reg_found && accu_frame_count_without_optimization > FLAGS_num_frame_thre_large_drift) //TODO: the tolerance should be determine using pose covariance (reference: overlapnet)
+                        if (!global_reg_on && !stable_reg_found && accu_frame_count_wo_opt > FLAGS_num_frame_thre_large_drift) //TODO: the tolerance should be determine using pose covariance (reference: overlapnet)
                             continue;                                                                                                        //without the global registration and since the lidar odometry may drift a lot, the inital guess may not be reliable, just skip
                         int registration_status_map2map = creg.mm_lls_icp(current_registration_edges[j], max_iteration_num_m2m, 3.5 * reg_corr_dis_thre_init,
                                                                           converge_tran, converge_rot_d, 2.0 * reg_corr_dis_thre_min, dis_thre_update_rate,
@@ -636,7 +622,7 @@ int main(int argc, char **argv)
                             cooling_index = FLAGS_cooling_submap_num;                              //wait for several submap (without loop closure detection)
                             for (int k = 0; k < cblock_submaps.size(); k++)
                                 cblock_submaps[k]->pose_stable = true;
-                            accu_frame_count_without_optimization = 0; //clear
+                            accu_frame_count_wo_opt = 0; //clear
                         }
                     }
                 }
@@ -661,7 +647,7 @@ int main(int argc, char **argv)
                                                                     FLAGS_used_feature_type, FLAGS_corr_weight_strategy, z_xy_balance_ratio,
                                                                     pt2pt_residual_window, pt2pl_residual_window, pt2li_residual_window,
                                                                     initial_guess_tran, FLAGS_reg_intersection_filter_on,
-                                                                    apply_motion_compensation_while_registration, FLAGS_normal_shooting_on, FLAGS_normal_bearing,
+                                                                    motion_com_while_reg_on, FLAGS_normal_shooting_on, FLAGS_normal_bearing,
                                                                     false, false, FLAGS_post_sigma_thre);
 
                 if (registration_status_scan2scan < 0) //candidate wrong registration
@@ -698,7 +684,7 @@ int main(int argc, char **argv)
                                                                    FLAGS_used_feature_type, FLAGS_corr_weight_strategy, z_xy_balance_ratio,
                                                                    pt2pt_residual_window, pt2pl_residual_window, pt2li_residual_window,
                                                                    initial_guess_tran, FLAGS_reg_intersection_filter_on,
-                                                                   apply_motion_compensation_while_registration, FLAGS_normal_shooting_on, FLAGS_normal_bearing,
+                                                                   motion_com_while_reg_on, FLAGS_normal_shooting_on, FLAGS_normal_bearing,
                                                                    false, false, FLAGS_post_sigma_thre);
                 if (registration_status_scan2map < 0) //candidate wrong registration
                 {
@@ -718,7 +704,7 @@ int main(int argc, char **argv)
         adjacent_pose_out = cblock_source->pose_lo.inverse() * cblock_target->pose_lo; //adjacent_pose_out is the transformation from k to k+1 frame (T2_1)
 
         std::chrono::steady_clock::time_point toc_registration = std::chrono::steady_clock::now();
-        if (apply_motion_compensation_while_registration)
+        if (motion_com_while_reg_on)
         {
             std::chrono::steady_clock::time_point tic_undistortion = std::chrono::steady_clock::now();
             cfilter.apply_motion_compensation(cblock_source->pc_raw, adjacent_pose_out);
@@ -825,7 +811,7 @@ int main(int argc, char **argv)
         std::chrono::duration<double> time_used_per_frame_2 = std::chrono::duration_cast<std::chrono::duration<double>>(toc_output - tic_output);
         time_count += (time_used_per_frame_lo_1.count() + time_used_per_frame_lo_2.count());
         LOG(INFO) << "Consuming time of lidar odometry for current frame is [" << 1000.0 * (time_used_per_frame_lo_1.count() + time_used_per_frame_lo_2.count()) << "] ms.\n";
-        LOG(INFO) << "Process frame [" << i << "] in [" << 1000.0 * (time_used_per_frame_1.count() + time_used_per_frame_2.count()) << "] ms.\n";
+        LOG(INFO) << "Process frame (including data IO) [" << i << "] in [" << 1000.0 * (time_used_per_frame_1.count() + time_used_per_frame_2.count()) << "] ms.\n";
         //record timing
         std::chrono::duration<double> time_used_per_frame_feature_extraction = std::chrono::duration_cast<std::chrono::duration<double>>(toc_feature_extraction - toc_import_pc);
         std::chrono::duration<double> time_used_per_frame_map_updating = std::chrono::duration_cast<std::chrono::duration<double>>(toc_update_map - toc_feature_extraction);
@@ -846,8 +832,7 @@ int main(int argc, char **argv)
     if (loop_closure_detection_on)
     {
         std::chrono::steady_clock::time_point tic_inner_submap_refine = std::chrono::steady_clock::now();
-        //method 1: pgo of all the frame nodes
-        if (FLAGS_framewise_pgo_on)
+        if (FLAGS_framewise_pgo_on)//method 1: pgo of all the frame nodes
         {
             pgoptimizer.set_robust_function(FLAGS_robust_kernel_on);
             pgoptimizer.set_equal_weight(FLAGS_equal_weight_on);
@@ -971,6 +956,7 @@ int main(int argc, char **argv)
     mviewer.keep_visualize(map_viewer);
     if (FLAGS_write_out_map_on || FLAGS_write_out_gt_map_on) //export map point cloud //TODO: be careful of the memory problem here!!! //FIX memory leakage while outputing map point cloud
     {
+        LOG(WARNING) << "Begin to output the generated map";
         pcTPtr pc_map_merged(new pcT), pc_map_gt_merged(new pcT);
         for (int i = 0; i < frame_num; i++) //output merged map (with dist_filter, intrinsic correction and motion distortion
         {
@@ -1068,3 +1054,4 @@ int main(int argc, char **argv)
 //TODO: add ros support
 //TODO: use deep learning based methods to do global registration (for loop closure)
 //TODO: add the on-fly calibration of intrinsic parameters (intrinsic angle displacement)
+//TODO: code refactoring from scratch

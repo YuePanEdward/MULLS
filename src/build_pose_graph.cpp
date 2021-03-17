@@ -101,7 +101,7 @@ namespace lo
 	{
 		int con_count = cons.size();
 		float confidence_thre = 0.2;
-		float sigma_thre = 0.16;
+		float sigma_thre = 0.3;
 		for (int i = 0; i < con_count; i++)
 		{
 			if (cons[i].con_type == REGISTRATION) //Registration ----> history  //or we will keep the registration edge

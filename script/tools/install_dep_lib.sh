@@ -9,7 +9,7 @@ mkdir dependent_libs
 echo "Create a new folder called dependent_libs at current path"
 
 sudo apt-get update
-# you'd better to use the higher version of cmake (which may not be installed by apt-get install)
+# you'd better to use the higher version of cmake for compiling TEASER (which may not be installed by apt-get install)
 sudo apt-get install cmake 
 # ccmake (terminal gui)
 sudo apt-get install cmake-curses-gui
@@ -172,6 +172,6 @@ echo "install evaluation tool done"
 echo "Finished"
 
 # you might then delete the dependent_libs folder
-# rm -rf ./dependent_libs
+sudo rm -rf ./dependent_libs
 
 # test pass on Ubuntu 16.04

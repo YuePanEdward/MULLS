@@ -1,7 +1,7 @@
 #!/bin/sh
 
-sequence_id=00
-infolder=xxxxx/${sequence_id}
+sequence_id=03
+infolder=/media/edward/BackupPlus/Data/kitti-dataset/sequences/${sequence_id}
 mkdir ${infolder}/pcd
 for file in ${infolder}/velodyne/*.bin
 do 
