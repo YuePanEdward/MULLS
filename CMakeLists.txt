@@ -1,9 +1,9 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.4)
 set(CMAKE_CXX_STANDARD 14)
 
 message("Current Cmake version is : " ${CMAKE_VERSION})
 
-project(lidar_odom)
+project(lidar_odom CXX)
 
 ########################
 #        brief         #
@@ -16,7 +16,7 @@ project(lidar_odom)
 ########################
 # set compile options  #
 ########################
-#delte the cache to rebuild after changing the options
+#delete the cache to rebuild after changing the options
 
 option(BUILD_WITH_CUDA "Build with CUDA for GPU computation" OFF)
 option(BUILD_WITH_OPENCV "Build with OpenCV2 for Image related Processing" ON)
@@ -33,9 +33,6 @@ option(BUILD_TOOLS "Build the point cloud format transformation tools" ON)
 option(BUILD_PAIRWISE_REG "Build the pairwise registration test" ON)
 option(BUILD_REPLAY "Build the Lidar SLAM replaying tool" ON)
 option(DEBUG_ON "Turn on DEBUG Mode" OFF)
-
-set(CMAKE_CXX_FLAGS "-O3 -std=c++14 -w -fopenmp -pthread")
-set(CMAKE_C_FLAGS "-O3 -std=c++14 -fopenmp -pthread")
 
 if (DEBUG_ON)
   message("[Debug Mode]")
@@ -54,48 +51,45 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_modules")
 # find libs & include  #
 ########################
 
+set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+find_package(Threads REQUIRED)
+find_package(Boost REQUIRED COMPONENTS thread)
+
+find_package(OpenMP REQUIRED)
+include_directories(${OpenMP_FOUND_INCLUDE_DIRS})
+message("OpenMP [OK]:" ${OpenMP_FOUND_INCLUDE_DIRS})
+
 #Eigen (involved in pcl, not needed)
-find_package(EIGEN3 REQUIRED QUIET)
-if (EIGEN3_FOUND)
-  include_directories(${EIGEN3_INCLUDE_DIR})
-  message("EIGEN3 [OK]:" ${EIGEN3_INCLUDE_DIR})
-endif (EIGEN3_FOUND)
+find_package(Eigen3 REQUIRED NO_MODULE QUIET)
+message("Eigen3 [OK]")
 
 #PCL (neccessary)
 #Boost, vtk, flann, eigen are involved in PCL
 find_package(PCL REQUIRED QUIET)
-if (PCL_FOUND)
-  include_directories(${PCL_INCLUDE_DIRS})
-  add_definitions(${PCL_DEFINITIONS})
-  list(REMOVE_ITEM PCL_LIBRARIES "vtkproj4")
-  message("PCL [OK]:" ${PCL_INCLUDE_DIRS})
-endif (PCL_FOUND)
+include_directories(${PCL_INCLUDE_DIRS})
+add_definitions(${PCL_DEFINITIONS})
+list(REMOVE_ITEM PCL_LIBRARIES "vtkproj4")
+message("PCL [OK]:" ${PCL_INCLUDE_DIRS})
 
 #GFLAG (neccessary)
 find_package(GFLAGS REQUIRED QUIET)
-if (GFLAGS_FOUND)
-  include_directories(${GFLAGS_INCLUDE_DIRS})
-  message("GFLAGS [OK]:" ${GFLAGS_INCLUDE_DIRS})
-endif (GFLAGS_FOUND)
+include_directories(${GFLAGS_INCLUDE_DIRS})
+message("GFLAGS [OK]:" ${GFLAGS_INCLUDE_DIRS})
 
 #GLOG (neccessary)
 find_package(GLOG REQUIRED QUIET)
-if (GLOG_FOUND)
-  include_directories(${GLOG_INCLUDE_DIRS})
-  message("GLOG [OK]:" ${GLOG_INCLUDE_DIRS})
-endif (GLOG_FOUND)
+include_directories(${GLOG_INCLUDE_DIRS})
+message("GLOG [OK]:" ${GLOG_INCLUDE_DIRS})
 
 #CUDA (not used)
 if (BUILD_WITH_CUDA)
   find_package(CUDA 9.0 REQUIRED QUIET)
-  if (CUDA_FOUND)
-    message("CUDA [OK]")
-  endif (CUDA_FOUND)
+  message("CUDA [OK]")
 endif (BUILD_WITH_CUDA)
 
-#HDF5 (optional: enable if your'd like to use H5 format IO )
+#HDF5 (optional: enable if you'd like to use H5 format IO )
 if (BUILD_WITH_HDF5)
-# DISABLE FIND_PACKAGE HERE BECAUSE WE MAY FIND THE WRONG HDF5 IN ANODCONDA
+# DISABLE FIND_PACKAGE HERE BECAUSE WE MAY FIND THE WRONG HDF5 IN ANACONDA
 #  find_package(HDF5 REQUIRED QUIET)
 #  if (HDF5_FOUND)
 #    include_directories(${HDF5_INCLUDE_DIR})
@@ -112,14 +106,12 @@ endif (BUILD_WITH_HDF5)
 #LIBLAS (optional: enable if your'd like to use LAS format IO)
 if (BUILD_WITH_LIBLAS)
   find_package(LIBLAS REQUIRED QUIET)
-  if (LIBLAS_FOUND)
-    include_directories(${LIBLAS_INCLUDE_DIR})
-    message("LIBLAS [OK]: " ${LIBLAS_INCLUDE_DIR})
-    add_definitions(-DLIBLAS_ON)
-  endif (LIBLAS_FOUND)
+  include_directories(${LIBLAS_INCLUDE_DIR})
+  message("LIBLAS [OK]: " ${LIBLAS_INCLUDE_DIR})
+  add_definitions(-DLIBLAS_ON)
 endif (BUILD_WITH_LIBLAS)
 
-#PROJ4 (optional: enable if your'd like to do geo-projection)
+#PROJ4 (optional: enable if you'd like to do geo-projection)
 if (BUILD_WITH_PROJ4)
   find_package(PROJ4 REQUIRED QUIET)
   if (PROJ4_FOUND)
@@ -138,21 +130,17 @@ endif (BUILD_WITH_PROJ4)
 # glog and gflag are involved in ceres
 if (BUILD_WITH_CERES)
   find_package(Ceres REQUIRED QUIET)
-  if (Ceres_FOUND)
-    include_directories(${CERES_INCLUDE_DIRS})
-    message("CERES [OK]:" ${CERES_INCLUDE_DIRS})
-    add_definitions(-DCERES_ON)
-  endif (Ceres_FOUND)
+  include_directories(${CERES_INCLUDE_DIRS})
+  message("CERES [OK]:" ${CERES_INCLUDE_DIRS})
+  add_definitions(-DCERES_ON)
 endif (BUILD_WITH_CERES)
 
 #G2O (optional)
 if (BUILD_WITH_G2O)
   find_package(G2O REQUIRED QUIET)
-  if (G2O_FOUND)
     message("G2O [OK]")
     include_directories(${G2O_INCLUDE_DIR})
     add_definitions(-DG2O_ON)
-  endif (G2O_FOUND)
   find_package(SuiteSparse REQUIRED QUIET)
   if (SuiteSparse_FOUND)
     message("SUITESPARSE_FOUND [OK]")
@@ -165,41 +153,33 @@ endif (BUILD_WITH_G2O)
 #GTSAM (optional)
 if (BUILD_WITH_GTSAM)
   find_package(GTSAM REQUIRED QUIET)
-  if (GTSAM_FOUND)
-    message("GTSAM [OK]: " ${GTSAM_INCLUDE_DIR})
-    include_directories(${GTSAM_INCLUDE_DIR})
-    add_definitions(-DGTSAM_ON)
-  endif (GTSAM_FOUND)
+  message("GTSAM [OK]: " ${GTSAM_INCLUDE_DIR})
+  include_directories(${GTSAM_INCLUDE_DIR})
+  add_definitions(-DGTSAM_ON)
 endif (BUILD_WITH_GTSAM)
 
 # Sophus (optional, only used in baseline registration method fast vgicp)
 if (BUILD_WITH_SOPHUS)
   find_package(Sophus REQUIRED QUIET)
-  if (Sophus_FOUND)
-    message("Sophus [OK]")
-    include_directories(${Sophus_INCLUDE_DIRS})
-    add_definitions(-DSOPHUS_ON)
-  endif (Sophus_FOUND)
+  message("Sophus [OK]")
+  include_directories(${Sophus_INCLUDE_DIRS})
+  add_definitions(-DSOPHUS_ON)
 endif (BUILD_WITH_SOPHUS)
 
 #TEASER++
 if (BUILD_WITH_TEASER)
   find_package(teaserpp REQUIRED QUIET)
-  if (teaserpp_FOUND)
-    include_directories(${teaserpp_INCLUDE_DIRS})
-    message("Teaser++ [OK]")
-    add_definitions(-DTEASER_ON)
-  endif (teaserpp_FOUND)
+  include_directories(${teaserpp_INCLUDE_DIRS})
+  message("Teaser++ [OK]")
+  add_definitions(-DTEASER_ON)
 endif (BUILD_WITH_TEASER)
 
 #OpenCV2
 if (BUILD_WITH_OPENCV)
-  find_package(OpenCV 3.0 REQUIRED QUIET)
-  if (OPENCV_FOUND)
-    include_directories(${OpenCV_INCLUDE_DIRS})
-    message("OPENCV [OK]: " ${OpenCV_INCLUDE_DIRS})
-    add_definitions(-DOPENCV_ON)
-  endif (OPENCV_FOUND)
+  find_package(OpenCV REQUIRED QUIET)
+  include_directories(${OpenCV_INCLUDE_DIRS})
+  message("OPENCV [OK]: " ${OpenCV_INCLUDE_DIRS})
+  add_definitions(-DOPENCV_ON)
 endif (BUILD_WITH_OPENCV)
 
 # include folder
@@ -217,6 +197,9 @@ message("SRC_LIST is " ${SRC_LIST})
 ########################
 #      link libs       #
 ########################
+
+set(DEP_LIBS ${DEP_LIBS} Threads::Threads Boost::thread OpenMP::OpenMP_CXX)
+set(DEP_LIBS ${DEP_LIBS} Eigen3::Eigen)
 
 #link pcl lib (neccessary)
 set(DEP_LIBS ${DEP_LIBS} ${PCL_LIBRARIES})
@@ -302,8 +285,3 @@ if (BUILD_TOOLS)
   target_link_libraries(txt2pcd ${DEP_LIBS})
 
 endif ()
-
-
-
-
-

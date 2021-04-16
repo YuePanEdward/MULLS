@@ -25,6 +25,8 @@
 
 #include <glog/logging.h>
 
+#include <boost/thread/thread.hpp>
+
 #include "utility.hpp"
 
 namespace lo
