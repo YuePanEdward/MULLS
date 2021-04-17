@@ -1,7 +1,10 @@
 version: "2.4"
 services:
   mulls:
-    build: .
+    build:
+      context: .
+      args:
+        UBUNTU_VERSION: 20.04
     volumes:
       - ./demo_data:/mulls/demo_data
     init: true

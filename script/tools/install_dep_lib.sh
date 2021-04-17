@@ -52,20 +52,20 @@ echo "install [pcl] done"
 # )
 # echo "install [g2o] done"
 
-echo "install [ceres] 1.14"
+echo "install [ceres]"
 # BLAS & LAPACK
 sudo apt-get install -y libatlas-base-dev
 # SuiteSparse and CXSparse (optional)
 sudo apt-get install -y libsuitesparse-dev
 #clone ceres to local
-git clone -b 1.14.0 https://github.com/ceres-solver/ceres-solver.git
+git clone -b 2.0.0 https://github.com/ceres-solver/ceres-solver.git
 (
   cd ceres-solver
   mkdir build
   cd build
   cmake ..
   make -j
-  checkinstall-auto libceres-dev 1.14.0
+  checkinstall-auto libceres-dev 2.0.0
 )
 echo "install [ceres] done"
 
@@ -85,14 +85,14 @@ echo "install [ceres] done"
 # echo "install [gtsam] done"
 
 echo "install [sophus]"
-git clone -b v1.0.0 https://github.com/strasdat/Sophus.git
+git clone https://github.com/strasdat/Sophus.git
 (
   cd Sophus
   mkdir build
   cd build
   cmake ..
   make -j
-  checkinstall-auto libsophus-dev 1.0.0
+  checkinstall-auto libsophus-dev 0.0.0
 )
 echo "install [sophus] done"
 
