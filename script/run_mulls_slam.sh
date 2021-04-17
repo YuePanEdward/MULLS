@@ -26,13 +26,14 @@ project_folder=./demo_data
 #MIMAP
 #project_folder=${diskbase}/mimap-dataset/mimap_in_slam_00
 
-#point cloud format (selecting from pcd, ply, las, txt, h5, csv)
+#point cloud format (selecting from pcd, ply, las, txt, h5, csv, bin)
 pc_format=pcd
 #pc_format=ply
 #pc_format=h5
 #pc_format=txt
 #pc_format=las
 #pc_format=csv
+#pc_format=bin
 
 #input point cloud folder path
 #pc_folder=${project_folder}/label_pcd  #used only in semanctic kitti

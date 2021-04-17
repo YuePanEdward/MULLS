@@ -200,6 +200,11 @@ class DataIo : public CloudUtility<PointT>
             read_csv_file(fileName, pointCloud);
             LOG(INFO) << "A csv file has been imported.";
         }
+        else if (!strcmp(extension.c_str(), "bin"))
+        {
+            read_bin_file(fileName, pointCloud);
+            LOG(INFO) << "A bin file (kitti_format) has been imported.";
+        }
         else
         {
             LOG(INFO) << "Undefined Point Cloud Format.";
@@ -327,7 +332,7 @@ class DataIo : public CloudUtility<PointT>
                 point_datastrings.push_back(point_datastring); // Add those isolated string into the vector
             }
             //order in mimap dataset:
-            //Points:x","Points:y","Points:z","intensity","laser_id","azimuth","distance_m","timestamp"
+            //"Points:x","Points:y","Points:z","intensity","laser_id","azimuth","distance_m","timestamp"
             x_p = std::atof(trim_str(point_datastrings[0]).c_str()); //x
             y_p = std::atof(trim_str(point_datastrings[1]).c_str()); //y
             z_p = std::atof(trim_str(point_datastrings[2]).c_str()); //z
@@ -346,6 +351,28 @@ class DataIo : public CloudUtility<PointT>
             i++;
         }
         fin.close();
+    }
+
+    bool read_bin_file(const std::string &file_name, typename pcl::PointCloud<PointT>::Ptr &cloud)
+    {
+        // Load point cloud stored as KITTI's bin format
+	    std::fstream input(file_name.c_str(), ios::in | ios::binary);
+	    if(!input.good()){
+		    LOG(ERROR) << "Could not read *.bin file: " << file_name;
+		    return false;
+	    }
+	    input.seekg(0, ios::beg);
+ 
+	    int i;
+	    for (i=0; input.good() && !input.eof(); i++) {
+		    PointT point;
+		    input.read((char *) &point.x, 3*sizeof(float));
+		    input.read((char *) &point.intensity, sizeof(float));
+            point.intensity*=255;
+		    cloud->push_back(point);
+	    }
+	    input.close();
+        return true;
     }
 
 #if HDF5_ON

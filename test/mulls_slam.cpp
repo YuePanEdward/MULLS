@@ -457,12 +457,9 @@ int main(int argc, char **argv)
             current_cblock_local_map->last_frame_index = i - 1; //save the last frame index
             current_cblock_local_map->unique_id = cblock_target->unique_id;
             current_cblock_local_map->pose_init = current_cblock_local_map->pose_lo;                                            //init guess for pgo
-            current_cblock_local_map->information_matrix_to_next = 1.0 / temp_accu_frame * scan2map_reg_con.information_matrix; //not used now //TODO: use the correct function by deducing Jacbobian of transformation
+            current_cblock_local_map->information_matrix_to_next = 1.0 / temp_accu_frame * scan2map_reg_con.information_matrix; //not used now //Use the correct function by deducing Jacbobian of transformation
             //encode features in the submap (this is already done in each frame)
-            //current_cblock_local_map->merge_feature_points(current_cblock_local_map->pc_down, false, true);
             cfilter.non_max_suppress(current_cblock_local_map->pc_vertex, non_max_suppresssion_radius, false, current_cblock_local_map->tree_vertex);
-            //bsc.extract_bsc_features(current_cblock_local_map->pc_down, current_cblock_local_map->pc_vertex, 4, current_cblock_local_map->keypoint_bsc); //6DOF feature (4 features/CSs for one keypoints)
-            //current_cblock_local_map->pc_down.reset(new pcT());
             if (submap_count == 0)
                 current_cblock_local_map->pose_fixed = true; //fixed the first submap
             LOG(INFO) << "Submap node index [" << submap_count << "]";
@@ -634,7 +631,7 @@ int main(int argc, char **argv)
         if (FLAGS_scan_to_scan_module_on || i <= FLAGS_initial_scan2scan_frame_num)
         {
             creg.assign_source_target_cloud(cblock_target, cblock_source, scan2scan_reg_con);
-            if (!strcmp(FLAGS_baseline_reg_method.c_str(), "ndt")) //baseline_method
+            if (!strcmp(FLAGS_baseline_reg_method.c_str(), "ndt")) //baseline_method 
                 creg.omp_ndt(scan2scan_reg_con, FLAGS_reg_voxel_size, FLAGS_ndt_searching_method,
                              initial_guess_tran, FLAGS_reg_intersection_filter_on);
             else if (!strcmp(FLAGS_baseline_reg_method.c_str(), "gicp")) //baseline_method
@@ -650,7 +647,7 @@ int main(int argc, char **argv)
                                                                     motion_com_while_reg_on, FLAGS_normal_shooting_on, FLAGS_normal_bearing,
                                                                     false, false, FLAGS_post_sigma_thre);
 
-                if (registration_status_scan2scan < 0) //candidate wrong registration
+                if (registration_status_scan2scan < 0) //candidate wrong registration --> use baseline method instead to avoid the crash of the system
                 {
                     add_length = 0.8;
                     lo_status_healthy = false;

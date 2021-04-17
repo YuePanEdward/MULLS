@@ -1,3 +1,5 @@
+# Copyright: Chris Choy @ Nvidia
+
 import sys
 import os
 import platform

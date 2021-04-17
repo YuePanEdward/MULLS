@@ -191,7 +191,7 @@ class PrincipleComponentAnalysis
 			std::vector<int>().swap(search_indices);
 			std::vector<float>().swap(distances);
 
-			tree.nearest_kSearch(in_cloud->points[i], K, search_indices, distances); //KD tree
+			tree.nearestKSearch(in_cloud->points[i], K, search_indices, distances); //KD tree
 			features[i].pt.x = in_cloud->points[i].x;
 			features[i].pt.y = in_cloud->points[i].y;
 			features[i].pt.z = in_cloud->points[i].z;

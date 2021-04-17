@@ -310,7 +310,7 @@ class CFilter : public CloudUtility<PointT>
 		for (int i = 0; i < cloud_in_out->points.size(); i++)
 		{
 			ang = std::atan2(cloud_in_out->points[i].y, cloud_in_out->points[i].x);
-			//atan2 (x,y)  --> [-pi , pi]
+			//atan2 (y,x) = atan(y/x) with x and y's sign--> [-pi , pi]
 			//I:   x+ y+ --> [0,   pi/2]
 			//II:  x- y+ --> [pi/2,  pi]
 			//III: x- y- --> [-pi,-pi/2]

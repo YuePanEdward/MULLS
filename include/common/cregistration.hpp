@@ -1226,7 +1226,7 @@ class CRegistration : public CloudUtility<PointT>
 				   float dis_thre_min = 0.4, float dis_thre_update_rate = 1.1, std::string used_feature_type = "111110",
 				   std::string weight_strategy = "1101", float z_xy_balanced_ratio = 1.0,
 				   float pt2pt_residual_window = 0.1, float pt2pl_residual_window = 0.1, float pt2li_residual_window = 0.1,
-				   Eigen::Matrix4d initial_guess = Eigen::Matrix4d::Identity(), //used_feature_type (1: on, 0: off, order: ground, pillar, beam, facade, roof, vetrex)
+				   Eigen::Matrix4d initial_guess = Eigen::Matrix4d::Identity(), //used_feature_type (1: on, 0: off, order: ground, pillar, facade, beam, roof, vetrex)
 				   bool apply_intersection_filter = true, bool apply_motion_undistortion_while_registration = false,
 				   bool normal_shooting_on = false, float normal_bearing = 45.0, bool use_more_points = false,
 				   bool keep_less_source_points = false, float sigma_thre = 0.5, float min_neccessary_corr_ratio = 0.03, float max_bearable_rotation_d = 45.0) //sigma_thre means the maximum threshold of the posterior standar deviation of the registration LLS (unit:m)
@@ -1245,7 +1245,7 @@ class CRegistration : public CloudUtility<PointT>
 		int process_code = 0;
 
 		//at least ${min_neccessary_corr_ratio} source points should have a match
-		int min_total_corr_num = 50;
+		int min_total_corr_num = 40;
 		int min_neccessary_corr_num = 20;
 
 		float neccessary_corr_ratio = 1.0; //posterior unground points overlapping ratio
@@ -1310,12 +1310,7 @@ class CRegistration : public CloudUtility<PointT>
 			source_feature_points_count += pc_beam_sc->points.size();
 
 		//Correspondence
-		boost::shared_ptr<pcl::Correspondences> corrs_ground(new pcl::Correspondences);
-		boost::shared_ptr<pcl::Correspondences> corrs_pillar(new pcl::Correspondences);
-		boost::shared_ptr<pcl::Correspondences> corrs_beam(new pcl::Correspondences);
-		boost::shared_ptr<pcl::Correspondences> corrs_facade(new pcl::Correspondences);
-		boost::shared_ptr<pcl::Correspondences> corrs_roof(new pcl::Correspondences);
-		boost::shared_ptr<pcl::Correspondences> corrs_vertex(new pcl::Correspondences);
+		boost::shared_ptr<pcl::Correspondences> corrs_ground(new pcl::Correspondences),corrs_pillar(new pcl::Correspondences),corrs_beam(new pcl::Correspondences),corrs_facade(new pcl::Correspondences),corrs_roof(new pcl::Correspondences),corrs_vertex(new pcl::Correspondences);
 
 		std::chrono::steady_clock::time_point tic_kdtree_iter = std::chrono::steady_clock::now();
 
@@ -1353,7 +1348,6 @@ class CRegistration : public CloudUtility<PointT>
 		for (int i = 0; i < max_iter_num; i++)
 		{
 			std::chrono::steady_clock::time_point tic_iter = std::chrono::steady_clock::now();
-
 			// Target (Dense): Cloud1,  Source (Sparse): Cloud2
 			if (i == 0)
 				LOG(INFO) << "Apply initial guess transformation\n"
@@ -2006,11 +2000,7 @@ class CRegistration : public CloudUtility<PointT>
 
 		if (weight_strategy[0] == '1') //x,y,z directional balanced weighting (guarantee the observability of the scene)
 		{
-			//deprecated
-			//w_ground = z_xy_balance_ratio * (0.0001 + 0.7 * m2 - 0.3 * m3 + m4) / (1.0 * m1); // x <-> y <-> z
-			//w_ground = z_xy_balance_ratio * (0.0001 + 1.414 / 2 * m2 - 0.414 / 2 * m3 + 1.414 / 2 * m4 ) / (1.0 * m1); // x <-> y <-> z
-			//float w_ground_square = z_xy_balance_ratio * (m2 + 2 * m3 - m4) / (0.0001 + 2.0 * m1);
-			w_ground = max_(0.01, z_xy_balance_ratio * (m2 + 2 * m3 - m4) / (0.0001 + 2.0 * m1));
+			w_ground = max_(0.01, z_xy_balance_ratio * (m2 + 2 * m3 - m4) / (0.0001 + 2.0 * m1)); // x <-> y <-> z
 			w_roof = w_ground;
 			w_facade = 1.0;
 			w_pillar = 1.0;

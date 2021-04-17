@@ -127,7 +127,7 @@ Similarly, you can use ```script/tools/run_semantic_kitti_labelbin2pcd.sh ``` to
 
 ##### Test on your own data
 
-If you'd like to use your own data, the data format should be one of the following: ```*.pcd```, ```*.ply```, ```*.txt```, ```*.las```, ```*.csv```, ```*.h5```.
+If you'd like to use your own data, the data format should be one of the following: `*.pcd`, `*.ply`, `*.txt`, `*.las`, `*.csv`, `*.h5`, `*.bin`.
 You can simply specify the data format in ```script/run_mulls_slam.sh```.
 
 The data foler structure can be as simple as follows:
@@ -135,8 +135,8 @@ The data foler structure can be as simple as follows:
 ```
 Base Folder
       |___dummy_framewise_point_cloud
-      .    |___00001.pcd (las,txt,ply,h5,csv...)
-      .    |___00002.pcd (las,txt,ply,h5,csv...)
+      .    |___00001.pcd (las,txt,ply,h5,csv,bin...)
+      .    |___00002.pcd (las,txt,ply,h5,csv,bin...)
       .    |___...
       |___dummy_ground_truth_trajectory.txt (optional)   
       |___dummy_calibration_file.txt (optional)  
