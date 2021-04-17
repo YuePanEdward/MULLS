@@ -51,7 +51,7 @@ echo "install [pcl] done"
 #   mkdir build
 #   cd build
 #   cmake ..
-#   make -j
+#   make -j $NPROC
 #   checkinstall-auto libg2o-dev 0.0.0
 # )
 # [ -z "$KEEP" ] && rm -rf g2o
@@ -69,7 +69,7 @@ git clone -b 2.0.0 --depth 1 https://github.com/ceres-solver/ceres-solver.git
   mkdir build
   cd build
   cmake .. -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DBUILD_BENCHMARKS=OFF
-  make -j
+  make -j $NPROC
   checkinstall-auto libceres-dev 2.0.0
 )
 [ -z "$KEEP" ] && rm -rf ceres-solver
@@ -85,7 +85,7 @@ echo "install [ceres] done"
 #   mkdir build
 #   cd build
 #   cmake ..
-#   make -j
+#   make -j $NPROC
 #   checkinstall-auto libgtsam-dev 1.14.0
 # )
 # [ -z "$KEEP" ] && rm -rf gtsam
@@ -98,7 +98,7 @@ git clone --depth 1 https://github.com/strasdat/Sophus.git
   mkdir build
   cd build
   cmake .. -DBUILD_TESTS=OFF -DBUILD_EXAMPLES=OFF
-  make -j
+  make -j $NPROC
   checkinstall-auto libsophus-dev 0.0.0
 )
 [ -z "$KEEP" ] && rm -rf Sophus
@@ -128,7 +128,7 @@ git clone --depth 1 https://github.com/MIT-SPARK/TEASER-plusplus.git
   mkdir build
   cd build
   cmake .. -DBUILD_TESTS=OFF
-  make -j
+  make -j $NPROC
   checkinstall-auto libteaser-dev 0.0.0
   sudo ldconfig
 )
