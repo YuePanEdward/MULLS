@@ -682,7 +682,7 @@ struct imu_info_t
 	double bwz;
 	timeval time_stamp;
 
-	bool set_imu_info(double ax_i, double ay_i, double az_i,
+	void set_imu_info(double ax_i, double ay_i, double az_i,
 					  double wx_i, double wy_i, double wz_i,
 					  timeval time_stamp_i)
 	{

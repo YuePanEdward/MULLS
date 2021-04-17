@@ -1044,7 +1044,7 @@ int main(int argc, char **argv)
     }
     map_viewer->removeAllShapes();
     mviewer.keep_visualize(map_viewer);
-    return true;
+    return 0;
 }
 
 //TODO LIST (potential future work)

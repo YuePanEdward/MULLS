@@ -794,6 +794,7 @@ bool GlobalOptimize::update_optimized_nodes(cloudblock_Ptrs &all_blocks, bool up
 			all_blocks[i]->free_raw_cloud();
 		}
 	}
+  return true;
 }
 
 bool GlobalOptimize::update_edge_covariance_ceres(constraints &all_cons)

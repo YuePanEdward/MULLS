@@ -985,6 +985,7 @@ class CRegistration : public CloudUtility<PointT>
 	{
 		registration_cons.block1 = block_1; //target
 		registration_cons.block2 = block_2; //source
+    return true;
 	}
 
 	//interface for the implement of basic icp algorithm using pcl
@@ -3027,6 +3028,7 @@ class CRegistration : public CloudUtility<PointT>
 											pc_ground_tc, pc_pillar_tc, pc_beam_tc, pc_facade_tc, pc_roof_tc, pc_vertex_tc,
 											pc_ground_sc, pc_pillar_sc, pc_beam_sc, pc_facade_sc, pc_roof_sc, pc_vertex_sc);
 		LOG(INFO) << "Intersection local bounding box filtering done";
+    return true;
 	}
 
 	//Coordinate system covertation related functions

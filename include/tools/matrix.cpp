@@ -408,6 +408,7 @@ FLOAT Matrix::det () {
   for( int32_t i=0; i<m; i++)
     d *= A.val[i][i];
   free(idx);
+  return d;
 }
 
 bool Matrix::solve (const Matrix &M, FLOAT eps) {

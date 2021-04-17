@@ -70,7 +70,7 @@ int main(int argc, char **argv)
     if (!run_or_not)
     {
         std::cout << "Do not replay, Done\n";
-        return false;
+        return 1;
     }
 
     //Data IO

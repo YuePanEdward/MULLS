@@ -46,8 +46,9 @@ int main(int argc, char **argv){
     if (pcl::io::savePCDFileBinary(outfile, *pointCloud) == -1) 
 	{
 		PCL_ERROR("Couldn't write file\n");
-		return false;
+		return 1;
 	}
 
 	std::cout<<"Transform done"<<std::endl;
+  return 0;
 }
