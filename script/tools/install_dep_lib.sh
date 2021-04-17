@@ -122,6 +122,7 @@ git clone https://github.com/MIT-SPARK/TEASER-plusplus.git
   cmake ..
   make -j
   checkinstall-auto libteaser-dev 0.0.0
+  sudo ldconfig
 )
 echo "install [TEASER++] done"
 
