@@ -1,0 +1,8 @@
+version: "2.4"
+services:
+  mulls:
+    build: .
+    volumes:
+      - ./demo_data:/mulls/demo_data
+    init: true
+    command: script/run_mulls_slam.sh
