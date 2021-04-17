@@ -37,11 +37,11 @@ option(DEBUG_ON "Turn on DEBUG Mode" OFF)
 if (DEBUG_ON)
   message("[Debug Mode]")
   set(CMAKE_BUILD_TYPE "Debug")
-  set(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
+  set(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -ggdb -Wall -Wno-unused-variable")
 else ()
   message("[Release Mode]")
   set(CMAKE_BUILD_TYPE "Release")
-  set(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
+  set(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall -Wno-unused-variable")
 endif ()
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
@@ -89,18 +89,18 @@ endif (BUILD_WITH_CUDA)
 
 #HDF5 (optional: enable if you'd like to use H5 format IO )
 if (BUILD_WITH_HDF5)
-# DISABLE FIND_PACKAGE HERE BECAUSE WE MAY FIND THE WRONG HDF5 IN ANACONDA
-#  find_package(HDF5 REQUIRED QUIET)
-#  if (HDF5_FOUND)
-#    include_directories(${HDF5_INCLUDE_DIR})
-#    message("HDF5 [OK]")
-#    add_definitions(-DHDF5_ON)
-#  else ()
-    set(HDF5_INCLUDE_DIR /usr/include/hdf5/serial)
-    include_directories(${HDF5_INCLUDE_DIR})
-    message("HDF5 [OK]")
-    add_definitions(-DHDF5_ON)
-#  endif (HDF5_FOUND)
+  # DISABLE FIND_PACKAGE HERE BECAUSE WE MAY FIND THE WRONG HDF5 IN ANACONDA
+  #  find_package(HDF5 REQUIRED QUIET)
+  #  if (HDF5_FOUND)
+  #    include_directories(${HDF5_INCLUDE_DIR})
+  #    message("HDF5 [OK]")
+  #    add_definitions(-DHDF5_ON)
+  #  else ()
+  set(HDF5_INCLUDE_DIR /usr/include/hdf5/serial)
+  include_directories(${HDF5_INCLUDE_DIR})
+  message("HDF5 [OK]")
+  add_definitions(-DHDF5_ON)
+  #  endif (HDF5_FOUND)
 endif (BUILD_WITH_HDF5)
 
 #LIBLAS (optional: enable if your'd like to use LAS format IO)
@@ -138,9 +138,9 @@ endif (BUILD_WITH_CERES)
 #G2O (optional)
 if (BUILD_WITH_G2O)
   find_package(G2O REQUIRED QUIET)
-    message("G2O [OK]")
-    include_directories(${G2O_INCLUDE_DIR})
-    add_definitions(-DG2O_ON)
+  message("G2O [OK]")
+  include_directories(${G2O_INCLUDE_DIR})
+  add_definitions(-DG2O_ON)
   find_package(SuiteSparse REQUIRED QUIET)
   if (SuiteSparse_FOUND)
     message("SUITESPARSE_FOUND [OK]")
@@ -191,8 +191,38 @@ include_directories(${PROJECT_SOURCE_DIR}/include/baseline_reg)
 include_directories(${PROJECT_SOURCE_DIR}/include/tools)
 
 # source folder
-aux_source_directory(${PROJECT_SOURCE_DIR}/src SRC_LIST)
-message("SRC_LIST is " ${SRC_LIST})
+set(SRC_LIST
+  include/baseline_reg/fast_vgicp.h
+  include/baseline_reg/fast_vgicp_impl.hpp
+  include/baseline_reg/fast_vgicp_utility.h
+  include/baseline_reg/fast_vgicp_voxel.h
+  include/baseline_reg/gicp_omp.h
+  include/baseline_reg/gicp_omp_impl.hpp
+  include/baseline_reg/ndt_omp.h
+  include/baseline_reg/ndt_omp_impl.hpp
+  include/baseline_reg/voxel_grid_covariance_omp.h
+  include/baseline_reg/voxel_grid_covariance_omp_impl.hpp
+  include/common/cfilter.hpp
+  include/common/cprocessing.hpp
+  include/common/cregistration.hpp
+  include/common/dataio.hpp
+  include/common/h5_io.hpp
+  include/common/map_viewer.h
+  include/common/map_viewer.hpp
+  include/common/pca.hpp
+  include/common/utility.hpp
+  include/nav/common_nav.h
+  include/nav/geo_tran.h
+  include/nav/odom_error_compute.h
+  include/pgo/build_pose_graph.h
+  include/pgo/graph_optimizer.h
+  include/pgo/map_manager.h
+
+  src/build_pose_graph.cpp
+  src/common_nav.cpp
+  src/graph_optimizer.cpp
+  src/map_manager.cpp
+  )
 
 ########################
 #      link libs       #
