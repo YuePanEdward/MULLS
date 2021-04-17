@@ -43,6 +43,7 @@ RUN rm -rf build && \
     make -j
 
 RUN apt-get install -y xvfb
+RUN sed -i 's/real_time_viewer_on=1/real_time_viewer_on=0/g' script/run_mulls_slam.sh
 ENTRYPOINT ["/usr/bin/xvfb-run", "-a", "-s", "-screen 0 1024x768x24"]
 CMD ["script/run_mulls_slam.sh"]
 
