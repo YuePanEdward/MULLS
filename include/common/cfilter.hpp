@@ -1375,7 +1375,7 @@ class CFilter : public CloudUtility<PointT>
 		return ringID;
 	}
 
-	bool get_pc_ring_ids(typename pcl::PointCloud<PointT>::Ptr &cloud)
+	void get_pc_ring_ids(typename pcl::PointCloud<PointT>::Ptr &cloud)
 	{
 		for (int i = 0; i < cloud->points.size(); i++)
 		{

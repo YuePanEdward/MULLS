@@ -353,7 +353,7 @@ class PrincipleComponentAnalysis
 		return true;
 	}
 
-	bool calculate_normal_inconsistency(typename pcl::PointCloud<PointT>::Ptr in_cloud,
+	void calculate_normal_inconsistency(typename pcl::PointCloud<PointT>::Ptr in_cloud,
 										std::vector<pca_feature_t> &features)
 	{
 		for (int i = 0; i < in_cloud->points.size(); i++)

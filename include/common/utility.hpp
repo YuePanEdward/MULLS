@@ -896,7 +896,7 @@ class CloudUtility
 		get_cloud_bbx(temp_cloud, bound);
 	}
 
-	bool get_ring_map(const typename pcl::PointCloud<PointT>::Ptr &cloud_in, ring_map_t &ring_map) //check it later
+	void get_ring_map(const typename pcl::PointCloud<PointT>::Ptr &cloud_in, ring_map_t &ring_map) //check it later
 	{
 		for (int i = 0; i < cloud_in->points.size(); i++)
 		{
