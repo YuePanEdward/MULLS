@@ -2,6 +2,10 @@
 # exit on errors
 set -e
 
+# can set the number of cores to build with, mostly to limit memory usage on CI
+NPROC=${NPROC:-$(nproc)}
+# can also set $KEEP to not remove the build dirs when finished
+
 #install necessary (optional) dependent libs
 #test pass on Ubuntu 16.04
 echo "Make sure your OS is Ubuntu 16.04, or you have to install these dependence on your own"
@@ -50,6 +54,7 @@ echo "install [pcl] done"
 #   make -j
 #   checkinstall-auto libg2o-dev 0.0.0
 # )
+# [ -z "$KEEP" ] && rm -rf g2o
 # echo "install [g2o] done"
 
 echo "install [ceres]"
@@ -67,6 +72,7 @@ git clone -b 2.0.0 --depth 1 https://github.com/ceres-solver/ceres-solver.git
   make -j
   checkinstall-auto libceres-dev 2.0.0
 )
+[ -z "$KEEP" ] && rm -rf ceres-solver
 echo "install [ceres] done"
 
 # echo "install [gtsam] 4.0"
@@ -82,6 +88,7 @@ echo "install [ceres] done"
 #   make -j
 #   checkinstall-auto libgtsam-dev 1.14.0
 # )
+# [ -z "$KEEP" ] && rm -rf gtsam
 # echo "install [gtsam] done"
 
 echo "install [sophus]"
@@ -94,6 +101,7 @@ git clone --depth 1 https://github.com/strasdat/Sophus.git
   make -j
   checkinstall-auto libsophus-dev 0.0.0
 )
+[ -z "$KEEP" ] && rm -rf Sophus
 echo "install [sophus] done"
 
 echo "install [libLAS]"
@@ -106,10 +114,10 @@ git clone --depth 1 https://github.com/libLAS/libLAS.git
   mkdir build
   cd build
   cmake .. -DWITH_TESTS=OFF
-  make -j
-  sudo make install
+  make -j $NPROC
   checkinstall-auto liblas-dev 0.0.0
 )
+[ -z "$KEEP" ] && rm -rf libLAS
 echo "install [libLAS] done"
 
 echo "install [TEASER++]"
@@ -124,6 +132,7 @@ git clone --depth 1 https://github.com/MIT-SPARK/TEASER-plusplus.git
   checkinstall-auto libteaser-dev 0.0.0
   sudo ldconfig
 )
+[ -z "$KEEP" ] && rm -rf TEASER-plusplus
 echo "install [TEASER++] done"
 
 echo "install [OpenCV]"
@@ -159,6 +168,6 @@ python3 -m pip install --upgrade -r ./python/requirements.txt
 echo "install python dependence done"
 
 # you might then delete the dependent_libs folder
-sudo rm -rf ./dependent_libs
+[ -z "$KEEP" ] && rm -rf ./dependent_libs
 
 # test pass on Ubuntu 16.04
