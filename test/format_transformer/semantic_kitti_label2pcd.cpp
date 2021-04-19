@@ -12,6 +12,8 @@
 #include <pcl/features/normal_3d_omp.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/segmentation/extract_clusters.h>
+// workaround for PCL 1.7 https://github.com/PointCloudLibrary/pcl/issues/2406
+#include <pcl/search/impl/search.hpp>
 
 #include "semantic_kitti_api.h"
 
