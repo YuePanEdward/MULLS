@@ -1,0 +1,11 @@
+version: "2.4"
+services:
+  mulls:
+    build:
+      context: .
+      args:
+        UBUNTU_VERSION: 20.04
+    volumes:
+      - ./demo_data:/mulls/demo_data
+    init: true
+    command: script/run_mulls_slam.sh
