@@ -1,0 +1,47 @@
+name: Build
+on:
+  push:
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'docker-compose.yml'
+      - '.dockerignore'
+      - 'assets/**'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'docker-compose.yml'
+      - '.dockerignore'
+      - 'assets/**'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu-version: [ 16.04, 18.04, 20.04 ]
+        # skipping g++ because it runs out of the available 7 GB of memory even when building with NPROC=1
+        cxx-compiler: [ clang++ ]
+    env:
+      DOCKER_IMAGE: mulls:${{ matrix.ubuntu-version }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build MULLS
+        run: |
+          docker build . \
+            --file Dockerfile \
+            --build-arg UBUNTU_VERSION=${{ matrix.ubuntu-version }} \
+            --build-arg CXX_COMPILER=${{ matrix.cxx-compiler }} \
+            --build-arg NPROC=1 \
+            --tag ${DOCKER_IMAGE}
+
+      - name: Run MULLS
+        run: |
+          docker run \
+            -v "$(pwd)/demo_data":/mulls/demo_data \
+            --init \
+            -t ${DOCKER_IMAGE}
