@@ -3,7 +3,7 @@
 #                     MULLS pairwise point cloud registration                           #
 ############################# part to configure (down)###################################
 
-#data path (*.pcd, *.las, *.ply, *.txt, *.h5)
+#data path (*.pcd, *.las, *.ply, *.txt, *.h5, *.bin)
 tpc_path=xxxx/dummy_target_point_cloud.xxx
 spc_path=xxxx/dummy_source_point_cloud.xxx
 opc_path=xxxx/dummy_transformed_source_point_cloud.xxx
