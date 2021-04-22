@@ -136,6 +136,7 @@ bool MapManager::update_local_map(cloudblock_Ptr local_map, cloudblock_Ptr last_
               << local_map->pc_vertex->points.size() << "].";
 
     LOG(INFO) << "Update local map ([" << local_map->feature_point_num << "] points at present) done in [" << time_update_local_map.count() * 1000.0 << "] ms.\n";
+    return true;
 }
 
 //the map consturction and updateing strategy is now the most important part for our application

@@ -273,6 +273,7 @@ class DataIo : public CloudUtility<PointT>
         std::chrono::duration<double> time_used = std::chrono::duration_cast<std::chrono::duration<double>>(toc - tic);
 
         LOG(INFO) << "[" << pointCloud->points.size() << "] points exported in [" << time_used.count() * 1000 << "] ms";
+        return true;
     }
 
     bool read_pcd_file(const std::string &fileName, typename pcl::PointCloud<PointT>::Ptr &pointCloud)
@@ -310,7 +311,7 @@ class DataIo : public CloudUtility<PointT>
         return true;
     }
 
-    bool read_csv_file(const std::string &file_name, typename pcl::PointCloud<PointT>::Ptr &cloud)
+    void read_csv_file(const std::string &file_name, typename pcl::PointCloud<PointT>::Ptr &cloud)
     {
         std::ifstream fin(file_name); // Open the file
 
@@ -770,8 +771,9 @@ class DataIo : public CloudUtility<PointT>
         if (pcl::io::loadPLYFile<PointT>(fileName, *pointCloud) == -1) //* load the file
         {
             PCL_ERROR("Couldn't read file \n");
-            return (-1);
+            return false;
         }
+        return true;
     }
 
     bool write_ply_file(const std::string &fileName, const typename pcl::PointCloud<PointT>::Ptr &pointCloud)
@@ -783,8 +785,9 @@ class DataIo : public CloudUtility<PointT>
         if (pcl::io::savePLYFile<PointT>(fileName, *pointCloud) == -1) //* load the file
         {
             PCL_ERROR("Couldn't write file \n");
-            return (-1);
+            return false;
         }
+        return true;
     }
 
     bool read_txt_file(const std::string &fileName, const typename pcl::PointCloud<PointT>::Ptr &pointCloud)
@@ -1238,6 +1241,7 @@ class DataIo : public CloudUtility<PointT>
                 break;
         }
         LOG(INFO) << "A new file [" << output_file << "] would be generated and used later";
+        return true;
     }
 
     bool write_constraint_file(const std::string &con_output_file, constraint_t &con)

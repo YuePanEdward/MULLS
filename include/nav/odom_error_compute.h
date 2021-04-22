@@ -68,7 +68,7 @@ class OdomErrorCompute
         double b = pose_error(1, 1);
         double c = pose_error(2, 2);
         double d = 0.5 * (a + b + c - 1.0);
-        double rot_error_deg = std::acos(std::max(std::min(d, 1.0d), -1.0d));
+        double rot_error_deg = std::acos(std::max(std::min(d, 1.0), -1.0));
 
         return rot_error_deg;
     }

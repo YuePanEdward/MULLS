@@ -481,7 +481,7 @@ int main(int argc, char **argv)
                                                                   pgo_edges[current_edge_index].Trans1_2, FLAGS_reg_intersection_filter_on, false,
                                                                   FLAGS_normal_shooting_on, 1.5 * FLAGS_normal_bearing, true, true, FLAGS_post_sigma_thre); //use its information matrix for pgo
 
-                if (registration_status_map2map <= 0) //candidate wrong registration
+                if (registration_status_map2map <= 0 && FLAGS_real_time_viewer_on) //candidate wrong registration
                     mviewer.keep_visualize(reg_viewer);
                 else
                     LOG(INFO) << "map to map registration done\nsubmap [" << pgo_edges[current_edge_index].block1->id_in_strip << "] - [" << pgo_edges[current_edge_index].block2->id_in_strip << "]:\n"
@@ -647,7 +647,7 @@ int main(int argc, char **argv)
                                                                     motion_com_while_reg_on, FLAGS_normal_shooting_on, FLAGS_normal_bearing,
                                                                     false, false, FLAGS_post_sigma_thre);
 
-                if (registration_status_scan2scan < 0) //candidate wrong registration --> use baseline method instead to avoid the crash of the system
+                if (registration_status_scan2scan < 0 && FLAGS_real_time_viewer_on) //candidate wrong registration --> use baseline method instead to avoid the crash of the system
                 {
                     add_length = 0.8;
                     lo_status_healthy = false;
@@ -683,7 +683,7 @@ int main(int argc, char **argv)
                                                                    initial_guess_tran, FLAGS_reg_intersection_filter_on,
                                                                    motion_com_while_reg_on, FLAGS_normal_shooting_on, FLAGS_normal_bearing,
                                                                    false, false, FLAGS_post_sigma_thre);
-                if (registration_status_scan2map < 0) //candidate wrong registration
+                if (registration_status_scan2map < 0 && FLAGS_real_time_viewer_on) //candidate wrong registration
                 {
                     add_length = 1.0;
                     lo_status_healthy = false;
@@ -759,7 +759,8 @@ int main(int argc, char **argv)
         if (i == 1) //write out pose
         {
             dataio.write_lo_pose_overwrite(adjacent_pose_out, output_adjacent_lo_pose_file);
-            mviewer.is_seed_origin_ = false;
+            if (FLAGS_real_time_viewer_on)
+                mviewer.is_seed_origin_ = false;
         }
         else
             dataio.write_lo_pose_append(adjacent_pose_out, output_adjacent_lo_pose_file);
@@ -824,7 +825,9 @@ int main(int argc, char **argv)
     cblock_frames.push_back(current_cblock_frame);
     LOG(INFO) << "Lidar Odometry done. Average processing time per frame is ["
               << 1000.0 * time_count / frame_num << "] ms over [" << frame_num << "] frames\n";
-    mviewer.keep_visualize(map_viewer);
+    if (FLAGS_real_time_viewer_on) {
+        mviewer.keep_visualize(map_viewer);
+    }
 
     if (loop_closure_detection_on)
     {
@@ -947,10 +950,12 @@ int main(int argc, char **argv)
             cblock_submaps[i]->free_all();
         constraints().swap(pgo_edges);
     }
-    map_viewer->removeAllPointClouds(); //refresh the map
-    mviewer.update_lo_pose(poses_lo_lidar_cs, poses_gt_lidar_cs, map_viewer, display_time_ms);
-    mviewer.update_submap_node(cblock_submaps, map_viewer, display_time_ms);
-    mviewer.keep_visualize(map_viewer);
+    if (FLAGS_real_time_viewer_on) {
+        map_viewer->removeAllPointClouds(); // refresh the map
+        mviewer.update_lo_pose(poses_lo_lidar_cs, poses_gt_lidar_cs, map_viewer, display_time_ms);
+        mviewer.update_submap_node(cblock_submaps, map_viewer, display_time_ms);
+        mviewer.keep_visualize(map_viewer);
+    }
     if (FLAGS_write_out_map_on || FLAGS_write_out_gt_map_on) //export map point cloud //TODO: be careful of the memory problem here!!! //FIX memory leakage while outputing map point cloud
     {
         LOG(WARNING) << "Begin to output the generated map";
@@ -984,7 +989,9 @@ int main(int argc, char **argv)
                 }
                 pc_map_merged->points.insert(pc_map_merged->points.end(), cblock_frames[i]->pc_raw_w->points.begin(), cblock_frames[i]->pc_raw_w->points.end());
                 cfilter.random_downsample(cblock_frames[i]->pc_raw_w, 2);
-                mviewer.display_dense_map_realtime(cblock_frames[i], map_viewer, frame_num, display_time_ms);
+                if (FLAGS_real_time_viewer_on) {
+                    mviewer.display_dense_map_realtime(cblock_frames[i], map_viewer, frame_num, display_time_ms);
+                }
             }
             if (FLAGS_write_out_gt_map_on)
             {
@@ -1011,7 +1018,7 @@ int main(int argc, char **argv)
         {
             cv::Mat map_2d;
             map_2d = cfilter.generate_2d_map(pc_map_merged, 1, FLAGS_screen_width, FLAGS_screen_height, 20, 1000, -FLT_MAX, FLT_MAX, true);
-            if (FLAGS_show_bev_image)
+            if (FLAGS_show_bev_image && FLAGS_real_time_viewer_on)
                 mviewer.display_image(map_2d, "2D Map");
             std::string output_merged_map_image = output_pc_folder + "/" + "merged_map_2d.png";
             cv::imwrite(output_merged_map_image, map_2d);
@@ -1042,9 +1049,11 @@ int main(int argc, char **argv)
             ec.print_error(slam_errors, true);
         }
     }
-    map_viewer->removeAllShapes();
-    mviewer.keep_visualize(map_viewer);
-    return true;
+    if (FLAGS_real_time_viewer_on) {
+        map_viewer->removeAllShapes();
+        mviewer.keep_visualize(map_viewer);
+    }
+    return 0;
 }
 
 //TODO LIST (potential future work)

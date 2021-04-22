@@ -408,7 +408,7 @@ void MapViewer<PointT>::keep_visualize(boost::shared_ptr<pcl::visualization::PCL
 {
     is_paused_ = true;
     std::cout << "Press [space] to continue\n";
-    while (!viewer->wasStopped() && is_paused_)
+    while (viewer && !viewer->wasStopped() && is_paused_)
     {
         viewer->spinOnce(refreshing_time_ms_);
         boost::this_thread::sleep(boost::posix_time::microseconds(sleep_micro_second_));

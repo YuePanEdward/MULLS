@@ -1375,7 +1375,7 @@ class CFilter : public CloudUtility<PointT>
 		return ringID;
 	}
 
-	bool get_pc_ring_ids(typename pcl::PointCloud<PointT>::Ptr &cloud)
+	void get_pc_ring_ids(typename pcl::PointCloud<PointT>::Ptr &cloud)
 	{
 		for (int i = 0; i < cloud->points.size(); i++)
 		{
@@ -2409,10 +2409,11 @@ class CFilter : public CloudUtility<PointT>
 											in_block->pc_pillar_down->points.size(), in_block->pc_beam_down->points.size());
 
 		//pcl::PointCloud<PointT>().swap(*rotated_pc_down);
+    return true;
 	}
 
 	//hard-coded (not a good way) to adjust the parameters on fly
-	bool update_parameters_self_adaptive(int &gf_down_rate_ground, int &gf_downsample_rate_nonground,
+	void update_parameters_self_adaptive(int &gf_down_rate_ground, int &gf_downsample_rate_nonground,
 										 float &pca_neighbor_k,
 										 float &edge_thre, float &planar_thre,
 										 float &edge_thre_down, float &planar_thre_down,
@@ -2504,7 +2505,7 @@ class CFilter : public CloudUtility<PointT>
 
 	//Only works on Semantic KITTI dataset (Deprecated)
 	//http://semantic-kitti.org/dataset.html
-	bool filter_with_semantic_mask(cloudblock_Ptr in_block, const std::string mask_feature_type = "000000")
+	void filter_with_semantic_mask(cloudblock_Ptr in_block, const std::string mask_feature_type = "000000")
 	{
 		float labeled_radius = 45.0;
 

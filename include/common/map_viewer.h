@@ -25,6 +25,8 @@
 
 #include <glog/logging.h>
 
+#include <boost/thread/thread.hpp>
+
 #include "utility.hpp"
 
 namespace lo
@@ -160,7 +162,7 @@ class MapViewer
         show_feature_ = show_feature_or_not;
     }
 
-    bool judge_pause()
+    void judge_pause()
     {
         if (pause_at_loop_)
             is_paused_ = true;

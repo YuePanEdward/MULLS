@@ -682,7 +682,7 @@ struct imu_info_t
 	double bwz;
 	timeval time_stamp;
 
-	bool set_imu_info(double ax_i, double ay_i, double az_i,
+	void set_imu_info(double ax_i, double ay_i, double az_i,
 					  double wx_i, double wy_i, double wz_i,
 					  timeval time_stamp_i)
 	{
@@ -896,7 +896,7 @@ class CloudUtility
 		get_cloud_bbx(temp_cloud, bound);
 	}
 
-	bool get_ring_map(const typename pcl::PointCloud<PointT>::Ptr &cloud_in, ring_map_t &ring_map) //check it later
+	void get_ring_map(const typename pcl::PointCloud<PointT>::Ptr &cloud_in, ring_map_t &ring_map) //check it later
 	{
 		for (int i = 0; i < cloud_in->points.size(); i++)
 		{
