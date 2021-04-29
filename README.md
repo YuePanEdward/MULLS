@@ -4,7 +4,9 @@ This repository implements MULLS, an efficient, low-drift, and versatile LiDAR-o
 
 #### [[Demo Video](https://www.youtube.com/watch?v=85bGD55e3-0&feature=youtu.be)] [[Preprint Paper](https://arxiv.org/abs/2102.03771)] [[Project Wiki](https://github.com/YuePanEdward/MULLS/wiki)]
 
-**Version 1.1 (tested on Ubuntu 16.04 / 18.04)**
+**Version 1.1**
+
+*(tested on Ubuntu 16.04 / 18.04 / 20.04)*
 
 Codes are currently under refactoring for better readability and performance.
 
@@ -217,6 +219,8 @@ If you have any questions, please let me know:
 ### Acknowledgments
 
 We thank the authors of [TEASER](https://github.com/MIT-SPARK/TEASER-plusplus) and [NDT_OMP](https://github.com/koide3/ndt_omp) for making their work public.
+
+Thanks Martin Valgur @[valgur](https://github.com/valgur) for fixing the compatibility issues.
 
 ------
 

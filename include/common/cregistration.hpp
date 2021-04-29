@@ -404,115 +404,7 @@ class CRegistration : public CloudUtility<PointT>
 
 		return fitness_score;
 	}
-#if 0
-	bool find_putable_feature_correspondence_bsc(const doubleVectorSBF &target_bscs, const doubleVectorSBF &source_bscs, int dof,
-												 const typename pcl::PointCloud<PointT>::Ptr &target_kpts, const typename pcl::PointCloud<PointT>::Ptr &source_kpts,
-												 typename pcl::PointCloud<PointT>::Ptr &target_corrs, typename pcl::PointCloud<PointT>::Ptr &source_corrs,
-												 int corr_num)
-	{
-		//reference: A novel binary shape context for 3D local surface description , ISPRS Journal 2017, Zhen Dong et al.
-		LOG(INFO) << "[" << target_bscs[0].size() << "] bsc features in target point cloud and [" << source_bscs[0].size() << "] bsc features in source point cloud.";
-
-		std::chrono::steady_clock::time_point tic = std::chrono::steady_clock::now();
-
-		std::vector<std::vector<int>> dist_table(target_bscs[0].size());
-		for (int i = 0; i < target_bscs[0].size(); i++)
-			dist_table[i].resize(source_bscs[0].size());
-
-		StereoBinaryFeature sbf_operator;
-
-		int num_bsc;
-		if (dof < 4)
-			num_bsc = 1;
-		else if (dof == 4)
-			num_bsc = 2;
-		else
-			num_bsc = 4;
-
-		int i;
-#pragma omp parallel for private(i) //Multi-thread
-		for (i = 0; i < target_bscs[0].size(); i++)
-		{
-			for (int j = 0; j < source_bscs[0].size(); j++)
-			{
-				if (target_bscs[0][i].keypointIndex_ == -1 || source_bscs[0][j].keypointIndex_ == -1)
-					dist_table[i][j] = 99999;
-				else
-				{
-					int min_dist_index = 0;
-					int min_dist = 99999;
-					for (int k = 0; k < num_bsc; k++)
-					{
-						int dist_temp = sbf_operator.hammingDistance(target_bscs[0][i], source_bscs[k][j]);
-						//LOG(INFO) << "hamming distance:" << dist_temp;
-						if (dist_temp < min_dist)
-						{
-							min_dist = dist_temp;
-							min_dist_index = k;
-						}
-					}
-					dist_table[i][j] = min_dist;
-				}
-			}
-		}
-		std::vector<std::pair<int, int>> dist_array;
-
-		for (int i = 0; i < target_bscs[0].size(); i++)
-		{
-			for (int j = 0; j < source_bscs[0].size(); j++)
-			{
-				std::pair<int, int> temp_pair;
-				temp_pair.first = i * source_bscs[0].size() + j;
-				temp_pair.second = dist_table[i][j];
-				dist_array.push_back(temp_pair);
-			}
-		}
-
-		std::sort(dist_array.begin(), dist_array.end(), [](const std::pair<int, int> &a, const std::pair<int, int> &b) { return a.second < b.second; });
-
-		corr_num = min_(corr_num, dist_array.size());
-
-		for (int k = 0; k < corr_num; k++)
-		{
-			int index = dist_array[k].first;
-			int i = index / source_bscs[0].size();
-			int j = index % source_bscs[0].size();
-
-			target_corrs->points.push_back(target_kpts->points[i]);
-			source_corrs->points.push_back(source_kpts->points[j]);
-		}
-
-		//find correspondence
-		// for (int i = 0; i < target_bscs[0].size(); i++)
-		// {
-		// 	if (target_bscs[0][i].keypointIndex_ == -1)
-		// 	{
-		// 		//LOG(WARNING) << "not an correct index";
-		// 		continue;
-		// 	}
-
-		// 	for (int j = 0; j < source_bscs[0].size(); j++)
-		// 	{
-		// 		if (dist_table[i][j] < max_hamming_dist)
-		// 		{
-		// 			target_corrs->points.push_back(target_kpts->points[i]);
-		// 			source_corrs->points.push_back(source_kpts->points[j]);
-		// 		}
-		// 	}
-		// }
-
-		std::vector<std::vector<int>>().swap(dist_table);
-		std::vector<std::pair<int, int>>().swap(dist_array);
-
-		std::chrono::steady_clock::time_point toc = std::chrono::steady_clock::now();
-		std::chrono::duration<double> time_used = std::chrono::duration_cast<std::chrono::duration<double>>(toc - tic);
-
-		LOG(INFO) << "[" << source_corrs->points.size() << "] correspondences found by BSC feature matching in [" << time_used.count() * 1000.0 << "] ms";
-
-		return true;
-	}
-#endif
-
+  
 	//NCC: neighborhood category context descriptor
 	bool find_feature_correspondence_ncc(const typename pcl::PointCloud<PointT>::Ptr &target_kpts, const typename pcl::PointCloud<PointT>::Ptr &source_kpts,
 										 typename pcl::PointCloud<PointT>::Ptr &target_corrs, typename pcl::PointCloud<PointT>::Ptr &source_corrs,
@@ -601,10 +493,8 @@ class CRegistration : public CloudUtility<PointT>
 			dist_table[i].resize(source_kpts_num);
 
 		std::vector<std::pair<int, float>> dist_array;
-        
-
-        //TODO: speed up
-		omp_set_num_threads(min_(6, omp_get_max_threads()));
+    
+		omp_set_num_threads(min_(6, omp_get_max_threads())); //TODO: speed up
 #pragma omp parallel for  //Multi-thread
 		for (int i = 0; i < target_kpts_num; i++)
 		{
@@ -1255,7 +1145,7 @@ class CRegistration : public CloudUtility<PointT>
 		Eigen::Matrix4d inv_init_guess_mat;
 		Matrix6d cofactor_matrix;
 		Matrix6d information_matrix;
-		double sigma_square_post;
+		double sigma_square_post=1.0;
 		Eigen::Matrix4d TempTran = Eigen::Matrix4d::Identity();
 		Vector6d transform_x;
 
@@ -1514,7 +1404,7 @@ class CRegistration : public CloudUtility<PointT>
 
 		registration_cons.Trans1_2 = initial_guess;
 #if 0
-			//deprecated, only consider this when you are deal with the point cloud in world coordinate system such as WGS84
+			//deprecated, only consider this when you are deal with the point cloud in world (geodetic) coordinate system such as WGS84 for geomatics applications
 			//Now the registration transformation is in the local shifted coordinate system, not in the global-shifted map coordinate system
 			//the transaltion would change
 			//R21m=R21l, t21m=(R21l-I)*tlm+t21l

@@ -20,7 +20,7 @@
 using namespace lo;
 //static void CheckCudaErrorAux(const char *, unsigned, const char *, cudaError_t);
 //#define CUDA_CHECK(value) CheckCudaErrorAux(__FILE__, __LINE__, #value, value)
-//Parameter Lists: //TODO: delete those deprecated parameters (most of the parameters listed below can be used as default in practice)
+//Parameter Lists: //TODO: delete those deprecated parameters (most of the parameters listed below can be used as default in practice, you may just fix them)
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------
 //GFLAG Template: DEFINE_TYPE(Flag_variable_name, default_value, "Comments")
 //data path
@@ -264,7 +264,7 @@ int main(int argc, char **argv)
     bool loop_closure_detection_on = FLAGS_loop_closure_detection_on;
 
     DataIo<Point_T> dataio;
-    MapViewer<Point_T> mviewer(0.0, 1, 0, 0, 0, FLAGS_vis_intensity_scale, FLAGS_vis_initial_color_type, FLAGS_laser_vis_size); //downsampling ratio
+    MapViewer<Point_T> mviewer(0.0, 1, 0, 1, 0, FLAGS_vis_intensity_scale, FLAGS_vis_initial_color_type, FLAGS_laser_vis_size); //downsampling ratio //N.B. default: map_viewer on, feature_viewer on, or the others off for the initialization
     CFilter<Point_T> cfilter;
     CRegistration<Point_T> creg;
     MapManager mmanager;
