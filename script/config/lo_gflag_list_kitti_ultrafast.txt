@@ -26,7 +26,7 @@
 --gf_nonground_down_rate=3
 --gf_grid_min_pt_num=6
 --intensity_thre_nonground=120.0
---unground_down_fixed_num=12000
+--unground_down_fixed_num=10000
 --ground_down_fixed_num=500
 --pillar_down_fixed_num=200
 --facade_down_fixed_num=800
@@ -47,9 +47,9 @@
 --pt2li_res_window=0.05
 --converge_tran=0.001
 --converge_rot_d=0.01
---reg_max_iter_num_s2s=3
---reg_max_iter_num_s2m=3
---reg_max_iter_num_m2m=3
+--reg_max_iter_num_s2s=5
+--reg_max_iter_num_s2m=5
+--reg_max_iter_num_m2m=5
 --local_map_radius=70
 --local_map_max_pt_num=15000
 --local_map_max_vertex_pt_num=2000

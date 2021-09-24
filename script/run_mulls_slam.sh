@@ -8,7 +8,7 @@ sequence_id=00
 exp_id=xxx_id
 
 #data path (base folder)
-diskbase=dummyfolder/dummysubfolder
+diskbase=/media/yuepan/BackupPlus/Data/
 
 #data path (project folder)
 #Example demo
@@ -50,6 +50,7 @@ calib_file=${project_folder}/calib.txt
 config_file=./script/config/lo_gflag_list_example_demo.txt
 #config_file=./script/config/lo_gflag_list_kitti_urban.txt
 #config_file=./script/config/lo_gflag_list_kitti_highway.txt
+#config_file=./script/config/lo_gflag_list_kitti_ultrafast.txt
 
 #input the frame you'd like to use
 frame_begin=0
@@ -106,7 +107,7 @@ ls ${pc_folder} >> ${pc_folder}_filelist.txt
 --real_time_viewer_on=1 \
 --gt_in_lidar_frame=0 \
 --gt_oxts_format=0 \
---write_out_map_on=1 \
+--write_out_map_on=0 \
 --write_out_gt_map_on=0 \
 --write_map_each_frame=0
 
@@ -122,7 +123,7 @@ evaluation_file=${project_folder}/result/Rt_lo_${exp_id}_evaluation.txt
 #simple evaluation using kitti_eval
 #python ./python/kitti_eval.py ${lo_body_pose_file} ${gt_body_pose_file} ${lo_adjacent_tran_file} ${calib_file} ${timing_report_file} ${evaluation_file}
 
-# cat ${config_file} >> ${evaluation_file}
+#cat ${config_file} >> ${evaluation_file}
 
 # results (figures, table) would be output in the ./results folder
 
