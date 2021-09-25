@@ -20,13 +20,13 @@ sudo apt-get install -y cmake cmake-curses-gui
 
 sudo apt-get install -y protobuf-compiler libprotobuf-dev libgoogle-glog-dev libgflags-dev
 
-# function checkinstall-auto {
-#   name=$1
-#   version=$2
-#   shift 2
-#   checkinstall -y --install=no --fstrans=yes --nodoc --exclude=/home --pkgname="$name" --pkgversion="$version" "$@"
-#   sudo apt install -y ./"$name"_*.deb
-# }
+function checkinstall-auto {
+  name=$1
+  version=$2
+  shift 2
+  checkinstall -y --install=no --fstrans=yes --nodoc --exclude=/home --pkgname="$name" --pkgversion="$version" "$@"
+  sudo apt install -y ./"$name"_*.deb
+}
 
 echo "install [eigen] 3"
 sudo apt-get install -y libeigen3-dev
