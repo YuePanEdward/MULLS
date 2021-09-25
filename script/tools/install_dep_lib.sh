@@ -70,7 +70,7 @@ git clone -b 2.0.0 --depth 1 https://github.com/ceres-solver/ceres-solver.git
   cd build
   cmake .. -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DBUILD_BENCHMARKS=OFF
   make -j $NPROC
-  # sudo make install
+  #sudo make install
   checkinstall-auto libceres-dev 2.0.0
 )
 [ -z "$KEEP" ] && rm -rf ceres-solver
@@ -100,27 +100,28 @@ git clone --depth 1 https://github.com/strasdat/Sophus.git
   cd build
   cmake .. -DBUILD_TESTS=OFF -DBUILD_EXAMPLES=OFF
   make -j $NPROC
-  # sudo make install
+  #sudo make install
   checkinstall-auto libsophus-dev 0.0.0
 )
 [ -z "$KEEP" ] && rm -rf Sophus
 echo "install [sophus] done"
 
-# echo "install [libLAS]"
-# echo "install libLAS dependent libs: geotiff"
-# sudo apt-get install -y libgeotiff-dev
-# #clone LibLAS to local
-# git clone --depth 1 https://github.com/libLAS/libLAS.git
-# (
-#   cd libLAS
-#   mkdir build
-#   cd build
-#   cmake .. -DWITH_TESTS=OFF
-#   make -j $NPROC
-#   checkinstall-auto liblas-dev 0.0.0
-# )
-# [ -z "$KEEP" ] && rm -rf libLAS
-# echo "install [libLAS] done"
+echo "install [libLAS]"
+echo "install libLAS dependent libs: geotiff"
+sudo apt-get install -y libgeotiff-dev
+#clone LibLAS to local
+git clone --depth 1 https://github.com/libLAS/libLAS.git
+(
+  cd libLAS
+  mkdir build
+  cd build
+  cmake .. -DWITH_TESTS=OFF
+  make -j $NPROC
+  #sudo make install
+  checkinstall-auto liblas-dev 0.0.0
+)
+[ -z "$KEEP" ] && rm -rf libLAS
+echo "install [libLAS] done"
 
 echo "install [TEASER++]"
 echo "Cmake version >= 3.10 required"
@@ -131,7 +132,7 @@ git clone --depth 1 https://github.com/MIT-SPARK/TEASER-plusplus.git
   cd build
   cmake .. -DBUILD_TESTS=OFF
   make -j $NPROC
-  # sudo make install
+  #sudo make install
   checkinstall-auto libteaser-dev 0.0.0
   sudo ldconfig
 )
@@ -143,9 +144,9 @@ echo "install OpenCV dependent libs"
 sudo apt-get install -y libopencv-dev
 echo "install [OpenCV] done"
 
-# echo "install [HDF] 5"
-# sudo apt-get install -y libhdf5-serial-dev libopenmpi-dev openmpi-bin libhdf5-openmpi-dev
-# echo "install [HDF] done"
+echo "install [HDF] 5"
+sudo apt-get install -y libhdf5-serial-dev libopenmpi-dev openmpi-bin libhdf5-openmpi-dev
+echo "install [HDF] done"
 
 # echo "Optional: install [ros] kinetic"
 # echo "Make sure your os is ubuntu 16.04. or you should install other distribution of ros"
@@ -165,12 +166,12 @@ echo "Finished"
 
 cd ..
 
-# echo "For the python toolboxes of the project"
-# echo "install python dependence"
-# python3 -m pip install --upgrade -r ./python/requirements.txt
-# echo "install python dependence done"
+echo "For the python toolboxes of the project"
+echo "install python dependence"
+python3 -m pip install --upgrade -r ./python/requirements.txt
+echo "install python dependence done"
 
 # you might then delete the dependent_libs folder
 [ -z "$KEEP" ] && rm -rf ./dependent_libs
 
-# test pass on Ubuntu 16.04
+# test pass on Ubuntu 16.04, 18.04, 20.04
