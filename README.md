@@ -42,7 +42,7 @@ Compulsory:
 - [PCL(>=1.7)](https://github.com/PointCloudLibrary/pcl)
 - [Glog](https://github.com/google/glog)
 - [Gflags](https://github.com/gflags/gflags)
-- [Eigen 3](https://eigen.tuxfamily.org/dox/)
+- [Eigen(>=3.3.1)](https://eigen.tuxfamily.org/dox/)
 
 Optional:
 
@@ -236,7 +236,7 @@ Thanks Martin Valgur @[valgur](https://github.com/valgur) for fixing the compati
 - [ ] Add cross-platform support (run on windows)
 - [ ] Add sensor fusion module
 - [ ] Add localization module with built map
-
+- [ ] Add dense mapping (reconstruction) module
 -----
 
 
