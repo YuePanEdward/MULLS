@@ -20,6 +20,8 @@
 
 [New College Dataset](https://ori.ox.ac.uk/older-projects/new-college-dataset/)
 
+[HILTI SLAM Challenge dataset](https://hilti-challenge.com/dataset.html)
+
 ### 32-line mechanical LiDAR
 
 [UrbanLoco](https://advdataset2019.wixsite.com/urbanloco)

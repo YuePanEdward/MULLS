@@ -70,7 +70,6 @@ git clone -b 2.0.0 --depth 1 https://github.com/ceres-solver/ceres-solver.git
   cd build
   cmake .. -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DBUILD_BENCHMARKS=OFF
   make -j $NPROC
-  #sudo make install
   checkinstall-auto libceres-dev 2.0.0
 )
 [ -z "$KEEP" ] && rm -rf ceres-solver
@@ -100,7 +99,6 @@ git clone --depth 1 https://github.com/strasdat/Sophus.git
   cd build
   cmake .. -DBUILD_TESTS=OFF -DBUILD_EXAMPLES=OFF
   make -j $NPROC
-  #sudo make install
   checkinstall-auto libsophus-dev 0.0.0
 )
 [ -z "$KEEP" ] && rm -rf Sophus
@@ -117,7 +115,6 @@ git clone --depth 1 https://github.com/libLAS/libLAS.git
   cd build
   cmake .. -DWITH_TESTS=OFF
   make -j $NPROC
-  #sudo make install
   checkinstall-auto liblas-dev 0.0.0
 )
 [ -z "$KEEP" ] && rm -rf libLAS
@@ -132,7 +129,6 @@ git clone --depth 1 https://github.com/MIT-SPARK/TEASER-plusplus.git
   cd build
   cmake .. -DBUILD_TESTS=OFF
   make -j $NPROC
-  #sudo make install
   checkinstall-auto libteaser-dev 0.0.0
   sudo ldconfig
 )
@@ -174,4 +170,4 @@ echo "install python dependence done"
 # you might then delete the dependent_libs folder
 [ -z "$KEEP" ] && rm -rf ./dependent_libs
 
-# test pass on Ubuntu 16.04, 18.04, 20.04
+# test pass on Ubuntu 16.04
