@@ -58,7 +58,7 @@ Optional:
 
 You may run the following shell file to install all the dependent libs (tested on Ubuntu 16.04):
 ```
-sh script/tools/install_dep_lib.sh
+bash script/tools/install_dep_lib.sh
 ```
 
 Note: ceres, g2o and gtsam are all used for pose graph optimization. You only need to install one of them (ceres is recommended).
